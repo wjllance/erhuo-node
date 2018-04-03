@@ -40,6 +40,15 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+// 我的发布
+router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
+    let goods = await Goods.find({userID: ctx.state.user._id}).populate('gpics');
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.outputify(goods)
+    }
+});
+
 // 收藏
 router.post('/users/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
