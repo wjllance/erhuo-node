@@ -45,3 +45,11 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
         success: 1
     };
 });
+
+router.get('/goods/detail/:id', async (ctx, next) => {
+    let goods = await Goods.findOne({"_id":ctx.params.id});
+    ctx.body = {
+        success: 1,
+        data: goods
+    };
+});
