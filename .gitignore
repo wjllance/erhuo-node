@@ -1,0 +1,6 @@
+node_modules
+config.yml
+db
+public
+.idea/
+venv

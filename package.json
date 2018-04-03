@@ -1,0 +1,39 @@
+{
+  "name": "downstairs-second-hand",
+  "version": "0.1.0",
+  "private": true,
+  "description": "* node >= 7.9.0\r * mongo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y-wan/downstairs-second-hand.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/y-wan/downstairs-second-hand/issues"
+  },
+  "homepage": "https://github.com/y-wan/downstairs-second-hand#readme",
+  "dependencies": {
+    "js-yaml": "^3.11.0",
+    "koa": "^2.5.0",
+    "koa-better-body": "^3.0.4",
+    "koa-bodyparser": "^4.2.0",
+    "koa-logger": "^3.2.0",
+    "koa-mount": "^3.0.0",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.8.1",
+    "koa-static": "^4.0.2",
+    "lodash": "^4.17.5",
+    "log": "^1.4.0",
+    "moment": "^2.21.0",
+    "mongoose": "^5.0.12",
+    "mz": "^2.7.0",
+    "should": "^13.2.1",
+    "superagent": "^3.8.2",
+    "utility": "^1.13.1"
+  }
+}
