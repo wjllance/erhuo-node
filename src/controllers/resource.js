@@ -25,6 +25,6 @@ router.post('/images/upload', auth.loginRequired, body, async (ctx, next) => {
 
     ctx.body = {
         success: 1,
-        image_id: image._id.toString()
+        data: image._id.toString()
     };
 });

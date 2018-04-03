@@ -18,11 +18,7 @@ router.get('/goods/index', async (ctx, next) => {
     let goods = await Goods.find().sort('-_id').limit(6).populate('gpics');
     ctx.body = {
         success: 1,
-        goods: goods.map(x => {
-            let g = _.pick(x, ['gname', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
-            g.gpics = x.gpics.map(y => y.url());
-            return g;
-        })
+        data: goods.map(x => x.toOBJ())
     }
 });
 
@@ -38,18 +34,20 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
     await goods.save();
 
     ctx.body = {
-        success: 1
+        success: 1,
+        data: goods._id.toString()
     };
 });
 
 router.get('/goods/detail/:id', async (ctx, next) => {
-    let goods = await Goods.findOne({"_id":ctx.params.id});
+    let goods = await Goods.findById(ctx.params.id).populate('gpics');
+    auth.assert(goods, '商品不存在');
     ctx.body = {
         success: 1,
-        data: goods
+        data: goods.toOBJ()
     };
 });

@@ -64,7 +64,7 @@ exports.login = async function(ctx, code) {
     });
     let data = JSON.parse(text);
 
-    let user = await User.findOneAndUpdate({openid: data.openid}, data, {upsert: true});
+    let user = await User.findOneAndUpdate({openid: data.openid}, data, {new: true, upsert: true});
     ctx.session.user_id = user._id;
 }
 

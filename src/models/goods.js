@@ -12,6 +12,7 @@ let goodsSchema = new mongoose.Schema({
 	},
 
 	gname: String,
+	gsummary: String,
 	glabel: String,
 	gprice: Number,
 	gpics: [{
@@ -25,5 +26,11 @@ let goodsSchema = new mongoose.Schema({
 
 	created_date: { type: Date, default: Date.now },
 });
+
+goodsSchema.methods.toOBJ = function() {
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+	g.gpics = this.gpics.map(y => y.url());
+	return g;
+}
 
 module.exports = mongoose.model("Goods", goodsSchema);

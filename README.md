@@ -1,4 +1,22 @@
 
+正确返回的统一格式：
+
+```json
+{
+    "success" : 1,
+    "data" : any // the data
+}
+```
+
+错误返回的统一格式：
+
+```json
+{
+    "err" : 1,
+    "msg" : string
+}
+```
+
 # 依赖
 
 * node >= 7.9.0
