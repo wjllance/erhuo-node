@@ -23,6 +23,15 @@ let userSchema = new mongoose.Schema({
 	country: String,
 	language: String,
 
+	// 收藏
+	collections: {
+		type: [{
+			type : mongoose.Schema.ObjectId,
+			ref : 'Goods',
+		}],
+		default: []
+	},
+
 	created_date: { type: Date, default: Date.now },
 });
 

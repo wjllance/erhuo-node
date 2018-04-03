@@ -8,7 +8,9 @@ let _ = require('lodash');
 
 let config = require('../config');
 let auth = require('../services/auth');
+let srv_goods = require('../services/goods');
 let { User } = require('../models');
+let { Goods } = require('../models');
 
 const router = module.exports = new Router();
 
@@ -20,7 +22,7 @@ router.post('/user/login', async (ctx, next) => {
     };
 });
 
-// 修改资料
+// 更新基本资料（来自微信）
 router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     auth.assert(ctx.request.body.signature == utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
 
@@ -36,4 +38,39 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     ctx.body = {
         success: 1
     };
+});
+
+// 收藏
+router.post('/users/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let user = ctx.state.user;
+    let goods = await Goods.findById(ctx.params.goods_id);
+    auth.assert(goods, '商品不存在');
+    auth.assert(!_.some(user.collections, x => goods._id.equals(x)), '已经收藏');
+    user.collections.push(goods._id);
+    await user.save();
+    ctx.body = {
+        success: 1,
+    }
+});
+
+// 取消收藏
+router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let user = ctx.state.user;
+    let goods = await Goods.findById(ctx.params.goods_id);
+    auth.assert(goods, '商品不存在');
+    auth.assert(_.some(user.collections, x => goods._id.equals(x)), '已经收藏');
+    user.collections = user.collections.filter(x => !goods._id.equals(x));
+    await user.save();
+    ctx.body = {
+        success: 1,
+    }
+});
+
+// 所有收藏
+router.get('/users/collections', auth.loginRequired, async (ctx, next) => {
+    let collections = await Goods.find({_id: ctx.state.user.collections}).populate('gpics');
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.outputify(collections, ctx.state.user)
+    }
 });

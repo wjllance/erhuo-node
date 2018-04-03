@@ -9,6 +9,7 @@ let body = require('koa-convert')(require('koa-better-body')());
 
 let config = require('../config');
 let auth = require('../services/auth');
+let srv_goods = require('../services/goods');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
@@ -18,7 +19,7 @@ router.get('/goods/index', async (ctx, next) => {
     let goods = await Goods.find().sort('-_id').limit(6).populate('gpics');
     ctx.body = {
         success: 1,
-        data: goods.map(x => x.toOBJ())
+        data: await srv_goods.outputify(goods, ctx.state.user)
     }
 });
 
@@ -43,11 +44,11 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-router.get('/goods/detail/:id', async (ctx, next) => {
-    let goods = await Goods.findById(ctx.params.id).populate('gpics');
+router.get('/goods/detail/:goods_id', async (ctx, next) => {
+    let goods = await Goods.findById(ctx.params.goods_id).populate('gpics');
     auth.assert(goods, '商品不存在');
     ctx.body = {
         success: 1,
-        data: goods.toOBJ()
+        data: await srv_goods.outputify(goods, ctx.state.user)
     };
 });
