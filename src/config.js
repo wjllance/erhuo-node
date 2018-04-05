@@ -21,6 +21,7 @@ if ('MONGO_HOST' in process.env) { // for docker
 
 exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
+exports.ENV = config['ENV'];
 
 let PUBLIC = exports.PUBLIC = {
     root: path.join(__dirname, '..', config['PUBLIC']),

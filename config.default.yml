@@ -9,6 +9,7 @@ MONGODB: # mongodb配置
   HOSTNAME: 127.0.0.1
   DATABASE: c2c_test
 
+ENV: local
 APP_ID: xxxxxx
 APP_SECRET: xxxxxxxxxx
 

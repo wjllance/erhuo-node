@@ -12,6 +12,8 @@ let Image = exports.Image = require('./image');
 
 let Goods = exports.Goods = require('./goods');
 
+let Comment = exports.Comment = require('./comment');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {

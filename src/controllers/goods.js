@@ -44,9 +44,27 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+
+
 router.get('/goods/detail/:goods_id', async (ctx, next) => {
-    let goods = await Goods.findById(ctx.params.goods_id).populate('gpics');
+    let goods = await srv_goods.getDetailById(ctx.params.goods_id);
+
     auth.assert(goods, '商品不存在');
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.outputify(goods, ctx.state.user)
+    };
+});
+
+router.post('/goods/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let goods = await srv_goods.getBaseById(ctx.params.goods_id);
+    auth.assert(goods, '商品不存在');
+    let cmt_str = ctx.request.body.comment;
+    auth.assert(cmt_str, '评论不能为空');
+    let toId = ctx.request.body.to;
+    console.log(toId);
+    await srv_goods.postComment(goods, ctx.state.user, cmt_str, toId);
+    goods = await srv_goods.getDetailById(ctx.params.goods_id);
     ctx.body = {
         success: 1,
         data: await srv_goods.outputify(goods, ctx.state.user)
