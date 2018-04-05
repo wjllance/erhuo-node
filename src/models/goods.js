@@ -24,6 +24,23 @@ let goodsSchema = new mongoose.Schema({
 	gcost: Number,
 	gcity: String,
 
+	comments: [{
+	    content: String,
+        fromId: {
+            type:  mongoose.Schema.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        toId: {
+            type:  mongoose.Schema.ObjectId,
+            ref: 'User'
+        },
+        date: {
+	        type: Date,
+            default: Date.now()
+        }
+    }],
+
 	created_date: { type: Date, default: Date.now },
 });
 

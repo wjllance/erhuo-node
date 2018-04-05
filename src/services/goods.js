@@ -25,3 +25,17 @@ let outputify = exports.outputify = async function(goods, user) {
         return ugoods;
     }
 }
+
+let postComment = exports.postComment = async function(goods, user, cmt, toUserId){
+    let new_comment = {
+        content: cmt,
+        fromId: user._id,
+    };
+    if(arguments[3])
+    {
+        new_comment.toId = toUserId;
+    }
+    goods.comments.append(new_comment);
+    goods.save();
+    return goods;
+};
