@@ -31,12 +31,6 @@ let goodsSchema = new mongoose.Schema({
 goodsSchema.methods.toOBJ = function() {
 	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
     g.gpics = this.gpics.map(y => y.url());
-	g.comments = this.comments.map(y => {
-		if(typeof(y.getUser) == 'function'){
-            return y.getUser();
-        }else
-			return y;
-    });
 	return g;
 };
 
