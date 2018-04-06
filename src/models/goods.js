@@ -25,6 +25,7 @@ let goodsSchema = new mongoose.Schema({
 	gcity: String,
 
 	created_date: { type: Date, default: Date.now },
+    removed_date: { type: Date, default: null},
 });
 
 
