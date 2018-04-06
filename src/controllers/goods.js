@@ -32,7 +32,7 @@ router.get('/goods/index', async (ctx, next) => {
         data: {
             goods: await srv_goods.outputify(goods, ctx.state.user),
             hasMore:hasMore,
-            totle:totle
+            total:totle
         }
     }
 });
