@@ -58,6 +58,21 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 });
 
 
+// 下架
+// 参数：gid
+router.post('/goods/removed', auth.loginRequired, async (ctx, next) => {
+    let myGood = await Goods.findOne({_id: ctx.request.body.gid});
+    auth.assert(myGood, '商品不存在');
+    auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
+    _.assign(myGood, {'removed_date':Date.now()});
+    console.log(myGood);
+    await myGood.save();
+    ctx.body = {
+        success: 1,
+        data: myGood._id.toString()
+    };
+});
+
 router.get('/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
