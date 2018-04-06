@@ -36,5 +36,15 @@
     "should": "^13.2.1",
     "superagent": "^3.8.2",
     "utility": "^1.13.1"
+  },
+
+  "apidoc":{
+    "name": "erhuotwo",
+    "version": "0.1.0",
+    "description": "二货兔C2C后端",
+    "apidoc": {
+      "title": "二货兔API",
+      "url" : "https://two.jicunbao.com/"
+    }
   }
 }

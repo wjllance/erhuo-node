@@ -15,6 +15,19 @@ let { User, Image, Goods } = require('../models');
 const router = module.exports = new Router();
 
 
+/**
+ * @api {post} /comment/:goods_id  商品评论
+ * @apiName     CommentPost
+ * @apiGroup    Comment
+ *
+ *
+ * @apiParam    {String}    comment     评论内容
+ * @apiParam    {String}    [to]          被回复人ID
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        商品详情
+ *
+ */
 router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
     let goods = await srv_goods.getBaseById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
@@ -30,10 +43,4 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-router.get('/comment/me', auth.loginRequired, async (ctx, next) => {
-    let comments = await srv_comment.myCommentList(ctx.state.user._id);
-    ctx.body = {
-        success: 1,
-        data: comments
-    };
-});
+

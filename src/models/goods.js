@@ -30,7 +30,7 @@ let goodsSchema = new mongoose.Schema({
 
 
 goodsSchema.methods.toOBJ = function() {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'removed_date']);
     g.gpics = this.gpics.map(y => y.url());
 	return g;
 };
