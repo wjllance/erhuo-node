@@ -29,3 +29,11 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
         data: goods
     };
 });
+
+router.get('/comment/me', auth.loginRequired, async (ctx, next) => {
+    let comments = await srv_comment.myCommentList(ctx.state.user._id);
+    ctx.body = {
+        success: 1,
+        data: comments
+    };
+});
