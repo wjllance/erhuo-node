@@ -29,9 +29,11 @@ router.get('/goods/index', async (ctx, next) => {
     ctx.response.type = 'application/json';
     ctx.body = {
         success: 1,
-        data: await srv_goods.outputify(goods, ctx.state.user),
-        hasMore:hasMore,
-        totle:totle
+        data: {
+            goods: await srv_goods.outputify(goods, ctx.state.user),
+            hasMore:hasMore,
+            totle:totle
+        }
     }
 });
 
