@@ -9,6 +9,7 @@ let _ = require('lodash');
 let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
+let srv_comment = require('../services/comment');
 let { User } = require('../models');
 let { Goods } = require('../models');
 
@@ -78,6 +79,16 @@ router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) 
 // 所有收藏
 router.get('/users/collections', auth.loginRequired, async (ctx, next) => {
     let collections = await Goods.find({_id: ctx.state.user.collections}).populate('gpics');
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.outputify(collections, ctx.state.user)
+    }
+});
+
+// 我的留言
+router.get('/users/my_comments', auth.loginRequired, async (ctx, next) => {
+    let my_comments = await srv_comment.getMyComments(ctx.state.user._id);
+
     ctx.body = {
         success: 1,
         data: await srv_goods.outputify(collections, ctx.state.user)
