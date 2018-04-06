@@ -5,6 +5,8 @@ let { User  } = require('../models');
 let { Comment } = require('../models');
 let { Goods } = require('../models');
 
+
+
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
@@ -43,21 +45,34 @@ exports.postComment = async function(goods, user, cmt, toUserId){
 };
 
 // 获取商品详情
-let getDetailById = exports.getDetailById = async function(goods_id) {
+let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
 
-    return Goods
+    let goods = await Goods
         .findById(goods_id)
-        .populate({
-            path: 'comments',
-            populate: {
-                path: 'fromId toId',
-            }
-        })
         .populate('gpics');
-}
+    if(!goods)
+        return goods;
+    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+    g.gpics = goods.gpics.map(y => y.url());
+
+    let comments = await Comment
+            .find({goodsId:goods_id})
+            .populate(['fromId','toId']);
+    g.comments = comments.map(y => y.getUser());
+
+    if(arguments[1])
+    {
+        _.assign(g, await injectGoods(g, userInfo));
+    }
+    return g;
+};
 
 // 获取商品详情
 let getBaseById = exports.getBaseById = async function(goods_id) {
-
     return Goods.findById(goods_id);
+}
+
+let getCardInfoById = exports.getBaseById = async function(goods_id) {
+    return Goods.findById(goods_id)
+        .populate('gpics');
 }

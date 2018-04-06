@@ -15,8 +15,29 @@ let commentSchema = new mongoose.Schema({
         type:  mongoose.Schema.ObjectId,
         ref: 'User'
     },
+    goodsId: {
+        type:  mongoose.Schema.ObjectId,
+        ref: 'Goods'
+    },
     created_date: { type: Date, default: Date.now },
 });
+
+
+commentSchema.methods.getUser = function() {
+    ret = {
+        content: this.content,
+        fromId: this.fromId._id,
+        fromName: this.fromId.nickName,
+        fromAvatar: this.fromId.avatarUrl,
+        created_date: this.created_date
+    };
+    if(this.toId != null)
+    {
+        ret.toId = this.toId._id;
+        ret.toName = this.toId.nickName;
+    }
+    return ret;
+}
 
 
 module.exports = mongoose.model("Comment", commentSchema);
