@@ -1,0 +1,16 @@
+SERVER:
+  ADDRESS: 127.0.0.1
+  PORT: 8000
+  URL_PREFIX: http://localhost:8000 # 地址前缀，不以/结尾
+  SECRET_KEYS: 'this is secret key' # 加密session用的key
+  MAXAGE: 0 # 静态资源缓存时间,单位ms,推荐在正式服务器上启用
+
+MONGODB: # mongodb配置
+  HOSTNAME: 39.106.112.28:27017
+  DATABASE: c2c
+
+ENV: local
+APP_ID: xxxxxx
+APP_SECRET: xxxxxxxxxx
+
+PUBLIC: public # 目录，储存各种用户上传的文件
