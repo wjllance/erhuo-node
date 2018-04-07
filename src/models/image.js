@@ -23,4 +23,9 @@ imageSchema.methods.url = function() {
 	return config.SERVER.URL_PREFIX + '/' + this.filename;
 }
 
+imageSchema.methods.thumb = function() {
+	let fn = this.thumbnails || this.filename;
+    return config.SERVER.URL_PREFIX + '/' + fn;
+}
+
 module.exports = mongoose.model("Image", imageSchema);
