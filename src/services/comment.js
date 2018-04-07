@@ -12,7 +12,7 @@ let { Goods, Comment } = require('../models');
 let getListInfo = exports.getListInfo = function(cmt){
     ret = {
         _id: cmt._id,
-        goodsId: cmt.goodsId,
+        goodsId: cmt.goodsId._id,
         content: cmt.content,
         fromId: cmt.fromId._id,
         fromName: cmt.fromId.nickName,
