@@ -121,15 +121,32 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 
 /**
  * @api {put} /goods/:goods_id  编辑商品
- * @apiName     GoodsEdit
+ * @apiName     GoodsEdit   暂不支持修改图片
  * @apiGroup    Goods
+ *
+ * @apiParam    {String}    gname
+ * @apiParam    {String}    glabel
+ * @apiParam    {Number}    gprice
+ * @apiParam    {String}    gstype
+ * @apiParam    {String}    glocation
+ * @apiParam    {Number}    gcost
+ * @apiParam    {Number}    gcity
  *
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
  *
  */
 router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let goods = await srv_goods.getBaseById(ctx.params.goods_id);
+    auth.assert(goods.userID != ctx.state.user._id, '无权限');
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+    goods.updated_date = Date.now();
+    await goods.save();
 
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user)
+    };
 });
 
 /**
@@ -150,3 +167,23 @@ router.get('/goods/detail/:goods_id', async (ctx, next) => {
     };
 });
 
+
+
+/**
+ * @api {get} /goods/base/:goods_id  获取商品基本信息
+ * @apiName     GetGoodsBaseInfo
+ * @apiGroup    Goods
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.get('/goods/base/:goods_id', async (ctx, next) => {
+    let goods = await srv_goods.getBaseById(ctx.params.goods_id);
+    goods = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+    auth.assert(goods, '商品不存在');
+    ctx.body = {
+        success: 1,
+        data: goods
+    };
+});

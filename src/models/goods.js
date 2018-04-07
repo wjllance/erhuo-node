@@ -26,6 +26,7 @@ let goodsSchema = new mongoose.Schema({
 
 	created_date: { type: Date, default: Date.now },
     removed_date: { type: Date, default: null},
+    updated_date: { type: Date, default: Date.now},
 });
 
 
