@@ -21,11 +21,15 @@ router.post('/images/upload', auth.loginRequired, body, async (ctx, next) => {
     let image = await Image.create({userID: ctx.state.user._id});
     image.filename = config.PUBLIC.images + '/' + image._id.toString() + path.extname(image_file.name);
     image.thumbnails = config.PUBLIC.images + '/' + image._id.toString() + "_tmb"+ path.extname(image_file.name);
-    await mzfs.rename(image_file.path, path.join(config.PUBLIC.root, image.filename));
-    await image.save();
+
+
+    console.log(image_file.path)
     await sharp(image_file.path)
         .resize(200)
-        .toFile(image.thumbnails);
+        .toFile(path.join(config.PUBLIC.root, image.thumbnails));
+    await mzfs.rename(image_file.path, path.join(config.PUBLIC.root, image.filename));
+    await image.save();
+
 
     ctx.body = {
         success: 1,
