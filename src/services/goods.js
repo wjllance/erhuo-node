@@ -58,7 +58,7 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     let comments = await Comment
             .find({goodsId:goods_id})
             .populate(['fromId','toId']);
-    g.comments = comments.map(y => y.getUser());
+    g.comments = comments.map(y => y.getFullInfo());
 
     if(arguments[1])
     {

@@ -16,8 +16,8 @@ const router = module.exports = new Router();
 
 
 /**
- * @api {get}   /center/leave_message   留言列表
- * @apiName     LeaveMessage
+ * @api {get}   /center/moments   留言动态
+ * @apiName     Moments
  * @apiGroup    Center
  *
  *
@@ -25,11 +25,13 @@ const router = module.exports = new Router();
  * @apiSuccess  {Object}    data        列表
  *
  */
-router.get('/center/leave_message', auth.loginRequired, async (ctx, next) => {
-    let comments = await srv_comment.myCommentList(ctx.state.user._id);
+router.get('/center/moments', auth.loginRequired, async (ctx, next) => {
+    let pageNo = eval(ctx.query.pageNo) || 1;
+    let pageSize = eval(ctx.query.pageSize) || 6;
+    let moments = await srv_comment.momentList(ctx.state.user._id, pageSize, pageNo);
     ctx.body = {
         success: 1,
-        data: comments
+        data: moments
     };
 });
 

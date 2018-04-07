@@ -9,24 +9,9 @@ let { User } = require('../models');
 let { Goods, Comment } = require('../models');
 
 
-exports.getDetailInfo = function(cmt){
-    ret = {
-        content: cmt.content,
-        fromId: cmt.fromId._id,
-        fromName: cmt.fromId.nickName,
-        fromAvatar: cmt.fromId.avatarUrl,
-        created_date: cmt.created_date
-    };
-    if(cmt.toId != null)
-    {
-        ret.toId = cmt.toId._id;
-        ret.toName = cmt.toId.nickName;
-    }
-    return ret;
-};
-
 let getListInfo = exports.getListInfo = function(cmt){
     ret = {
+        _id: cmt._id,
         content: cmt.content,
         fromId: cmt.fromId._id,
         fromName: cmt.fromId.nickName,
@@ -38,7 +23,7 @@ let getListInfo = exports.getListInfo = function(cmt){
 };
 
 
-exports.myCommentList = async function(user_id){
+exports.momentList = async function(user_id, pageSize, pageNo){
 
     let my_goods_ids = await Goods.find({userID:user_id},['_id']);
     my_goods_ids = my_goods_ids.map(y=>y._id);
@@ -54,8 +39,23 @@ exports.myCommentList = async function(user_id){
             populate: {
                 path: 'gpics',
             }
-        }).populate('fromId');
-    return { commentList : comments.map(y=>getListInfo(y))};
+        }).populate('fromId')
+        .sort('-created_date').limit(pageSize).skip((pageNo-1)*pageSize);
+
+    let total = await Comment.find({
+        $or: [
+            {goodsId: {$in:my_goods_ids}},
+            {toId: user_id}
+        ],
+        fromId: {$ne: user_id}
+    }).count();
+
+    let hasMore=total-pageNo*pageSize>0;
+    return {
+        moments : comments.map(y=>getListInfo(y)),
+        total: total,
+        hasMore: hasMore
+    };
 };
 
 

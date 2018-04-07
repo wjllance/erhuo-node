@@ -23,8 +23,9 @@ let commentSchema = new mongoose.Schema({
 });
 
 
-commentSchema.methods.getUser = function() {
+commentSchema.methods.getFullInfo = function() {
     ret = {
+        _id: this._id,
         content: this.content,
         fromId: this.fromId._id,
         fromName: this.fromId.nickName,
@@ -37,7 +38,7 @@ commentSchema.methods.getUser = function() {
         ret.toName = this.toId.nickName;
     }
     return ret;
-}
+};
 
 
 module.exports = mongoose.model("Comment", commentSchema);

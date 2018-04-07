@@ -62,8 +62,10 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 /**
  * @api {get}   /users/mypublish   我的发布
  * @apiName     MyPublish
- * @apiParam    String  isRemoved
- * @apiGroup    User
+ * @apGroup     User
+ *
+ * @apiParam    {Number}  [isRemoved]   是否下架
+ *
  */
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
     let isRemoved = null || ctx.query.isRemoved;  //默认未下架
