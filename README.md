@@ -67,3 +67,12 @@
 ```
 
 然后用浏览器打开[http://localhost:8000/ping](http://localhost:8000/ping)，如果收到`{"data":"pong"}`则表示启动成功。
+
+```
+
+服务器代码更新
+c2c/Jicunbao2017
+重启app
+>pm2 restart app
+查看服务器的输出
+>pm2 logs app

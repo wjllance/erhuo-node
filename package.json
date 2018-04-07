@@ -25,6 +25,7 @@
     "koa-bodyparser": "^4.2.0",
     "koa-logger": "^3.2.0",
     "koa-mount": "^3.0.0",
+    "koa-resizer": "^1.0.0",
     "koa-router": "^7.4.0",
     "koa-session": "^5.8.1",
     "koa-static": "^4.0.2",
@@ -37,14 +38,13 @@
     "superagent": "^3.8.2",
     "utility": "^1.13.1"
   },
-
-  "apidoc":{
+  "apidoc": {
     "name": "erhuotwo",
     "version": "0.1.0",
     "description": "二货兔C2C后端",
     "apidoc": {
       "title": "二货兔API",
-      "url" : "https://two.jicunbao.com/"
+      "url": "https://two.jicunbao.com/"
     }
   }
 }

@@ -10,7 +10,7 @@ let body = require('koa-convert')(require('koa-better-body')());
 let config = require('../config');
 let auth = require('../services/auth');
 let { User, Image } = require('../models');
-
+const sharp = require('sharp');
 const router = module.exports = new Router();
 
 // 上传图片
@@ -20,8 +20,12 @@ router.post('/images/upload', auth.loginRequired, body, async (ctx, next) => {
 
     let image = await Image.create({userID: ctx.state.user._id});
     image.filename = config.PUBLIC.images + '/' + image._id.toString() + path.extname(image_file.name);
+    image.thumbnails = config.PUBLIC.images + '/' + image._id.toString() + "_tmb"+ path.extname(image_file.name);
     await mzfs.rename(image_file.path, path.join(config.PUBLIC.root, image.filename));
     await image.save();
+    await sharp(image_file.path)
+        .resize(200)
+        .toFile(image.thumbnails);
 
     ctx.body = {
         success: 1,

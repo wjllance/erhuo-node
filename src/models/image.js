@@ -13,7 +13,8 @@ let imageSchema = new mongoose.Schema({
 		required: true
 	},
 
-	filename: String,
+    filename: String,
+    thumbnails: String,
 
 	created_date: { type: Date, default: Date.now },
 });
