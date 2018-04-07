@@ -12,13 +12,14 @@ let { Goods, Comment } = require('../models');
 let getListInfo = exports.getListInfo = function(cmt){
     ret = {
         _id: cmt._id,
+        goodsId: cmt.goodsId,
         content: cmt.content,
         fromId: cmt.fromId._id,
         fromName: cmt.fromId.nickName,
         fromAvatar: cmt.fromId.avatarUrl,
         created_date: cmt.created_date
     };
-    ret.gpic = cmt.goodsId.gpics[0].url();
+    ret.gpic = cmt.goodsId.gpics[0].thumb();
     return ret;
 };
 
