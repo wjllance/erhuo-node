@@ -165,8 +165,8 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/goods/detail/:goods_id', async (ctx, next) => {
-    let goods = await srv_goods.getDetailById(ctx.params.goods_id);
+router.get('/goods/detail/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,
