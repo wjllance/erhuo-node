@@ -62,10 +62,20 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 /**
  * @api {get}   /users/mypublish   我的发布
  * @apiName     MyPublish
+ * @apiParam    String  isRemoved
  * @apiGroup    User
  */
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
-    let goods = await Goods.find({userID: ctx.state.user._id}).populate('gpics');
+    let isRemoved = null || ctx.query.isRemoved;  //默认未下架
+    let condi = {userID: ctx.state.user._id};  //加入未下架筛选
+    if(isRemoved == '1'){
+        condi.$and = [{removed_date: {$ne: null}},{removed_date: {$lte: Date.now()}}];
+    }
+    else if(isRemoved == '0'){
+        condi.$or = [{removed_date: null},{removed_date: {$gt: Date.now()}}];
+    }
+    console.log(condi);
+    let goods = await Goods.find(condi).populate('gpics');
     ctx.body = {
         success: 1,
         data: await srv_goods.outputify(goods)
