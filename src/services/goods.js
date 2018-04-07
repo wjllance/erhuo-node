@@ -14,7 +14,7 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
     return {
         has_collected
     };
-}
+};
 
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
@@ -28,7 +28,7 @@ let outputify = exports.outputify = async function(goods, user) {
         }
         return ugoods;
     }
-}
+};
 
 exports.postComment = async function(goods, user, cmt, toUserId){
     let new_comment = await Comment.create({
@@ -52,7 +52,7 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         .populate('gpics');
     if(!goods)
         return goods;
-    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'removed_date']);
     g.gpics = goods.gpics.map(y => y.url());
 
     let comments = await Comment
@@ -70,9 +70,15 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
 // 获取商品详情
 let getBaseById = exports.getBaseById = async function(goods_id) {
     return Goods.findById(goods_id);
-}
+};
 
 let getCardInfoById = exports.getBaseById = async function(goods_id) {
     return Goods.findById(goods_id)
         .populate('gpics');
-}
+};
+
+//商品未下架过滤层
+//返回值为true值表示已下架，为null或者false时为未下架
+let isGoodRemoved = exports.isGoodRemoved = async function(good) {
+    return good.removed_date && good.removed_date < Date.now();
+};
