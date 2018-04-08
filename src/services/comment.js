@@ -50,11 +50,15 @@ exports.momentList = async function(user_id, pageSize, pageNo){
         ],
         fromId: {$ne: user_id}
     }).count();
+    comments.map(y=>{
+        y.read_date = new Date();
+        y.save()
+    });
 
     let hasMore=total-pageNo*pageSize>0;
     return {
         moments : comments.map(y=>getListInfo(y)),
-        total: total,
+        total: total.length,
         hasMore: hasMore
     };
 };
@@ -73,5 +77,18 @@ exports.post = async function(cmt, goods_id, fromId, toId) {
     await new_comment.save();
 };
 
+exports.unread = async function(user_id) {
+    let my_goods_ids = await Goods.find({userID:user_id},['_id']);
+    my_goods_ids = my_goods_ids.map(y=>y._id);
+    let total = await Comment.find({
+        $or: [
+            {goodsId: {$in:my_goods_ids}},
+            {toId: user_id}
+        ],
+        fromId: {$ne: user_id},
+        read_date: null
+    }).count();
+    return total;
+};
 
 

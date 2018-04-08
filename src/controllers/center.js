@@ -69,3 +69,23 @@ router.get('/center/collections', auth.loginRequired, async (ctx, next) => {
         data: collections
     };
 });
+
+/**
+ * @api {get}   /center/unread   我的未读消息
+ * @apiName     Unread
+ * @apiGroup    Center
+ *
+ *
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+router.get('/center/unread', auth.loginRequired, async (ctx, next) => {
+
+    let unread = await srv_comment.unread(ctx.state.user._id);
+    ctx.body = {
+        success: 1,
+        data: unread
+    };
+});

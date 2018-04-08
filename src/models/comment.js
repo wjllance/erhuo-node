@@ -19,6 +19,7 @@ let commentSchema = new mongoose.Schema({
         type:  mongoose.Schema.ObjectId,
         ref: 'Goods'
     },
+    read_date: {type: Date, default: null},
     created_date: { type: Date, default: Date.now },
 });
 

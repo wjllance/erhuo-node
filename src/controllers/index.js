@@ -9,3 +9,4 @@ router.get('/ping', async ctx => {
         data: 'pong'
     }
 });
+
