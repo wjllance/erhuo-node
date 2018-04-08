@@ -30,7 +30,8 @@ const router = module.exports = new Router();
 router.post('/user/login', async (ctx, next) => {
     await auth.login(ctx, ctx.request.body.code);
     ctx.body = {
-        success: 1
+        success: 1,
+        user_id: ctx.session.user_id
     };
 });
 

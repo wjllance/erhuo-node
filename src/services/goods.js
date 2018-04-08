@@ -54,6 +54,8 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         return goods;
     let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'removed_date']);
     g.gpics = goods.gpics.map(y => y.url());
+    g.state = this.removed_date ? "已下架" : "在售";
+    g.created_date = tools.dateStr(this.created_date);
 
     let comments = await Comment
             .find({goodsId:goods_id})
