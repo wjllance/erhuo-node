@@ -1,6 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
+let tools = require('../services/tools')
 
 // 评论
 let commentSchema = new mongoose.Schema({
@@ -31,7 +32,7 @@ commentSchema.methods.getFullInfo = function() {
         fromId: this.fromId._id,
         fromName: this.fromId.nickName,
         fromAvatar: this.fromId.avatarUrl,
-        created_date: this.created_date
+        created_date: tools.dateStr(this.created_date)
     };
     if(this.toId != null)
     {
