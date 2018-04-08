@@ -39,7 +39,7 @@ exports.dateStr = (date) => {
     //获取js 时间戳
     var time=new Date().getTime();
     //去掉 js 时间戳后三位，与php 时间戳保持一致
-
+    console.log(time+" "+date.getTime())
     time=parseInt((time-date.getTime())/1000);
 
     //存储转换值
@@ -60,7 +60,7 @@ exports.dateStr = (date) => {
         return s+"天前";
     }else{
         //超过3天
-        var date= new Date(parseInt(date) * 1000);
-        return date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
+        // var date= new Date(parseInt(date) * 1000);
+        return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
     }
 }
