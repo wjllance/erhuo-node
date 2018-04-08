@@ -53,10 +53,10 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         .populate('gpics');
     if(!goods)
         return goods;
-    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'removed_date']);
+    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
     g.gpics = goods.gpics.map(y => y.url());
     g.state = this.removed_date ? "已下架" : "在售";
-    g.created_date = tools.dateStr(this.created_date);
+    g.created_date = tools.dateStr(goods.created_date);
 
     let comments = await Comment
             .find({goodsId:goods_id})
