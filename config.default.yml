@@ -10,7 +10,12 @@ MONGODB: # mongodb配置
   DATABASE: c2c
 
 ENV: local
-APP_ID: xxxxxx
-APP_SECRET: xxxxxxxxxx
 
+#   OL
+APP_ID: wxeb3470bf6817d8b1
+APP_SECRET: fb90ff46df72a1c84f432fd2bcc941d3
+
+#   DEV
+#   APP_ID: wxeedf8d0cba505192
+#   APP_SECRET: 599fb18cb0bb8c712353031a37d8e58c
 PUBLIC: public # 目录，储存各种用户上传的文件
