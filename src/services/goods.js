@@ -6,6 +6,7 @@ let { Comment } = require('../models');
 let { Goods } = require('../models');
 
 
+let tools = require('./tools')
 
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
