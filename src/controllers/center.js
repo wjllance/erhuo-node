@@ -55,22 +55,17 @@ router.get('/center/moments', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.get('/center/collections', auth.loginRequired, async (ctx, next) => {
-    let total = await Goods.find({_id: ctx.state.user.collections}).count();//用户总收藏数
     let reqParam= ctx.query;
     let pageNo = 1;
     if (reqParam.pageNo) {pageNo = Number(reqParam.pageNo);}  //页码数, 默认为1
     let pageSize = 6;
     if (reqParam.pageSize) {pageSize = Number(reqParam.pageSize);}//每页显示的记录条数, 默认为6
     console.log(pageNo);console.log(pageSize);
-    let collections = await Goods.find({_id: ctx.state.user.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
-    let hasMore=total-pageNo*pageSize>0;
-    ctx.response.type = 'application/json';
+
+    let collections = await srv_goods.collectionList(ctx.state.user, pageNo, pageSize);
+
     ctx.body = {
         success: 1,
-        data: {
-            goods: await srv_goods.outputify(collections, ctx.state.user),
-            hasMore:hasMore,
-            total:total
-        }
+        data: collections
     };
 });

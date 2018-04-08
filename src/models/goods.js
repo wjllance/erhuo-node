@@ -1,7 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
-
+let tools = require('../services/tools')
 // 商品
 let goodsSchema = new mongoose.Schema({
 
@@ -31,8 +31,11 @@ let goodsSchema = new mongoose.Schema({
 
 
 goodsSchema.methods.toOBJ = function() {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'removed_date']);
-    g.gpics = this.gpics.map(y => y.thumb());
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+    g.gpics = [];
+    g.gpics[0] = this.gpics[0].thumb();
+    g.state = this.removed_date ? "已下架" : "在售";
+    g.created_date = tools.dateStr(this.created_date);
 	return g;
 };
 

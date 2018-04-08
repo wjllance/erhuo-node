@@ -82,3 +82,18 @@ let getCardInfoById = exports.getBaseById = async function(goods_id) {
 let isGoodRemoved = exports.isGoodRemoved = async function(good) {
     return good.removed_date && good.removed_date < Date.now();
 };
+
+exports.collectionList = async function(user_state, pageNo, pageSize)
+{
+
+    let total = await Goods.find({_id: user_state.collections}).count();//用户总收藏数
+
+    let collections = await Goods.find({_id: user_state.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let ugoods = collections.map(x => x.toOBJ());
+    let hasMore=total-pageNo*pageSize>0;
+    return {
+        collections: ugoods,
+        hasMore : hasMore,
+        total : total
+    }
+}
