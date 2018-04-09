@@ -7,6 +7,7 @@ let config = require('../config');
 let { log } = require('../config');
 let { User } = require('../models');
 let { Goods, Comment } = require('../models');
+let tools = require("./tools")
 
 
 let getListInfo = exports.getListInfo = function(cmt){
@@ -17,8 +18,9 @@ let getListInfo = exports.getListInfo = function(cmt){
         fromId: cmt.fromId._id,
         fromName: cmt.fromId.nickName,
         fromAvatar: cmt.fromId.avatarUrl,
-        created_date: cmt.created_date
+        // created_date: cmt.created_date
     };
+    ret.created_date = tools.dateStr(cmt.created_date)
     ret.gpic = cmt.goodsId.gpics[0].thumb();
     return ret;
 };
