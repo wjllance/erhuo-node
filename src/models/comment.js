@@ -26,7 +26,7 @@ let commentSchema = new mongoose.Schema({
 
 
 commentSchema.methods.getFullInfo = function() {
-    ret = {
+    let ret = {
         _id: this._id,
         content: this.content,
         fromId: this.fromId._id,

@@ -36,7 +36,7 @@ exports.postComment = async function(goods, user, cmt, toUserId){
         content: cmt,
         fromId: user._id
     });
-    if(arguments[3] != null)
+    if (toUserId)
     {
         new_comment.toId = toUserId;
     }
@@ -68,7 +68,7 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
             .populate(['fromId','toId']);
     g.comments = comments.map(y => y.getFullInfo());
 
-    if(arguments[1])
+    if (userInfo)
     {
         _.assign(g, await injectGoods(g, userInfo));
     }

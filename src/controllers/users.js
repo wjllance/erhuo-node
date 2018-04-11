@@ -69,7 +69,7 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
-    let isRemoved = null || ctx.query.isRemoved;  //默认未下架
+    let isRemoved = ctx.query.isRemoved || null;  //默认未下架
     let condi = {userID: ctx.state.user._id};  //加入未下架筛选
 
     if(isRemoved == '1'){

@@ -47,7 +47,6 @@ router.get('/goods/index', async (ctx, next) => {
     if (reqParam.pageSize) {pageSize = Number(reqParam.pageSize);}//每页显示的记录条数, 默认为6
     let goods = await Goods.find(condi).sort('-_id').limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
     let hasMore=totle-pageNo*pageSize>0;
-    ctx.response.type = 'application/json';
     ctx.body = {
         success: 1,
         data: {
@@ -145,7 +144,8 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  */
 router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     let goods = await srv_goods.getBaseById(ctx.params.goods_id);
-    auth.assert(goods.userID != ctx.state.user._id, '无权限');
+    auth.assert(goods, '商品不存在');
+    auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
     _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
     goods.updated_date = Date.now();
     await goods.save();
@@ -167,6 +167,7 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  */
 router.get('/goods/detail/:goods_id', auth.loginRequired, async (ctx, next) => {
     let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
+    auth.assert(goods, '商品不存在');
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,

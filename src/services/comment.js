@@ -11,7 +11,7 @@ let tools = require("./tools")
 
 
 let getListInfo = exports.getListInfo = function(cmt){
-    ret = {
+    let ret = {
         _id: cmt._id,
         goodsId: cmt.goodsId._id,
         content: cmt.content,
@@ -20,7 +20,7 @@ let getListInfo = exports.getListInfo = function(cmt){
         fromAvatar: cmt.fromId.avatarUrl,
         // created_date: cmt.created_date
     };
-    ret.created_date = tools.dateStr(cmt.created_date)
+    ret.created_date = tools.dateStr(cmt.created_date);
     ret.gpic = cmt.goodsId.gpics[0].thumb();
     return ret;
 };
@@ -72,7 +72,7 @@ exports.post = async function(cmt, goods_id, fromId, toId) {
         fromId: fromId,
         goodsId: goods_id
     });
-    if(arguments[3] != null)
+    if (toId)
     {
         new_comment.toId = toId;
     }

@@ -26,8 +26,8 @@ const router = module.exports = new Router();
  *
  */
 router.get('/center/moments', auth.loginRequired, async (ctx, next) => {
-    let pageNo = eval(ctx.query.pageNo) || 1;
-    let pageSize = eval(ctx.query.pageSize) || 6;
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
     let moments = await srv_comment.momentList(ctx.state.user._id, pageSize, pageNo);
     ctx.body = {
         success: 1,
