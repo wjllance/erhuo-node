@@ -50,14 +50,19 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
 
     let goods = await Goods
         .findById(goods_id)
-        .populate('gpics');
+        .populate('gpics')
+        .populate('userID');
     if(!goods)
         return goods;
     let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
     g.gpics = goods.gpics.map(y => y.url());
     g.state = this.removed_date ? "已下架" : "在售";
     g.created_date = tools.dateStr(goods.created_date);
-
+    g.user = {
+        _id: goods.userID._id,
+        name: goods.userID.nickName,
+        avatar: goods.userID.avatarUrl
+    };
     let comments = await Comment
             .find({goodsId:goods_id})
             .populate(['fromId','toId']);
