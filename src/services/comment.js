@@ -60,7 +60,7 @@ exports.momentList = async function(user_id, pageSize, pageNo){
     let hasMore=total-pageNo*pageSize>0;
     return {
         moments : comments.map(y=>getListInfo(y)),
-        total: total.length,
+        total: total,
         hasMore: hasMore
     };
 };
