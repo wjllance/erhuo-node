@@ -3,6 +3,7 @@ let _ = require('lodash');
 require('should');
 let moment = require('moment')
 
+moment.locale('zh-cn');
 exports.bindFindByXX = (objs, XX) => {
     objs.should.be.instanceOf(Array);
     XX.should.be.a.String();
