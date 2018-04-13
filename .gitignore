@@ -7,3 +7,4 @@ venv
 package-lock.json
 doc
 .DS_Store
+logs

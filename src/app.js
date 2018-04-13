@@ -7,12 +7,35 @@ let mount = require('koa-mount');
 let bodyParser = require('koa-bodyparser');
 let path = require('path');
 let session = require('koa-session');
-
 let config = require('./config');
 let { log, SERVER, PUBLIC } = require('./config');
 let auth = require('./services/auth');
-
+const logUtil = require('./services/log_util');
 let app = new Koa();
+
+
+
+//logger
+app.use(async (ctx, next) => {
+    //响应开始时间
+    const start = new Date();
+    //响应间隔时间
+    var ms;
+    try {
+        //开始进入到下一个中间件
+        await next();
+
+        ms = new Date() - start;
+        //记录响应日志
+        logUtil.logResponse(ctx, ms);
+
+    } catch (error) {
+
+        ms = new Date() - start;
+        //记录异常日志
+        logUtil.logError(ctx, error, ms);
+    }
+});
 
 app.use(bodyParser({
     formLimit: '10MB'
@@ -55,6 +78,43 @@ app.use(require('koa-static')(PUBLIC.root, {
     maxage: SERVER.MAXAGE
 }));
 
+
+
+var fs = require('fs');
+var logConfig = require('./log_config');
+
+/**
+ * 确定目录是否存在，如果不存在则创建目录
+ */
+var confirmPath = function(pathStr) {
+
+    if(!fs.existsSync(pathStr)){
+        fs.mkdirSync(pathStr);
+        console.log('createPath: ' + pathStr);
+    }
+}
+
+/**
+ * 初始化log相关目录
+ */
+var initLogPath = function(){
+    //创建log的根目录'logs'
+    if(logConfig.baseLogPath){
+        confirmPath(logConfig.baseLogPath)
+        //根据不同的logType创建不同的文件目录
+        for(var i = 0, len = logConfig.appenders.length; i < len; i++){
+            if(logConfig.appenders[i].path){
+                confirmPath(logConfig.baseLogPath + logConfig.appenders[i].path);
+            }
+        }
+    }
+}
+
+initLogPath();
+
 app.listen(SERVER.PORT, SERVER.ADDRESS);
 
 log.info(`listen on http://${SERVER.ADDRESS}:${SERVER.PORT}`);
+
+
+

@@ -16,7 +16,7 @@ let userSchema = new mongoose.Schema({
 		required: true,
 		index: true
     },
-	sa_open_id: String,
+	sa_openid: String,
 
 	// 以下是从微信获取到的用户数据
 	nickName: String,
