@@ -56,11 +56,8 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
 
     let comment = await Comment.findOne({_id:comment_id}).populate('fromId').populate('goodsId');
     let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
-    if(touser.sa_openid == null)
+    if(touser.sa_openid == null || touser._id == comment.fromId.userID)
         return ;
-    // console.log(comment);
-    // if(toId == Comment.fromId.sa_openid)
-    //     return;
 
     let access_token = await get_access_token();
     let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+access_token;
