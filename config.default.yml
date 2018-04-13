@@ -15,6 +15,9 @@ ENV: local
 APP_ID: wxeb3470bf6817d8b1
 APP_SECRET: fb90ff46df72a1c84f432fd2bcc941d3
 
+SA_APP_ID : wxbe500a2cde70261c
+SA_SECRET : 0b9b5299cb18bee3ad62ab5fa5ecc4d9
+
 #   DEV
 #   APP_ID: wxeedf8d0cba505192
 #   APP_SECRET: 599fb18cb0bb8c712353031a37d8e58c
