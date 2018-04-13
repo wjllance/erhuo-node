@@ -1,6 +1,7 @@
 
 let _ = require('lodash');
 require('should');
+let moment = require('moment')
 
 exports.bindFindByXX = (objs, XX) => {
     objs.should.be.instanceOf(Array);
@@ -61,6 +62,7 @@ exports.dateStr = (date) => {
     }else{
         //超过3天
         // var date= new Date(parseInt(date) * 1000);
-        return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+        return moment(date).format('ll')
+        // return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
     }
 }

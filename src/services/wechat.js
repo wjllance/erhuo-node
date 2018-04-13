@@ -3,7 +3,8 @@ let _ = require('lodash');
 let utils = require('utility');
 let superagent = require('superagent');
 let config = require('../config');
-let {User, AccessToken} = require('../models')
+let {User, AccessToken, Comment} = require('../models')
+let moment = require('moment')
 
 let log4js = require('log4js');
 
@@ -51,21 +52,51 @@ let get_access_token = exports.get_access_token = async function()
     }
     return accessToken.token
 }
-let sendReplyNotice = exports.sendReplyNotice = async function(touser, info) {
+let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
+
+    let comment = await Comment.findOne({_id:comment_id}).populate('fromId').populate('goodsId');
+    let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
+    if(touser.sa_openid == null)
+        return ;
+    // console.log(comment);
+    // if(toId == Comment.fromId.sa_openid)
+    //     return;
+
     let access_token = await get_access_token();
     let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+access_token;
-    let res = await superagent.post(post_url).send({
-        touser: touser,
-        template_id: "pj1M_E5T2TXvxGU1dzNx4ab5GavuY-5TizlP8vKOjSg",
+    let {text} = await superagent.post(post_url).send({
+        touser: touser.sa_openid,
+        template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
         miniprogram: {
             appid: config.APP_ID,
-            pagepath: "index"
+            pagepath: "pages/index/index"
         },
-        data: {}
+        data: {
+            first: {
+                value: "收到新的留言"
+            },
+            keyword2:{
+                value: comment.goodsId.gname
+            },
+            keyword3:{
+                value: comment.content
+            },
+            keyword4:{
+                value: moment(comment.created_date).format('lll')
+            },
+            keyword5:{
+                value: comment.fromId.nickName
+            },
+            remark:{
+                value: "点击进入小程序回复"
+            },
+        }
     });
+    let res = JSON.parse(text);
+
     return res
 
-}
+};
 
 let update_service_account_userid = exports.update_service_account_userid = async function(next_openid){
 

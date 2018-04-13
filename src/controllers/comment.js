@@ -35,9 +35,10 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
     let cmt_str = ctx.request.body.comment;
     auth.assert(cmt_str, '评论不能为空');
     let toId = ctx.request.body.to;
-    console.log(toId);
-    await srv_comment.post(cmt_str, goods._id, ctx.state.user, toId);
+    console.log("to id"+toId);
+    let res = await srv_comment.post(cmt_str, goods._id, ctx.state.user, toId);
     goods = await srv_goods.getDetailById(goods._id, ctx.state.user);
+    await srv_wechat.sendReplyNotice(res._id);
     ctx.body = {
         success: 1,
         data: goods
@@ -46,9 +47,8 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
 
 
 
-router.get('/comment/test', async (ctx, next) => {
-    ctx.body = await srv_wechat.sendReplyNotice(ctx.state.user.unionid);
-
+router.get('/comment/test', auth.loginRequired, async (ctx, next) => {
+    ctx.body = await srv_wechat.sendReplyNotice(ctx.state.user.sa_openid);
 })
 
 

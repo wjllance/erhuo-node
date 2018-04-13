@@ -76,7 +76,7 @@ exports.post = async function(cmt, goods_id, fromId, toId) {
     {
         new_comment.toId = toId;
     }
-    await new_comment.save();
+    return await new_comment.save();
 };
 
 exports.unread = async function(user_id) {
