@@ -56,8 +56,14 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
 
     let comment = await Comment.findOne({_id:comment_id}).populate('fromId').populate('goodsId');
     let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
-    if(touser.sa_openid == null || touser._id == comment.fromId.userID)
+    let tid = String(touser._id);
+    let fid = String(comment.fromId._id);
+    // console.log(comment.fromId._id)
+    // console.log(touser._id)
+    if(touser.sa_openid == null ||  fid == tid){
+        // console.log("no!!!!!!!!!");
         return ;
+    }
 
     let access_token = await get_access_token();
     let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+access_token;
@@ -113,7 +119,7 @@ let update_service_account_userid = exports.update_service_account_userid = asyn
         err.status = ERR_CODE;
         throw err;
     }else{
-        return await update_services_openids(res.data.openid)
+        await update_services_openids(res.data.openid)
         return res.data.next_openid;
     }
 }
