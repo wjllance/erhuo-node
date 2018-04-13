@@ -10,6 +10,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
+let srv_wechat = require('../services/wechat');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
@@ -42,5 +43,12 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
         data: goods
     };
 });
+
+
+
+router.get('/comment/test', async (ctx, next) => {
+    ctx.body = await srv_wechat.sendReplyNotice(ctx.state.user.unionid);
+
+})
 
 

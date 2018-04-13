@@ -23,6 +23,10 @@ exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
 exports.ENV = config['ENV'];
 
+
+exports.SA_APP_ID = config['SA_APP_ID'];
+exports.SA_SECRET = config['SA_SECRET'];
+
 let PUBLIC = exports.PUBLIC = {
     root: path.join(__dirname, '..', config['PUBLIC']),
     images: 'images'

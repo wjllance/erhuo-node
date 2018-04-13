@@ -9,6 +9,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
+let srv_wechat = require('../services/wechat')
 let { User } = require('../models');
 let { Goods } = require('../models');
 
@@ -89,3 +90,13 @@ router.get('/center/unread', auth.loginRequired, async (ctx, next) => {
         data: unread
     };
 });
+
+
+router.get('/center/test_update_service_account_user', async (ctx, next) => {
+    let next_openid = ctx.query.next_openid;
+    let res = await srv_wechat.update_service_account_userid(next_openid)
+    ctx.body = {
+        success: 1,
+        data: res
+    }
+})

@@ -14,6 +14,8 @@ let Goods = exports.Goods = require('./goods');
 
 let Comment = exports.Comment = require('./comment');
 
+let AccessToken = exports.AccessToken = require('./access_token');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {
