@@ -37,7 +37,7 @@ let updateAccessToken = async function (access_token) {
     }else{
         access_token.token = res.access_token;
         access_token.expire_date = Date.now()+res.expires_in*1000;
-        await access_token.save();
+        return await access_token.save();
     }
 }
 
@@ -47,7 +47,7 @@ let get_access_token = exports.get_access_token = async function()
         accessToken = await AccessToken.findOne();
         if(!accessToken || accessToken.expire_date < Date.now())
         {
-            await updateAccessToken(accessToken)
+            accessToken = await updateAccessToken(accessToken)
         }
     }
     return accessToken.token
@@ -119,8 +119,11 @@ let update_service_account_userid = exports.update_service_account_userid = asyn
         err.status = ERR_CODE;
         throw err;
     }else{
-        await update_services_openids(res.data.openid)
-        return res.data.next_openid;
+        let newly_inserted = await update_services_openids(res.data.openid)
+        return {
+            new: newly_inserted,
+            next_openid: res.data.next_openid
+        };
     }
 }
 
@@ -165,6 +168,7 @@ let update_services_openids = exports.update_services_openids = async function(s
 
     console.log("sa openids, size"+ sa_openids.length)
 
+    let count = 0;
     for (let i = 0; i < sa_openids.length; i++) {
         if(sa_openids_exists.indexOf(sa_openids[i]) < 0){
             user_list.push({openid:sa_openids[i]})
@@ -172,12 +176,13 @@ let update_services_openids = exports.update_services_openids = async function(s
                 await doit(user_list)
                 user_list = []
             }
+            count += 1
         }
     }
     if(user_list.length > 0){
         await doit(user_list)
     }
-
+    return count;
 }
 
 

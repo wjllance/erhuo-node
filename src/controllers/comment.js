@@ -47,8 +47,8 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
 
 
 
-router.get('/comment/test', auth.loginRequired, async (ctx, next) => {
-    ctx.body = await srv_wechat.sendReplyNotice(ctx.state.user.sa_openid);
-})
+// router.get('/comment/test', auth.loginRequired, async (ctx, next) => {
+//     ctx.body = await srv_wechat.sendReplyNotice(ctx.state.user.sa_openid);
+// })
 
 
