@@ -26,6 +26,7 @@ exports.ENV = config['ENV'];
 
 exports.SA_APP_ID = config['SA_APP_ID'];
 exports.SA_SECRET = config['SA_SECRET'];
+exports.SA_TOKEN = config['SA_TOKEN'];
 
 let PUBLIC = exports.PUBLIC = {
     root: path.join(__dirname, '..', config['PUBLIC']),

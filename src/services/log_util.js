@@ -1,6 +1,6 @@
 var log4js = require('log4js');
 
-var log_config = require('../log_config');
+var log_config = require('../config/log_config');
 
 //加载配置文件
 log4js.configure(log_config);
@@ -11,6 +11,7 @@ var resLogger = log4js.getLogger("resLogger");
 var errorLogger = log4js.getLogger("errorLogger");
 var consoleLogger = log4js.getLogger();
 
+let fs = require('fs');
 
 //封装错误日志
 logUtil.logError = function (ctx, error, resTime) {
@@ -121,6 +122,34 @@ var formatReqLog = function (req, resTime) {
     logText += "response time: " + resTime + "\n";
 
     return logText;
+}
+
+
+/**
+ * 确定目录是否存在，如果不存在则创建目录
+ */
+let confirmPath = function(pathStr) {
+
+    if(!fs.existsSync(pathStr)){
+        fs.mkdirSync(pathStr);
+        console.log('createPath: ' + pathStr);
+    }
+}
+
+/**
+ * 初始化log相关目录
+ */
+logUtil.initLogPath = function(){
+    //创建log的根目录'logs'
+    if(log_config.baseLogPath){
+        confirmPath(log_config.baseLogPath)
+        //根据不同的logType创建不同的文件目录
+        for(var i = 0, len = log_config.appenders.length; i < len; i++){
+            if(log_config.appenders[i].path){
+                confirmPath(log_config.baseLogPath + log_config.appenders[i].path);
+            }
+        }
+    }
 }
 
 module.exports = logUtil;

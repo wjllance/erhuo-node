@@ -2,17 +2,17 @@
 
 let _ = require('lodash');
 let Koa = require('koa');
-let Router = require('koa-router');
 let mount = require('koa-mount');
 let bodyParser = require('koa-bodyparser');
 let path = require('path');
 let session = require('koa-session');
 let config = require('./config');
 let { log, SERVER, PUBLIC } = require('./config');
-let auth = require('./services/auth');
 const logUtil = require('./services/log_util');
 let app = new Koa();
 
+
+const router2controller = require('./router2controller.js');
 
 
 //logger
@@ -60,57 +60,14 @@ app.use(async (ctx, next) => {
     await next();
 });
 
-let router = new Router();
+app.use(router2controller());
 
-router.use(require('koa-logger')());
-router.use(auth.visit);
-router.use(auth.userM);
-
-router.use('', require('./controllers/index').routes());
-router.use('', require('./controllers/users').routes());
-router.use('', require('./controllers/resource').routes());
-router.use('', require('./controllers/goods').routes());
-router.use('', require('./controllers/comment').routes());
-router.use('', require('./controllers/center').routes());
-
-app.use(router.routes());
 app.use(require('koa-static')(PUBLIC.root, {
     maxage: SERVER.MAXAGE
 }));
 
 
-
-var fs = require('fs');
-var logConfig = require('./log_config');
-
-/**
- * 确定目录是否存在，如果不存在则创建目录
- */
-var confirmPath = function(pathStr) {
-
-    if(!fs.existsSync(pathStr)){
-        fs.mkdirSync(pathStr);
-        console.log('createPath: ' + pathStr);
-    }
-}
-
-/**
- * 初始化log相关目录
- */
-var initLogPath = function(){
-    //创建log的根目录'logs'
-    if(logConfig.baseLogPath){
-        confirmPath(logConfig.baseLogPath)
-        //根据不同的logType创建不同的文件目录
-        for(var i = 0, len = logConfig.appenders.length; i < len; i++){
-            if(logConfig.appenders[i].path){
-                confirmPath(logConfig.baseLogPath + logConfig.appenders[i].path);
-            }
-        }
-    }
-}
-
-initLogPath();
+logUtil.initLogPath();
 
 app.listen(SERVER.PORT, SERVER.ADDRESS);
 
