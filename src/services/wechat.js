@@ -45,9 +45,16 @@ let get_access_token = exports.get_access_token = async function()
 {
     if(accessToken == null){
         accessToken = await AccessToken.findOne();
-        if(!accessToken || accessToken.expire_date < Date.now())
+        if(accessToken){
+
+            console.log(moment(accessToken.expire_date));
+            console.log(moment())
+        }
+        if(!accessToken || moment(accessToken.expire_date).isBefore(moment()))
         {
+            console.log("updating access token")
             accessToken = await updateAccessToken(accessToken)
+            console.log(accessToken)
         }
     }
     return accessToken.token
@@ -58,14 +65,17 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
     let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
     let tid = String(touser._id);
     let fid = String(comment.fromId._id);
-    // console.log(comment.fromId._id)
-    // console.log(touser._id)
+    console.log(comment.fromId._id)
+    console.log(touser._id)
     if(touser.sa_openid == null ||  fid == tid){
         // console.log("no!!!!!!!!!");
         return ;
     }
+    console.log("send notify to..."+touser.sa_openid)
+
 
     let access_token = await get_access_token();
+    console.log(access_token);
     let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+access_token;
     let {text} = await superagent.post(post_url).send({
         touser: touser.sa_openid,
@@ -96,7 +106,7 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
         }
     });
     let res = JSON.parse(text);
-
+    console.log(res)
     return res
 
 };
