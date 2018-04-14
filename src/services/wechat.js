@@ -12,7 +12,6 @@ let logger = log4js.getLogger('errorLogger');
 
 const ERR_CODE = 985;
 
-let accessToken = null;
 
 
 let updateAccessToken = async function (access_token) {
@@ -43,12 +42,13 @@ let updateAccessToken = async function (access_token) {
 
 let get_access_token = exports.get_access_token = async function()
 {
-    if(accessToken == null){
-        accessToken = await AccessToken.findOne();
-        if(!accessToken || accessToken.expire_date < Date.now())
-        {
-            accessToken = await updateAccessToken(accessToken)
-        }
+    let accessToken = await AccessToken.findOne();
+
+    if(!accessToken || moment(accessToken.expire_date).isBefore(moment()))
+    {
+        console.log("updating access token")
+        accessToken = await updateAccessToken(accessToken)
+        console.log(accessToken)
     }
     return accessToken.token
 }
@@ -64,6 +64,8 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
         // console.log("no!!!!!!!!!");
         return ;
     }
+    console.log("send notify to..."+touser.sa_openid)
+
 
     let access_token = await get_access_token();
     let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+access_token;
@@ -96,7 +98,7 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
         }
     });
     let res = JSON.parse(text);
-
+    console.log(res)
     return res
 
 };
@@ -184,5 +186,4 @@ let update_services_openids = exports.update_services_openids = async function(s
     }
     return count;
 }
-
 
