@@ -12,7 +12,6 @@ let logger = log4js.getLogger('errorLogger');
 
 const ERR_CODE = 985;
 
-let accessToken = null;
 
 
 let updateAccessToken = async function (access_token) {
@@ -43,19 +42,13 @@ let updateAccessToken = async function (access_token) {
 
 let get_access_token = exports.get_access_token = async function()
 {
-    if(accessToken == null){
-        accessToken = await AccessToken.findOne();
-        if(accessToken){
+    let accessToken = await AccessToken.findOne();
 
-            console.log(moment(accessToken.expire_date));
-            console.log(moment())
-        }
-        if(!accessToken || moment(accessToken.expire_date).isBefore(moment()))
-        {
-            console.log("updating access token")
-            accessToken = await updateAccessToken(accessToken)
-            console.log(accessToken)
-        }
+    if(!accessToken || moment(accessToken.expire_date).isBefore(moment()))
+    {
+        console.log("updating access token")
+        accessToken = await updateAccessToken(accessToken)
+        console.log(accessToken)
     }
     return accessToken.token
 }
@@ -193,14 +186,5 @@ let update_services_openids = exports.update_services_openids = async function(s
         await doit(user_list)
     }
     return count;
-}
-
-
-exports.checkSignature = function(sig, ts, nonce){
-    let arr = [config.SA_TOKEN, ts, nonce].sort();
-    let tmp_str = arr[0]+arr[1]+arr[2];
-
-
-
 }
 
