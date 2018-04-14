@@ -66,7 +66,7 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
     let tid = String(touser._id);
     let fid = String(comment.fromId._id);
     console.log(comment.fromId._id)
-    console.log(touser._id)
+    console.log(touser)
     if(touser.sa_openid == null ||  fid == tid){
         // console.log("no!!!!!!!!!");
         return ;
