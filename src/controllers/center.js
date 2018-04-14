@@ -56,11 +56,8 @@ router.get('/center/moments', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.get('/center/collections', auth.loginRequired, async (ctx, next) => {
-    let reqParam= ctx.query;
-    let pageNo = 1;
-    if (reqParam.pageNo) {pageNo = Number(reqParam.pageNo);}  //页码数, 默认为1
-    let pageSize = 6;
-    if (reqParam.pageSize) {pageSize = Number(reqParam.pageSize);}//每页显示的记录条数, 默认为6
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
     console.log(pageNo);console.log(pageSize);
 
     let collections = await srv_goods.collectionList(ctx.state.user, pageNo, pageSize);

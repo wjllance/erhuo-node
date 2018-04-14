@@ -40,11 +40,8 @@ router.get('/goods/index', async (ctx, next) => {
         ]
     };
     let totle = await Goods.find(condi).count();//表总记录数
-    let reqParam= ctx.query;
-    let pageNo = 1;
-    if (reqParam.pageNo) {pageNo = Number(reqParam.pageNo);}  //页码数, 默认为1
-    let pageSize = 6;
-    if (reqParam.pageSize) {pageSize = Number(reqParam.pageSize);}//每页显示的记录条数, 默认为6
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
     let goods = await Goods.find(condi).sort('-_id').limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
     let hasMore=totle-pageNo*pageSize>0;
     ctx.body = {

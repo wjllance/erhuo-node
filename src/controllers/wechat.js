@@ -10,7 +10,9 @@ const crypto = require('crypto')
 
 const router = module.exports = new Router();
 
-
+/**
+ * @apiName 微信服务器验证接口
+ */
 router.get('/wechat', async (ctx, next) => {
     let params = ctx.query;
     // let params = ctx.data.xml;

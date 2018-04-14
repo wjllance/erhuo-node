@@ -52,12 +52,31 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     auth.assert(data.watermark.appid == config.APP_ID, '水印错误');
 
     _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
-    await ctx.state.user.save();
+    let user = await ctx.state.user.save();
 
     ctx.body = {
-        success: 1
+        success: 1,
+        data: user.toOBJ()
     };
 });
+
+/**
+ * @api {post}   /user/update_mina   小程序内用户更新
+ * @apiName     UpdateMina
+ * @apiGroup    User
+ */
+
+router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
+
+    _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl', 'gender', 'location']));
+    let user = await ctx.state.user.save();
+
+    ctx.body = {
+        success: 1,
+        data: user.toOBJ()
+    };
+});
+
 
 // 我的发布tobe migrate
 /**
@@ -121,7 +140,6 @@ router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) 
         success: 1,
     }
 });
-
 
 
 

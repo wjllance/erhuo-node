@@ -17,6 +17,8 @@ let userSchema = new mongoose.Schema({
 		index: true
     },
 	sa_openid: String,
+	location: String,
+	// stu_verified: Boolean,
 
 	// 以下是从微信获取到的用户数据
 	nickName: String,
@@ -38,5 +40,10 @@ let userSchema = new mongoose.Schema({
 
 	created_date: { type: Date, default: Date.now },
 });
+
+userSchema.methods.toOBJ = function(){
+	let output = _.pick(this, _id, nickName, avatarUrl, gender, location);
+	return output;
+}
 
 module.exports = mongoose.model("User", userSchema);
