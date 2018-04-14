@@ -186,3 +186,11 @@ let update_services_openids = exports.update_services_openids = async function(s
 }
 
 
+exports.checkSignature = function(sig, ts, nonce){
+    let arr = [config.SA_TOKEN, ts, nonce].sort();
+    let tmp_str = arr[0]+arr[1]+arr[2];
+
+
+
+}
+
