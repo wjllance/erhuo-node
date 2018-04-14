@@ -34,15 +34,15 @@ const router = module.exports = new Router();
  *
  */
 router.get('/goods/index', async (ctx, next) => {
-    let condi= {
-        $or: [
-            {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
-        ]
-    };
-    let totle = await Goods.find(condi).count();//表总记录数
+    // let condi= {
+    //     $or: [
+    //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
+    //     ]
+    // };
+    let totle = await Goods.find().count();//表总记录数
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
-    let goods = await Goods.find(condi).sort('-_id').limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let goods = await Goods.find().sort('-_id').limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
     let hasMore=totle-pageNo*pageSize>0;
     ctx.body = {
         success: 1,
