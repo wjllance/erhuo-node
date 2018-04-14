@@ -42,7 +42,7 @@ let userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.toOBJ = function(){
-	let output = _.pick(this, _id, nickName, avatarUrl, gender, location);
+	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", "location"]);
 	return output;
 }
 
