@@ -100,7 +100,35 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 // 参数：gid
 
 /**
- * @api {delete} /goods/:goods_id  商品下架
+ * @api {put} /goods/remove/:goods_id  商品下架
+ * @apiName     GoodsDelete
+ * @apiGroup    Goods
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let myGood = await Goods.findOne({_id: ctx.params.goods_id});
+    auth.assert(myGood, '商品不存在');
+    let isRemoved = await srv_goods.isGoodRemoved(myGood);
+    auth.assert(!isRemoved, '商品已下架');
+    auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
+    _.assign(myGood, {'removed_date':Date.now()});
+    console.log(myGood);
+    await myGood.save();
+    ctx.body = {
+        success: 1,
+        data: myGood._id.toString()
+    };
+});
+
+
+// 删除
+// 参数：gid
+
+/**
+ * @api {delete} /goods/:goods_id  商品删除
  * @apiName     GoodsDelete
  * @apiGroup    Goods
  *
@@ -112,9 +140,9 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findOne({_id: ctx.params.goods_id});
     auth.assert(myGood, '商品不存在');
     let isRemoved = await srv_goods.isGoodRemoved(myGood);
-    auth.assert(!isRemoved, '商品已下架');
-    auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
-    _.assign(myGood, {'removed_date':Date.now()});
+    auth.assert(isRemoved, '商品未下架，不能删除');
+    auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限删除商品');
+    _.assign(myGood, {'deleted_date':Date.now()});
     console.log(myGood);
     await myGood.save();
     ctx.body = {
