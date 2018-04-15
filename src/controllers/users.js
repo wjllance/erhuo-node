@@ -99,13 +99,16 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
  */
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
     let isRemoved = ctx.query.isRemoved || null;  //默认未下架
-    let condi = {userID: ctx.state.user._id};  //加入未下架筛选
+    let condi = {
+        userID: ctx.state.user._id,
+        deleted_date: null
+    };  //未删除筛选
 
     if(isRemoved == '1'){
-        condi.$and = [{removed_date: {$ne: null}},{removed_date: {$lte: Date.now()}}];
+        condi.removed_date = {$ne: null};
     }
     else if(isRemoved == '0'){
-        condi.$or = [{removed_date: null},{removed_date: {$gt: Date.now()}}];
+        condi.removed_date = null;
     }
     console.log(condi);
     let goods = await Goods.find(condi).populate('gpics');
