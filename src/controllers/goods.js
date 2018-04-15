@@ -122,6 +122,34 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+
+// 删除
+// 参数：gid
+
+/**
+ * @api {delete} /goods/delete/:goods_id  商品下架
+ * @apiName     GoodsDelete
+ * @apiGroup    Goods
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.delete('/goods/delete/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let myGood = await Goods.findOne({_id: ctx.params.goods_id});
+    auth.assert(myGood, '商品不存在');
+    let isRemoved = await srv_goods.isGoodRemoved(myGood);
+    auth.assert(isRemoved, '商品未下架，不能删除');
+    auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限删除商品');
+    _.assign(myGood, {'deleted_date':Date.now()});
+    console.log(myGood);
+    await myGood.save();
+    ctx.body = {
+        success: 1,
+        data: myGood._id.toString()
+    };
+});
+
 /**
  * @api {put} /goods/:goods_id  编辑商品
  * @apiName     GoodsEdit   暂不支持修改图片
