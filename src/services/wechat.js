@@ -188,3 +188,38 @@ let update_services_openids = exports.update_services_openids = async function(s
     return count;
 }
 
+
+//根据openid从服务号获取用户基本信息并存入数据库
+let update_userInfo_by_openId = exports.update_userInfo_by_openId = async function(openid){
+    let access_token = await get_access_token();
+    console.log(access_token);
+    let get_url = "https://api.weixin.qq.com/cgi-bin/user/info";
+    let {text} = await superagent.get(get_url).query({
+        access_token: access_token,
+        openid: openid,
+        lang:'zh_CN'
+    });
+    let res = JSON.parse(text);
+    if(res.errcode){
+        console.log(res);
+        let err = new Error(res.errmsg);
+        err.status = ERR_CODE;
+        throw err;
+    }else{
+        let userInfo=
+        {
+            sa_openid: res.openid,
+            nickname: res.nickName,
+            gender: res.sex,
+            avatarUrl:res.headimgurl,
+            city:res.city,
+            province:res.province,
+            country: res.country,
+            language: res.language,
+            unionid: res.unionid
+        };
+        console.log(userInfo);
+        let unionid = userInfo.unionid;
+        await User.findOneAndUpdate({unionid: unionid}, userInfo, {new: true, upsert: true});
+    }
+};
