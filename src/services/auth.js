@@ -63,9 +63,12 @@ exports.login = async function(ctx, code) {
         grant_type: 'authorization_code'
     });
     let data = JSON.parse(text);
-
-    // let user = await User.findOneAndUpdate({unionid: data.unionid}, data, {new: true, upsert: true});
-    let user = await User.findOneAndUpdate({openid: data.openid}, data, {new: true, upsert: true});
+    let user = null;
+    if(data.unionid){
+        user = await User.findOneAndUpdate({unionid: data.unionid}, data, {new: true, upsert: true});
+    }else{
+        user = await User.findOneAndUpdate({openid: data.openid}, data, {new: true, upsert: true});
+    }
     ctx.session.user_id = user._id;
 }
 
