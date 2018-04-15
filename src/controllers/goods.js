@@ -99,7 +99,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 // 参数：gid
 
 /**
- * @api {delete} /goods/:goods_id  商品下架
+ * @api {put} /goods/remove/:goods_id  商品下架
  * @apiName     GoodsDelete
  * @apiGroup    Goods
  *
@@ -107,7 +107,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findOne({_id: ctx.params.goods_id});
     auth.assert(myGood, '商品不存在');
     let isRemoved = await srv_goods.isGoodRemoved(myGood);
@@ -127,7 +127,7 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 // 参数：gid
 
 /**
- * @api {delete} /goods/delete/:goods_id  商品下架
+ * @api {delete} /goods/:goods_id  商品删除
  * @apiName     GoodsDelete
  * @apiGroup    Goods
  *
@@ -135,7 +135,7 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.delete('/goods/delete/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findOne({_id: ctx.params.goods_id});
     auth.assert(myGood, '商品不存在');
     let isRemoved = await srv_goods.isGoodRemoved(myGood);
