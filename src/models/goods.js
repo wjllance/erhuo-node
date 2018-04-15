@@ -20,7 +20,10 @@ let goodsSchema = new mongoose.Schema({
 		ref : 'Image'
 	}],
 	gstype: String,
-	glocation: String,
+	glocation: {
+		type: Number,
+		default: 0
+    },
 	gcost: Number,
 	gcity: String,
 
@@ -31,7 +34,7 @@ let goodsSchema = new mongoose.Schema({
 
 
 goodsSchema.methods.toOBJ = function() {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost']);
     g.gpics = [];
     g.gpics[0] = this.gpics[0].thumb();
     g.state = this.removed_date ? "已下架" : "在售";

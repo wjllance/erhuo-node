@@ -5,8 +5,8 @@ let { User  } = require('../models');
 let { Comment } = require('../models');
 let { Goods } = require('../models');
 
-
 let tools = require('./tools')
+const schools = require('../config').CONSTANT.SCHOOL;
 
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
@@ -19,11 +19,14 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
 
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
+
     if (!_.isArray(goods)) {
-        return _.assign(goods.toOBJ(), await injectGoods(goods, user));
+        goods = goods.toOBJ();
+        _.assign(goods.toOBJ(), await injectGoods(goods, user));
+        return goods
     } else {
         let ugoods = goods.map(x => x.toOBJ());
-        // FIXME too slow
+            // FIXME too slow
         for(let i = 0; i < goods.length; i ++) {
             _.assign(ugoods[i], await injectGoods(goods[i], user));
         }
@@ -103,5 +106,23 @@ exports.collectionList = async function(user_state, pageNo, pageSize)
         collections: ugoods,
         hasMore : hasMore,
         total : total
+    }
+}
+
+
+exports.goodsList = async (user, pageNo, pageSize)=>{
+    let condi = {
+        deleted_date: null,
+    };
+    if(user && user.location>0){ //not other
+        condi.glocation = user.location
+    }
+    let total = await Goods.find(condi).count();//表总记录数
+    let goods = await Goods.find(condi).sort({removed_date:1, created_date:-1}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let hasMore=total-pageNo*pageSize>0;
+    return {
+        goods: await outputify(goods, user),
+        hasMore: hasMore,
+        total: total
     }
 }

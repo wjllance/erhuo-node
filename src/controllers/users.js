@@ -12,6 +12,7 @@ let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let { User } = require('../models');
 let { Goods } = require('../models');
+const schools = config.CONSTANT.SCHOOL;
 
 const router = module.exports = new Router();
 
@@ -43,6 +44,9 @@ router.post('/user/login', async (ctx, next) => {
  */
 
 router.post('/user/update', auth.loginRequired, async (ctx, next) => {
+
+    console.log("here is update")
+
     auth.assert(ctx.request.body.signature == utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
 
     let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
@@ -52,6 +56,7 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     auth.assert(data.watermark.appid == config.APP_ID, '水印错误');
 
     _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
+
     let user = await ctx.state.user.save();
 
     ctx.body = {
@@ -68,7 +73,12 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 
 router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
 
-    _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl', 'gender', 'location']));
+    let userInfo = ctx.request.body.userInfo;
+    if(userInfo.location){
+        userInfo.location = locationTransform(userInfo.location);
+    }
+    _.assign(ctx.state.user, _.pick(userInfo, ['nickName', 'avatarUrl', 'gender', 'location']));
+    console.log(ctx.state.user);
     let user = await ctx.state.user.save();
 
     ctx.body = {
@@ -142,4 +152,11 @@ router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) 
 });
 
 
+let locationTransform = (location) => {
+    if(location == "北京大学" || Number(location) == 1)
+        return 1;
+    if(location == "清华大学" || Number(location) == 1)
+        return 2;
+    return 0;
+}
 

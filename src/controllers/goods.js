@@ -13,6 +13,7 @@ let srv_goods = require('../services/goods');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
+const schools = config.CONSTANT.SCHOOL
 
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
@@ -39,18 +40,14 @@ router.get('/goods/index', async (ctx, next) => {
     //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
     //     ]
     // };
-    let totle = await Goods.find().count();//表总记录数
+    // await auth.loginRequired(ctx, next)
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
-    let goods = await Goods.find().sort('-_id').limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
-    let hasMore=totle-pageNo*pageSize>0;
+
+    let data = await srv_goods.goodsList(ctx.state.user, pageNo, pageSize);
     ctx.body = {
         success: 1,
-        data: {
-            goods: await srv_goods.outputify(goods, ctx.state.user),
-            hasMore:hasMore,
-            total:totle
-        }
+        data: data
     }
 });
 
@@ -86,6 +83,10 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
     _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+
+    if(!goods.glocation){
+        goods.glocation = ctx.state.user.location || schools.OTHER;
+    }
     await goods.save();
 
     ctx.body = {
@@ -162,7 +163,7 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/goods/detail/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.get('/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
     auth.assert(goods, '商品不存在');
     // auth.assert(!isRemoved, '商品已下架');

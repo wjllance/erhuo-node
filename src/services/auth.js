@@ -78,8 +78,11 @@ exports.loginRequired = async function (ctx, next) {
     {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
         // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
-        let user_id = ctx.session.user_id ||"5ac41747758e552f031118f5";  //wjl
+        let user_id = ctx.session.user_id ||"5ad31bfba2e0c833c23d9d56";  //wjl
         ctx.state.user = await User.findById(user_id);
+        if(!ctx.state.user){
+            console.log(user_id+"not exist")
+        }
     }
     assert(ctx.state.user, '尚未登录');
 

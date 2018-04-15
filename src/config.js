@@ -28,6 +28,15 @@ exports.SA_APP_ID = config['SA_APP_ID'];
 exports.SA_SECRET = config['SA_SECRET'];
 exports.SA_TOKEN = config['SA_TOKEN'];
 
+exports.CONSTANT = {
+    SCHOOL:{
+        OTHER: 0,
+        PKU:1,
+        THU:2,
+    },
+    SCHOOL_MAP:["其他学校","北京大学","清华大学"]
+}
+
 let PUBLIC = exports.PUBLIC = {
     root: path.join(__dirname, '..', config['PUBLIC']),
     images: 'images'
