@@ -209,7 +209,7 @@ let update_userInfo_by_openId = exports.update_userInfo_by_openId = async functi
         let userInfo=
         {
             sa_openid: res.openid,
-            nickname: res.nickName,
+            nickName: res.nickname,
             gender: res.sex,
             avatarUrl:res.headimgurl,
             city:res.city,
