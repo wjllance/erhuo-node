@@ -34,7 +34,7 @@ exports.CONSTANT = {
         PKU:1,
         THU:2,
     },
-    SCHOOL_MAP:["其他学校","北京大学","清华大学"]
+    SCHOOL_MAP:["全城","北京大学","清华大学"]
 }
 
 let PUBLIC = exports.PUBLIC = {
