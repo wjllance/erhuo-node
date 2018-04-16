@@ -49,6 +49,8 @@ let get_access_token = exports.get_access_token = async function()
         console.log("updating access token")
         accessToken = await updateAccessToken(accessToken)
         console.log(accessToken)
+    }else{
+        console.info(moment(accessToken.expire_date));
     }
     return accessToken.token
 }
