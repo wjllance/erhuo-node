@@ -35,7 +35,7 @@ exports.CONSTANT = {
         THU:3,
         OTHER: 1,
     },
-    SCHOOL_MAP:["全城", "其他院校","北京大学","清华大学"]
+    SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学"]
 }
 
 let PUBLIC = exports.PUBLIC = {
