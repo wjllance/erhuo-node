@@ -85,7 +85,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
 
     if(!goods.glocation){
-        goods.glocation = ctx.state.user.location || schools.OTHER;
+        goods.glocation = ctx.state.user.location || schools.ALL;
     }
     await goods.save();
 
