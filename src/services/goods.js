@@ -19,13 +19,10 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
 
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
-
     if (!_.isArray(goods)) {
-        goods = goods.toOBJ();
-        _.assign(goods.toOBJ(), await injectGoods(goods, user));
-        return goods
+        return _.assign(goods.baseInfo(), await injectGoods(goods, user));
     } else {
-        let ugoods = goods.map(x => x.toOBJ());
+        let ugoods = goods.map(x => x.baseInfo());
             // FIXME too slow
         for(let i = 0; i < goods.length; i ++) {
             _.assign(ugoods[i], await injectGoods(goods[i], user));
@@ -57,10 +54,14 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         .populate('userID');
     if(!goods)
         return goods;
-    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
-    g.gpics = goods.gpics.map(y => y.url());
-    g.state = this.removed_date ? "已下架" : "在售";
-    g.created_date = tools.dateStr(goods.created_date);
+    let g = goods.baseInfo(1);
+    // g.gpics = goods.gpics.map(y => y.url());
+
+    // let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
+    // g.state = goods.removed_date ? "已下架" : "在售";
+    // g.created_date = tools.dateStr(goods.created_date);
+    // g.glocation = school_map[goods.glocation] ;
+
     g.user = {
         _id: goods.userID._id,
         name: goods.userID.nickName,
@@ -100,7 +101,7 @@ exports.collectionList = async function(user_state, pageNo, pageSize)
     let total = await Goods.find({_id: user_state.collections}).count();//用户总收藏数
 
     let collections = await Goods.find({_id: user_state.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
-    let ugoods = collections.map(x => x.toOBJ());
+    let ugoods = collections.map(x => x.baseInfo());
     let hasMore=total-pageNo*pageSize>0;
     return {
         collections: ugoods,

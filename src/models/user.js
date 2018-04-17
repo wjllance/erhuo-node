@@ -44,8 +44,8 @@ let userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.toOBJ = function(){
-	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", "location"]);
-	output.location = school_map[output.location]
+	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender"]);
+	output.location = school_map[this.location];
 	return output;
 }
 
