@@ -26,7 +26,7 @@ module.exports = {
             "errorLogger": {
                 "type": "dateFile",
                 "filename": errorLogPath,
-                "pattern": "-yyyy-MM-dd-hh.log",
+                "pattern": "-yyyy-MM-dd.log",
                 "alwaysIncludePattern": true,
                 "encoding":"utf-8",
                 "maxLogSize": 1000,
@@ -36,7 +36,7 @@ module.exports = {
             "resLogger": {
                 "type": "dateFile",
                 "filename": responseLogPath,
-                "pattern": "-yyyy-MM-dd-hh.log",
+                "pattern": "-yyyy-MM-dd.log",
                 "alwaysIncludePattern": true,
                 "encoding":"utf-8",
                 "maxLogSize": 1000,

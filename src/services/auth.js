@@ -12,6 +12,7 @@ const ERR_CODE = 978;
 
 const FRIENDLY_CHARSET = "123456789qwertyuplkjhgfdsazxcvbnmQWERTYUPKJHGFDSAZXCVBNM";
 
+let logger = require('log4js').getLogger('errorLogger');
 exports.visit = async function (ctx, next) {
     try {
         if (!ctx.query.notrecord) {
@@ -42,6 +43,7 @@ let userM = exports.userM = async function (ctx, next) {
             msg: e.message || 'unknow'
         };
         console.error(e);
+        logger.error(e)
 	}
 }
 
