@@ -11,6 +11,10 @@ let tools = require("./tools")
 
 
 let getListInfo = exports.getListInfo = function(cmt){
+
+    // console.log(cmt.goodsId)
+    if(!cmt.goodsId)
+        return {}
     let ret = {
         _id: cmt._id,
         goodsId: cmt.goodsId._id,

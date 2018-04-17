@@ -164,9 +164,9 @@ let update_services_openids = exports.update_services_openids = async function(s
     sa_openids_exists = sa_openids_exists.map(y=>y.sa_openid);
     logger.level = 'info';
     logger.info("sa openids exists, size"+ sa_openids_exists.length)
-    logger.info(sa_openids_exists)
+    // logger.info(sa_openids_exists)
     logger.info("sa openids, size"+ sa_openids.length)
-    logger.info(sa_openids)
+    // logger.info(sa_openids)
 
 
     console.log("sa openids exists, size"+ sa_openids_exists.length)
@@ -203,7 +203,9 @@ let update_userInfo_by_openId = exports.update_userInfo_by_openId = async functi
     });
     let res = JSON.parse(text);
     if(res.errcode){
+        logger.error(res);
         console.log(res);
+
         let err = new Error(res.errmsg);
         err.status = ERR_CODE;
         throw err;
