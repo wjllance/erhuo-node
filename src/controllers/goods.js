@@ -14,6 +14,7 @@ let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
 const schools = config.CONSTANT.SCHOOL
+const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
@@ -217,7 +218,7 @@ router.get('/goods/base/:goods_id', async (ctx, next) => {
     auth.assert(goods, '商品不存在');
     let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
     g.gpics = goods.gpics.map(y=>y.urlwithid());
-
+    g.glocation = school_map[goods.glocation] ;
     ctx.body = {
         success: 1,
         data: g
