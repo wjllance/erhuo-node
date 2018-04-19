@@ -60,10 +60,15 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
     let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
     let tid = String(touser._id);
     let fid = String(comment.fromId._id);
-    console.log(comment.fromId._id)
-    console.log(touser)
+    logger.info(comment.fromId._id)
+    logger.info(touser)
     if(touser.sa_openid == null ||  fid == tid){
         // console.log("no!!!!!!!!!");
+        logger.info("not sending notify");
+        if(touser.sa_openid == null)
+        {
+            logger.error(comment);
+        }
         return ;
     }
     console.log("send notify to..."+touser.sa_openid)
@@ -120,6 +125,7 @@ let update_service_account_userid = exports.update_service_account_userid = asyn
 
     if(res.errcode){
         console.log(res)
+        logger.err(res)
         let err = new Error(res.errmsg);
         err.status = ERR_CODE;
         throw err;
