@@ -55,7 +55,7 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     auth.assert(data.openId == ctx.state.user.openid, '签名错误2');
     auth.assert(data.watermark.appid == config.APP_ID, '水印错误');
 
-    _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
+    _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'unionid', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
 
     let user = await ctx.state.user.save();
 
