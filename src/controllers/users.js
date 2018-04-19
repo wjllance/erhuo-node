@@ -13,7 +13,7 @@ let srv_comment = require('../services/comment');
 let { User } = require('../models');
 let { Goods } = require('../models');
 const schools = config.CONSTANT.SCHOOL;
-
+let moment = require('moment');
 const router = module.exports = new Router();
 
 // 登录
@@ -57,6 +57,7 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     console.log(data)
     _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'unionid', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
     ctx.state.user.unionid = data.unionId;
+    ctx.state.user.updated_date = moment();
     let user = await ctx.state.user.save();
 
     ctx.body = {
