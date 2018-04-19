@@ -42,7 +42,9 @@ let userM = exports.userM = async function (ctx, next) {
             err: 1,
             msg: e.message || 'unknow'
         };
+
         console.error(e);
+        logger.error(ctx.request);
         logger.error(e)
 	}
 }
