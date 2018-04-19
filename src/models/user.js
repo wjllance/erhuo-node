@@ -40,7 +40,8 @@ let userSchema = new mongoose.Schema({
 		default: []
 	},
 
-	created_date: { type: Date, default: Date.now },
+    created_date: { type: Date, default: Date.now },
+    updated_date: { type: Date, default: Date.now },
 });
 
 userSchema.methods.toOBJ = function(){
