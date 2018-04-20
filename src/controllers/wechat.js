@@ -63,3 +63,19 @@ router.post('/wechat', async (ctx, next) => {
     }
     ctx.body = {}
 });
+
+router.post('/wechat/qrcode', async (ctx, next) => {
+    let scene = ctx.request.body.scene;
+    let path = ctx.request.body.path;
+    auth.assert(scene, "miss scene");
+    auth.assert(path, "miss path");
+    let filename = await wechat.qrcode(scene, path);
+    // console.log(Buffer.isBuffer(body));
+    // ctx.length = Buffer.byteLength(body);
+
+    ctx.body = {
+        success:1,
+        data: config.SERVER.URL_PREFIX + '/' + filename
+    }
+});
+

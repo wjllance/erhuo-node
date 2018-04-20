@@ -2,6 +2,8 @@ require('should');
 let _ = require('lodash');
 let utils = require('utility');
 let superagent = require('superagent');
+let fs = require('fs');
+let path = require('path');
 let config = require('../config');
 let {User, AccessToken, Comment} = require('../models')
 let moment = require('moment')
@@ -11,47 +13,61 @@ let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 
 const ERR_CODE = 985;
-
+const TYPE_SA = 0;
+const TYPE_MINA = 1;
 
 
 let updateAccessToken = async function (access_token) {
-    if(access_token==null){
-        access_token = new AccessToken({type:0})
-    }
-    console.log(access_token);
 
-    let api_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential"
-    let {text} = await superagent.get(api_url).query({
+    let query_sa = {
         grant_type: "client_credential",
         appid: config.SA_APP_ID,
         secret: config.SA_SECRET
-    });
+    };
+    let query_mina = {
+        grant_type: "client_credential",
+        appid: config.APP_ID,
+        secret: config.APP_SECRET
+    };
+    let api_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential"
+    let {text} = await superagent.get(api_url)
+        .query(access_token.type==TYPE_SA?query_sa:query_mina);
+
+    logger.info(text);
     console.log(text);
+
     let res = JSON.parse(text);
     if(res.errcode){
+
         console.log(res);
+        logger.error(res)
         let err = new Error(res.errmsg);
         err.status = ERR_CODE;
         throw err;
     }else{
         access_token.token = res.access_token;
-        access_token.expire_date = Date.now()+res.expires_in*1000;
+        access_token.expire_date = Date.now()+res.expires_in*1000 / 4;
         return await access_token.save();
     }
 }
 
-let get_access_token = exports.get_access_token = async function()
+let get_access_token = exports.get_access_token = async function(type)
 {
-    let accessToken = await AccessToken.findOne();
-
-    if(!accessToken || moment(accessToken.expire_date).isBefore(moment().add(1, 'h')))
-    {
-        console.log("updating access token")
-        accessToken = await updateAccessToken(accessToken)
-        console.log(accessToken)
-    }else{
-        console.info(moment(accessToken.expire_date));
+    let token_type = type || 0;
+    let accessToken = await AccessToken.findOne({type:token_type});
+    if(!accessToken){
+        accessToken = new AccessToken({
+            type:token_type,
+            expire_date: moment().subtract(2, 'h')
+        });
     }
+    if(moment(accessToken.expire_date).isBefore())
+    {
+        logger.info("updating access token");
+        // console.log("updating access token")
+        accessToken = await updateAccessToken(accessToken);
+    }
+    logger.info(accessToken);
     return accessToken.token
 }
 let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
@@ -232,4 +248,23 @@ let update_userInfo_by_openId = exports.update_userInfo_by_openId = async functi
         let unionid = userInfo.unionid;
         await User.findOneAndUpdate({unionid: unionid}, userInfo, {new: true, upsert: true});
     }
+};
+
+
+exports.qrcode = async(mina_scene, mina_path) => {
+
+    let api_url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+ await get_access_token(TYPE_MINA);
+
+    let ts = moment().millisecond().toString();
+    let filename = config.PUBLIC.images + '/qr_'+ts+'.jpg';
+    let ret = path.join(config.PUBLIC.root, filename);
+    let stream = fs.createWriteStream(ret);
+    await superagent.post(api_url).send({
+        scene: mina_scene,
+        path: mina_path
+    }).pipe(stream);
+    return filename;
+    // let res = JSON.parse(text);
+    // console.log(res);
+    // return res;
 };
