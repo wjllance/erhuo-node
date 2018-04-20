@@ -214,8 +214,8 @@ router.get('/goods/detail/:goods_id', async (ctx, next) => {
  */
 router.get('/goods/base/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getBaseById(ctx.params.goods_id);
-    goods = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
     auth.assert(goods, '商品不存在');
+    goods = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
     ctx.body = {
         success: 1,
         data: goods

@@ -36,7 +36,7 @@ let goodsSchema = new mongoose.Schema({
 
 
 goodsSchema.methods.baseInfo = function(fullPic) {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost']);
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date']);
 	if(fullPic){
         g.gpics = this.gpics.map(y => y.url());
 	}else{

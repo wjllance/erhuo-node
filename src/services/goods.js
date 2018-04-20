@@ -119,7 +119,11 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
         condi.glocation = user.location
     }
     let total = await Goods.find(condi).count();//表总记录数
-    let goods = await Goods.find(condi).sort({removed_date:1, created_date:-1}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let goods = await Goods.find(condi)
+       // .sort({removed_date:1, created_date:-1})
+        .sort({removed_date:1, updated_date:-1})
+        .limit(pageSize).skip((pageNo-1)*pageSize)
+        .populate('gpics');
     let hasMore=total-pageNo*pageSize>0;
     return {
         goods: await outputify(goods, user),
