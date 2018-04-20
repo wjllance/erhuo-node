@@ -44,7 +44,7 @@ let get_access_token = exports.get_access_token = async function()
 {
     let accessToken = await AccessToken.findOne();
 
-    if(!accessToken || moment(accessToken.expire_date).isBefore(moment().add(30, 'm')))
+    if(!accessToken || moment(accessToken.expire_date).isBefore(moment().add(90, 'm')))
     {
         console.log("updating access token")
         accessToken = await updateAccessToken(accessToken)
