@@ -9,12 +9,17 @@ let { User } = require('../models');
 let { Goods, Comment } = require('../models');
 let tools = require("./tools")
 
+let log4js = require('log4js');
+let logger = log4js.getLogger('errorLogger');
 
 let getListInfo = exports.getListInfo = function(cmt){
 
     // console.log(cmt.goodsId)
-    if(!cmt.goodsId)
+    if(!cmt.goodsId || !cmt.fromId){
+        logger.error("goodsid or fromid miss!");
+        logger.error(cmt);
         return {}
+    }
     let ret = {
         _id: cmt._id,
         goodsId: cmt.goodsId._id,
