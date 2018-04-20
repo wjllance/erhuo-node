@@ -125,7 +125,7 @@ let update_service_account_userid = exports.update_service_account_userid = asyn
 
     if(res.errcode){
         console.log(res)
-        logger.err(res)
+        logger.error(res)
         let err = new Error(res.errmsg);
         err.status = ERR_CODE;
         throw err;
