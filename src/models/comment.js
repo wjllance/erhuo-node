@@ -3,6 +3,9 @@ let mongoose = require('mongoose');
 let _ = require('lodash');
 let tools = require('../services/tools')
 
+let log4js = require('log4js');
+let logger = log4js.getLogger('errorLogger');
+
 // 评论
 let commentSchema = new mongoose.Schema({
 
@@ -26,6 +29,11 @@ let commentSchema = new mongoose.Schema({
 
 
 commentSchema.methods.getFullInfo = function() {
+    if(!this.fromId){
+        logger.error("fromid not exist")
+        logger.error(this);
+        return {}
+    }
     let ret = {
         _id: this._id,
         content: this.content,

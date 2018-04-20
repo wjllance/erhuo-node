@@ -6,8 +6,8 @@ let config = require('../config');
 let {User, AccessToken, Comment} = require('../models')
 let moment = require('moment')
 moment.locale('zh-cn');
-let log4js = require('log4js');
 
+let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 
 const ERR_CODE = 985;
