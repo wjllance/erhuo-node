@@ -258,7 +258,20 @@ exports.dealText = function(responseMSg, fromUserName, toUserName){
     ret_xml += '<MsgType><![CDATA[text]]></MsgType>';
     ret_xml += '<Content><![CDATA['+responseMSg+']]></Content></xml>';
     return ret_xml;
-}
+};
+exports.message = {
+    text (msg, content) {
+        // return xml.jsonToXml({
+        //     xml: {
+        //         ToUserName: msg.FromUserName,
+        //         FromUserName: msg.ToUserName,
+        //         CreateTime: Date.now(),
+        //         MsgType: msg.MsgType,
+        //         Content: content
+        //     }
+        // })
+    }
+};
 
 
 exports.qrcode = async(mina_scene, mina_path) => {
