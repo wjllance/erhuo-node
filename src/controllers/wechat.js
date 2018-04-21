@@ -62,27 +62,28 @@ router.post('/wechat', async (ctx, next) => {
             switch (event){
                 case "subscribe":
                     wechat.update_userInfo_by_openId(fromUserName);
+                    let mes="欢迎订阅IM二货兔！";
+                    ret_body = wechat.dealText(mes,toUserName, fromUserName);
+                    break;
+                case "unsubscribe":
+                case "SCAN":
+                case "LOCATION":
+                case "CLICK":
+                case "VIEW":
                     break;
             }
             break;
         case "text":
+        case "image":
+        case "voice":
+        case "video":
+        case "shortvideo":
+        case "location":
+        case "link":
+        default:
             const content = xmlData.Content;
             auth.assert(content, "MISS");
-            ret_body = wechat.dealText("您的消息已收到。",fromUserName, toUserName);
-            break;
-        case "image":
-            break;
-        case "voice":
-            break;
-        case "video":
-            break;
-        case "shortvideo":
-            break;
-        case "location":
-            break;
-        case "link":
-            break;
-        default:
+            ret_body = wechat.dealText("您的消息已收到。",toUserName, fromUserName);
             break;
     }
     ctx.res.setHeader('Content-Type', 'application/xml');
