@@ -256,7 +256,7 @@ exports.qrcode = async(mina_scene, mina_path) => {
     let api_url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+ await get_access_token(TYPE_MINA);
 
     let ts = moment().millisecond().toString();
-    let filename = config.PUBLIC.images + '/qr_'+ts+'.jpg';
+    let filename = config.PUBLIC.images + '/qr_'+ts+'.png';
     let ret = path.join(config.PUBLIC.root, filename);
     let stream = fs.createWriteStream(ret);
     await superagent.post(api_url).send({
