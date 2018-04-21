@@ -27,7 +27,7 @@ let goodsSchema = new mongoose.Schema({
     },
 	gcost: Number,
 	gcity: String,
-
+	gpriority: Number,
 	created_date: { type: Date, default: Date.now },
     removed_date: { type: Date, default: null},   // 下架
     deleted_date: { type: Date, default: null},   // 删除
@@ -36,7 +36,7 @@ let goodsSchema = new mongoose.Schema({
 
 
 goodsSchema.methods.baseInfo = function(fullPic) {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date']);
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
 	if(fullPic){
         g.gpics = this.gpics.map(y => y.url());
 	}else{

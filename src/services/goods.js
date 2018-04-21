@@ -116,14 +116,21 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
         deleted_date: null,
     };
     if(user && user.location>0){ //not other
-        condi.glocation = user.location
+        condi.$or=[{
+            glocation:user.location
+        },{
+            glocation:0
+        }]
     }
+    let sorti = {
+        gpriority:-1,
+        removed_date:1,
+        updated_date:-1
+    };
     let total = await Goods.find(condi).count();//表总记录数
-    let goods = await Goods.find(condi)
-       // .sort({removed_date:1, created_date:-1})
-        .sort({removed_date:1, updated_date:-1})
-        .limit(pageSize).skip((pageNo-1)*pageSize)
-        .populate('gpics');
+
+    let goods = await Goods.find(condi).sort(sorti).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    console.log(goods);
     let hasMore=total-pageNo*pageSize>0;
     return {
         goods: await outputify(goods, user),
