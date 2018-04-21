@@ -62,7 +62,9 @@ router.post('/wechat', async (ctx, next) => {
             switch (event){
                 case "subscribe":
                     wechat.update_userInfo_by_openId(fromUserName);
-                    let mes="欢迎订阅IM二货兔！";
+                    let mes="欢迎关注IM二货兔，本兔兔是 校内小仙女的二手衣妆交易平台，发现本校周边童鞋的闲置物品，越省钱越美丽\n" +
+                        "IM二货兔刚刚发布，各位公主担待点，一起走向未来~\n" +
+                        "有爱的家庭，欢迎大家~";
                     ret_body = wechat.dealText(mes,toUserName, fromUserName);
                     break;
                 case "unsubscribe":
@@ -74,6 +76,14 @@ router.post('/wechat', async (ctx, next) => {
             }
             break;
         case "text":
+            const content = xmlData.Content;
+            auth.assert(content, "MISS");
+            let mes = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
+            if (String(content).match(/购买|买|卖|出售/)){
+                mes = "要买卖的话可以用二货兔小程序哦~戳菜单栏“进入平台”，即可参与买卖啦，还不快去做生意~"
+            }
+            ret_body = wechat.dealText(mes,toUserName, fromUserName);
+            break;
         case "image":
         case "voice":
         case "video":
@@ -81,9 +91,8 @@ router.post('/wechat', async (ctx, next) => {
         case "location":
         case "link":
         default:
-            const content = xmlData.Content;
-            auth.assert(content, "MISS");
-            ret_body = wechat.dealText("您的消息已收到。",toUserName, fromUserName);
+            mes = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
+            ret_body = wechat.dealText(mes,toUserName, fromUserName);
             break;
     }
     ctx.res.setHeader('Content-Type', 'application/xml');
