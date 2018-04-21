@@ -85,7 +85,10 @@ router.post('/wechat', async (ctx, next) => {
         default:
             break;
     }
-    ctx.body = ret_body;
+    ctx.body = {
+        success:1,
+        data:ret_body
+    };
 });
 
 router.post('/wechat/qrcode', async (ctx, next) => {
