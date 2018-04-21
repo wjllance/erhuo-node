@@ -37,6 +37,11 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
     let toId = ctx.request.body.to;
     console.log("to id"+toId);
     let res = await srv_comment.post(cmt_str, goods._id, ctx.state.user, toId);
+
+    goods.updated_date = Date.now();
+    await goods.save();
+
+
     goods = await srv_goods.getDetailById(goods._id, ctx.state.user);
     await srv_wechat.sendReplyNotice(res._id);
     ctx.body = {
