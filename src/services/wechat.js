@@ -250,6 +250,16 @@ let update_userInfo_by_openId = exports.update_userInfo_by_openId = async functi
     }
 };
 
+exports.dealText = function(responseMSg, fromUserName, toUserName){
+    let ret_xml='<xml>';
+    ret_xml += '<FromUserName><![CDATA[' + fromUserName + ']]></FromUserName>';
+    ret_xml += '<ToUserName><![CDATA[' + toUserName + ']]></ToUserName>';
+    ret_xml += '<CreateTime>'+new Date().getTime()+'</CreateTime>';
+    ret_xml += '<MsgType><![CDATA[text]]></MsgType>';
+    ret_xml += '<Content><![CDATA['+responseMSg+']]></Content></xml>';
+    return ret_xml;
+}
+
 
 exports.qrcode = async(mina_scene, mina_path) => {
 

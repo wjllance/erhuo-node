@@ -48,20 +48,44 @@ router.get('/wechat', async (ctx, next) => {
 router.post('/wechat', async (ctx, next) => {
     let xmlData = ctx.data.xml;
     console.log(xmlData);
+    let ret_body = "";
     const toUserName = xmlData.ToUserName[0],  // 开发者微信号
         fromUserName = xmlData.FromUserName[0],  // 发送方帐号（一个OpenID）
         createTime = xmlData.CreateTime[0],  //	消息创建时间 （整型）
-        msgType = xmlData.MsgType[0],	//消息类型，event
-        event = xmlData.Event[0];  // 事件类型，subscribe
+        msgType = xmlData.MsgType[0];	//消息类型，event
     auth.assert(fromUserName, "MISS");
     auth.assert(msgType, "MISS");
-    auth.assert(event, "MISS");
-    if (msgType ==="event"){
-        if (event === "subscribe"){
-            wechat.update_userInfo_by_openId(fromUserName);
-        }
+    switch (msgType){
+        case "event":
+            const event = xmlData.Event[0];  // 事件类型，subscribe
+            auth.assert(event, "MISS");
+            switch (event){
+                case "subscribe":
+                    wechat.update_userInfo_by_openId(fromUserName);
+                    break;
+            }
+            break;
+        case "text":
+            const content = xmlData.Content;
+            auth.assert(content, "MISS");
+            ret_body = wechat.dealText("您的消息已收到。",fromUserName, toUserName);
+            break;
+        case "image":
+            break;
+        case "voice":
+            break;
+        case "video":
+            break;
+        case "shortvideo":
+            break;
+        case "location":
+            break;
+        case "link":
+            break;
+        default:
+            break;
     }
-    ctx.body = {}
+    ctx.body = ret_body;
 });
 
 router.post('/wechat/qrcode', async (ctx, next) => {
