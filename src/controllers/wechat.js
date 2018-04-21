@@ -91,8 +91,8 @@ router.post('/wechat', async (ctx, next) => {
         case "location":
         case "link":
         default:
-            mes = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
-            ret_body = wechat.dealText(mes,toUserName, fromUserName);
+            let mes2 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
+            ret_body = wechat.dealText(mes2,toUserName, fromUserName);
             break;
     }
     ctx.res.setHeader('Content-Type', 'application/xml');
