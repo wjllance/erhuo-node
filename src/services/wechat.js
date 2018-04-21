@@ -272,7 +272,8 @@ exports.qrcode = async(mina_scene, mina_path) => {
     let stream = fs.createWriteStream(ret);
     await superagent.post(api_url).send({
         scene: mina_scene,
-        path: mina_path
+        path: mina_path,
+        width: 60
     }).pipe(stream);
     return filename;
     // let res = JSON.parse(text);
