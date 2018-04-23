@@ -23,6 +23,7 @@ let commentSchema = new mongoose.Schema({
         type:  mongoose.Schema.ObjectId,
         ref: 'Goods'
     },
+    secret: Boolean,
     read_date: {type: Date, default: null},
     created_date: { type: Date, default: Date.now },
 });
@@ -34,6 +35,11 @@ commentSchema.methods.getFullInfo = function() {
         logger.error(this);
         return {}
     }
+    let title = "";
+    if(this.secret){
+        title += "(密)";
+    }
+    title += this.fromId.nickName;
     let ret = {
         _id: this._id,
         content: this.content,
@@ -46,7 +52,9 @@ commentSchema.methods.getFullInfo = function() {
     {
         ret.toId = this.toId._id;
         ret.toName = this.toId.nickName;
+        title += " @"+this.toId.nickName;
     }
+    ret.title = title;
     return ret;
 };
 

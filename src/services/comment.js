@@ -75,11 +75,12 @@ exports.momentList = async function(user_id, pageSize, pageNo){
 };
 
 
-exports.post = async function(cmt, goods_id, fromId, toId) {
+exports.post = async function(cmt, goods_id, fromId, secret, toId) {
     let new_comment = await Comment.create({
         content: cmt,
         fromId: fromId,
-        goodsId: goods_id
+        goodsId: goods_id,
+        secret: secret
     });
     if (toId)
     {
