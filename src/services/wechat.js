@@ -1,5 +1,6 @@
 require('should');
 let _ = require('lodash');
+const xml2js = require('xml2js');
 let utils = require('utility');
 let superagent = require('superagent');
 let fs = require('fs');
@@ -250,13 +251,23 @@ let update_userInfo_by_openId = exports.update_userInfo_by_openId = async functi
     }
 };
 
+exports.dealText = function(responseMSg, fromUserName, toUserName){
+    let ret_xml='<xml>';
+    ret_xml += '<FromUserName><![CDATA[' + fromUserName + ']]></FromUserName>';
+    ret_xml += '<ToUserName><![CDATA[' + toUserName + ']]></ToUserName>';
+    ret_xml += '<CreateTime>'+new Date().getTime()+'</CreateTime>';
+    ret_xml += '<MsgType><![CDATA[text]]></MsgType>';
+    ret_xml += '<Content><![CDATA['+responseMSg+']]></Content></xml>';
+    return ret_xml;
+};
+
 
 exports.qrcode = async(mina_scene, mina_path) => {
 
     let api_url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+ await get_access_token(TYPE_MINA);
 
     let ts = moment().millisecond().toString();
-    let filename = config.PUBLIC.images + '/qr_'+ts+'.jpg';
+    let filename = config.PUBLIC.images + '/qr_'+ts+'.png';
     let ret = path.join(config.PUBLIC.root, filename);
     let stream = fs.createWriteStream(ret);
     await superagent.post(api_url).send({

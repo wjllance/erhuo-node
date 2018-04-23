@@ -97,8 +97,8 @@ let getBaseById = exports.getBaseById = async function(goods_id) {
     return await Goods.findById(goods_id);
 };
 
-let getCardInfoById = exports.getBaseById = async function(goods_id) {
-    return Goods.findById(goods_id)
+let getCardInfoById = exports.getCardInfoById = async function(goods_id) {
+    return await Goods.findById(goods_id)
         .populate('gpics');
 };
 
@@ -141,6 +141,7 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
         updated_date:-1
     };
     let total = await Goods.find(condi).count();//表总记录数
+
     let goods = await Goods.find(condi).sort(sorti).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
     console.log(goods);
     let hasMore=total-pageNo*pageSize>0;
