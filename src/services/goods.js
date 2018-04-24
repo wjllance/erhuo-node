@@ -54,7 +54,7 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         .populate('userID');
     if(!goods)
         return goods;
-    let g = goods.baseInfo(1);
+    let g = goods.baseInfo(1); //fullpic
     // g.gpics = goods.gpics.map(y => y.url());
 
     // let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
@@ -67,8 +67,21 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         name: goods.userID.nickName,
         avatar: goods.userID.avatarUrl
     };
+
+    let userid = userInfo ? userInfo._id : null;
+
+    let condi = {goodsId:goods_id};
+    if(goods.userID._id.toString() != userid.toString()){
+        condi.$or = [
+            {fromId: userid},
+            {toId: userid},
+            {secret: null},
+            {secret: false}
+        ]
+    }
+    console.log(condi);
     let comments = await Comment
-            .find({goodsId:goods_id})
+            .find(condi)
             .populate(['fromId','toId']);
     g.comments = comments.map(y => y.getFullInfo());
 
