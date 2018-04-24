@@ -71,7 +71,9 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     let userid = userInfo ? userInfo._id : null;
 
     let condi = {goodsId:goods_id};
-    if(goods.userID._id != userid){
+    console.log(userid);
+    console.log(goods.userID);
+    if(goods.userID._id.toString() != userid.toString()){
         condi.$or = [
             {fromId: userid},
             {toId: userid},
