@@ -114,3 +114,18 @@ router.post('/wechat/qrcode', async (ctx, next) => {
     }
 });
 
+
+
+router.post('/wechat/pay', async(ctx, next) => {
+
+});
+
+router.post('/wechat/notified', async(ctx, next) => {
+
+});
+
+router.post('/wechat/refund', async(ctx, next) => {
+
+});
+
+
