@@ -36,7 +36,8 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
     auth.assert(cmt_str, '评论不能为空');
     let toId = ctx.request.body.to;
     console.log("to id"+toId);
-    let res = await srv_comment.post(cmt_str, goods._id, ctx.state.user, toId);
+    let secret = ctx.request.body.secret || 0;
+    let res = await srv_comment.post(cmt_str, goods._id, ctx.state.user, secret, toId);
 
     goods.updated_date = Date.now();
     await goods.save();

@@ -78,7 +78,7 @@ exports.login = async function(ctx, code) {
 
 /// 需用户登录
 exports.loginRequired = async function (ctx, next) {
-    if(config.ENV == "local")
+    if(config.ENV == "local" && !ctx.state.user)
     {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
         // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
