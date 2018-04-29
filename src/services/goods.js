@@ -143,7 +143,11 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
     };
     let total = await Goods.find(condi).count();//表总记录数
 
-    let goods = await Goods.find(condi).sort(sorti).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let goods = await Goods.find(condi)
+        .sort(sorti)
+        .limit(pageSize)
+        .skip((pageNo-1)*pageSize)
+        .populate('gpics');
     // console.log(goods);
     let hasMore=total-pageNo*pageSize>0;
     return {

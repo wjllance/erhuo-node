@@ -9,6 +9,7 @@ let body = require('koa-convert')(require('koa-better-body')());
 let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
+let srv_order = require('../services/order');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
@@ -25,21 +26,54 @@ const school_map = require('../config').CONSTANT.SCHOOL_MAP
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/order/buy/', async (ctx, next) => {
+router.get('/order/buy/', auth.loginRequired, async (ctx, next) => {
 
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
+    let condi = {
+        buyer: ctx.state.user._id
+    };
+    let orders = await srv_order.getOrderList(condi, pageNo, pageSize);
+
+    ctx.body = {
+        success: 1,
+        data: orders
+    };
+});
+
+router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
+    let condi = {
+        seller: ctx.state.user._id
+    };
+    let orders = await srv_order.getOrderList(condi, pageNo, pageSize);
+
+    ctx.body = {
+        success: 1,
+        data: orders
+    };
 
 });
 
-router.get('/order/sold/', async (ctx, next) => {
+router.post('/order/', auth.loginRequired, async(ctx, next) => {
+    let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
+    auth.assert(goods, "商品不存在");
 
+    let order = await srv_order.createOrder(goods, ctx.state.user);
+
+    ctx.body = {
+        success: 1,
+        data: order._id
+    };
 
 });
 
-router.post('/order/', async(ctx, next) => {
+router.post('/order/receive', auth.loginRequired, async(ctx, next) => {
 
 });
 
-router.get('/order/detail/:order_id', async (ctx, next) => {
+router.get('/order/detail/:order_id', auth.loginRequired, async (ctx, next) => {
 
 
 });

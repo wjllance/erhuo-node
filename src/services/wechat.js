@@ -1,17 +1,20 @@
 require('should');
 let _ = require('lodash');
-const xml2js = require('xml2js');
 let utils = require('utility');
 let superagent = require('superagent');
-let fs = require('fs');
-let path = require('path');
 let config = require('../config');
-let {User, AccessToken, Comment} = require('../models')
-let moment = require('moment')
-moment.locale('zh-cn');
-
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
+let tools = require("./tools");
+let moment = require('moment')
+moment.locale('zh-cn');
+/*-----------------------------------------------*/
+
+const xml2js = require('xml2js');
+let fs = require('fs');
+let path = require('path');
+let {User, AccessToken, Comment} = require('../models')
+
 
 const ERR_CODE = 985;
 const TYPE_SA = 0;
