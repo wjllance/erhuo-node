@@ -19,19 +19,19 @@
 
 # 依赖
 
-* node >= 7.9.0
+* node >= 8.3.0
 * mongo
 
 # 安装
 
-### 安装Node 7.9.0
+### 安装Node 8.3.0
 
 1. CentOS
 
 ```sh
 > sudo yum install npm
 > sudo npm install n -g
-> sudo n 7.9.0
+> sudo n 8.3.0
 ```
 
 2. Ubuntu
@@ -39,7 +39,7 @@
 ```sh
 > sudo apt install npm
 > sudo npm install n -g
-> sudo n 7.9.0
+> sudo n 8.3.0
 ```
 
 3. Windows
@@ -72,7 +72,16 @@
 
 服务器代码更新
 c2c/Jicunbao2017
+日志目录:
+ROOT_PATH/logs/error/   错误日志
+ROOT_PATH/logs/response/    访问日志
+【线上】~/erhuo
 重启app
 >pm2 restart app
 查看服务器的输出
 >pm2 logs app
+【测试】~/dev/erhuo
+重启app
+>pm2 restart dev
+查看服务器的输出
+>pm2 logs dev

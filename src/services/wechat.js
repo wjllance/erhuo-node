@@ -10,12 +10,22 @@ let moment = require('moment')
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
+
+let auth = require('./auth');
 const xml2js = require('xml2js');
 let fs = require('fs');
 let path = require('path');
 let {User, AccessToken, Comment} = require('../models')
-
-
+const tenpay = require('tenpay');
+const pay_config = {
+    appid: config.APP_ID,
+    mchid: config.MCH_ID,
+    partnerKey: config.API_KEY,
+    pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.pem"),
+    // notify_url: '支付回调网址',
+    // spbill_create_ip: 'IP地址'
+};
+const api =  new tenpay(pay_config);
 const ERR_CODE = 985;
 const TYPE_SA = 0;
 const TYPE_MINA = 1;
@@ -283,3 +293,17 @@ exports.qrcode = async(mina_scene, mina_path) => {
     // console.log(res);
     // return res;
 };
+
+exports.getPayParams = async (order_id) => {
+    let order = await Order.find({_id: order_id}).populate('buyer');
+    auth.assert(order, "订单不存在！");
+    let res = await api.getPayParams({
+        out_trade_no: order.sn,
+        body: order.goodsInfo.gname,
+        total_fee: order.price*100,
+        openid: order.buyer.openid
+    });
+    return res;
+}
+
+

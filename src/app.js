@@ -43,7 +43,11 @@ app.use(async (ctx, next) => {
 });
 
 app.use(bodyParser({
-    formLimit: '10MB'
+    formLimit: '10MB',
+    enableTypes: ['json', 'form', 'text'],
+    extendTypes: {
+        text: ['text/xml', 'application/xml']
+    }
 }));
 app.keys = [config.SERVER.SECRET_KEYS];
 const CONFIG = {

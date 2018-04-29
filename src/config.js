@@ -23,6 +23,9 @@ exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
 exports.ENV = config['ENV'];
 
+exports.MCH_ID = config['MCH_ID'];
+exports.API_KEY = config['API_KEY'];
+exports.CERT_PATH = config['CERT_PATH'];
 
 exports.SA_APP_ID = config['SA_APP_ID'];
 exports.SA_SECRET = config['SA_SECRET'];
