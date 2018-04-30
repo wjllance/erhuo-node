@@ -4,7 +4,7 @@ db
 public
 .idea/
 venv
-package-lock.json
 doc
 .DS_Store
 logs
+src/cert

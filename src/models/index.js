@@ -16,6 +16,11 @@ let Comment = exports.Comment = require('./comment');
 
 let AccessToken = exports.AccessToken = require('./access_token');
 
+let Order = exports.Order = require('./order');
+
+let Wallet = exports.Wallet = require('./wallet');
+
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {

@@ -2,7 +2,7 @@
   "name": "downstairs-second-hand",
   "version": "0.1.0",
   "private": true,
-  "description": "* node >= 7.9.0\r * mongo",
+  "description": "* node >= 8.3.0\r * mongo",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -39,6 +39,7 @@
     "mz": "^2.7.0",
     "should": "^13.2.1",
     "superagent": "^3.8.2",
+    "tenpay": "^2.1.4",
     "utility": "^1.13.1"
   },
   "apidoc": {
