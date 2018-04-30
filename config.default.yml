@@ -21,3 +21,7 @@ APP_ID: id
 APP_SECRET: secret
 
 PUBLIC: public # 目录，储存各种用户上传的文件
+
+MCH_ID: id
+API_KEY: key
+CERT_PATH: path
