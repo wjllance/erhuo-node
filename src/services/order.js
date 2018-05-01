@@ -29,23 +29,26 @@ let generateSerialNumber = () => {
     return datetime + rand + No + ts;
 };
 
-// 获取可以输出的数据
-let createOrder = exports.createOrder = async function(goods, user) {
+exports.findOrCreate = async function(goods, user) {
 
-    let order = new Order({
+    let order = await Order.findOne({
         goodsId: goods._id,
-        seller: goods.userID,
-        buyer: user._id,
-        price: goods.gprice,
-        sn: generateSerialNumber()
+        buyer: user._id
     });
-
-    order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
-    order.goodsInfo.img = goods.gpics[0].thumbnails;
-    order.markModified('goodsInfo');
-
+    if(!order) {
+        order = new Order({
+            goodsId: goods._id,
+            seller: goods.userID,
+            buyer: user._id,
+            price: goods.gprice,
+            sn: generateSerialNumber()
+        });
+        order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
+        order.goodsInfo.img = goods.gpics[0].thumbnails;
+        order.markModified('goodsInfo');
+        order.save();
+    }
     console.log(order);
-    order.save();
     return order;
 };
 

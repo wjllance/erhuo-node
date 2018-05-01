@@ -4,6 +4,8 @@ let Router = require('koa-router');
 
 let _ = require('lodash');
 
+let log4js = require('log4js');
+let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
@@ -119,16 +121,46 @@ router.post('/wechat/qrcode', async (ctx, next) => {
 router.post('/wechat/pay', async(ctx, next) => {
 
     let order_id = ctx.request.body.oid;
-    let res = wechat.getPayParams(order_id);
+    auth.assert(order_id, "oid miss")
+    let res = await wechat.getPayParams(order_id);
     ctx.body = {
         success:1,
         data: res
     }
 });
 
-router.post('/wechat/notified', async(ctx, next) => {
 
+router.post('/wechat/notify', async(ctx, next) => {
+
+    let xmlData = ctx.data.xml;
+
+    logger.info(xmlData);
+    console.log(xmlData);
+
+    let out_trade_no = xmlData.out_trade_no;
+
+    auth.assert(xmlData.sign == utils.sha1(xmlData.rawData + ctx.state.user.session_key), '签名错误1');
+
+    auth.assert(order_id, "oid miss")
+    let res = await wechat.getPayParams(order_id);
+    ctx.body = {
+        success:1,
+        data: res
+    }
 });
+
+router.get('/wechat/query_order', async(ctx, next) => {
+
+    let order_id = ctx.query.oid;
+    auth.assert(order_id, "oid miss")
+    let res = await wechat.queryOrder(order_id);
+    ctx.body = {
+        success:1,
+        data: res
+    }
+});
+
+
 
 router.post('/wechat/refund', async(ctx, next) => {
 
