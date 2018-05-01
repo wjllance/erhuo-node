@@ -6,6 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
+let auth = require('./auth');
 let moment = require('moment')
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
@@ -62,3 +63,24 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
     return orders;
 }
 
+exports.checkPay = async (out_trade_no, result_code, fee)=>{
+    let order = await Order.findOne({sn:out_trade_no});
+    auth.assert(order, "订单不存在");
+    if(result_code == "FAIL"){
+        order.pay_status = PAY_STATUS.FAILED;
+        await order.save();
+        return;
+    }
+    order.priceGet = fee;
+    if(order.price != fee){  // 接入退款
+        order.pay_status = PAY_STATUS.WRONG_FEE;
+        await order.save();
+        logger.error("金额不对");
+        console.error("金额不对");
+        return;
+    }
+    order.pay_status = PAY_STATUS.SUCCEED;
+    order.paid_at = moment();
+    order.order_status = ORDER_STATUS.PAID;
+    await order.save();
+};

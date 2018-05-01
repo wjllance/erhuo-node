@@ -10,6 +10,7 @@ let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
+let srv_order = require('../services/order');
 
 const router = module.exports = new Router();
 
@@ -133,16 +134,25 @@ router.post('/wechat/notify', async(ctx, next) => {
 
     logger.info(xmlData);
     console.log(xmlData);
-
+    let ret_body = '<xml>\n' +
+        '  <return_code><![CDATA[FAIL]]></return_code>\n' +
+        '  <return_msg><![CDATA[empty]]></return_msg>\n' +
+        '</xml>';
 
     auth.assert(wechat.checkMchSig(xmlData), '签名错误1');
-    let out_trade_no = xmlData.out_trade_no;
+    if(xmlData.return_code[0] == "SUCCESS"){
+        let res = await srv_order.checkPay(xmlData.out_trade_no[0], xmlData.result_code[0], xmlData.total_fee[0]);
+        ret_body = '<xml>\n' +
+            '  <return_code><![CDATA[SUCCESS]]></return_code>\n' +
+            '  <return_msg><![CDATA[OK]]></return_msg>\n' +
+            '</xml>';
+    }
 
+    ctx.status = 200;
+    ctx.res.setHeader('Content-Type', 'application/xml');
+    ctx.res.end(ret_body)
     // auth.assert(order_id, "oid miss")
     // let res = await wechat.getPayParams(order_id);
-    ctx.body = {
-        success:1,
-    }
 });
 
 router.get('/wechat/query_order', async(ctx, next) => {

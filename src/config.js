@@ -47,7 +47,8 @@ exports.CONSTANT = {
         INIT: 0,
         SUCCEED: 1,
         FAILED: 2,
-        TIMEOUT: 3
+        TIMEOUT: 3,
+        WRONG_FEE: 4
     },
     REFUND_STATUS: {
         INIT: 0,

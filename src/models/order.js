@@ -27,6 +27,7 @@ let orderSchema = new Schema({
     goodsInfo: Schema.Types.Mixed,
     sn: String,
     price: Number,
+    priceGet: Number,
     order_status: {
         type: Number,
         default: 0

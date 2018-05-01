@@ -42,6 +42,15 @@ router.get('/order/buy/', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+/**
+ * @api {get} /order/sell/  我卖出的
+ * @apiName     GetOrderBuy
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
 router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
@@ -57,6 +66,15 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
 
 });
 
+/**
+ * @api {post} /order/sell/  下单
+ * @apiName     OrderCreate
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
 router.post('/order/', auth.loginRequired, async(ctx, next) => {
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
@@ -70,6 +88,17 @@ router.post('/order/', auth.loginRequired, async(ctx, next) => {
 
 });
 
+
+
+/**
+ * @api     {post}  /order/create_pay/  下单并支付
+ * @apiName     OrderCreateAndPay
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
 router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
@@ -84,10 +113,29 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
 });
 
 
-router.post('/order/receive', auth.loginRequired, async(ctx, next) => {
+/**
+ * @api     {post}  /order/confirm/  确认收货
+ * @apiName     OrderConfirm
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
 
 });
 
+
+/**
+ * @api     {get}  /order/detail/:order_id  订单详情
+ * @apiName     OrderDetail
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
 router.get('/order/detail/:order_id', auth.loginRequired, async (ctx, next) => {
 
 
