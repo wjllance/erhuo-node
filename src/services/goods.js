@@ -71,6 +71,8 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     let userid = userInfo ? userInfo._id : null;
 
     let condi = {goodsId:goods_id};
+    console.log(userid);
+    console.log(goods.userID);
     if(goods.userID._id.toString() != userid.toString()){
         condi.$or = [
             {fromId: userid},
@@ -143,7 +145,11 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
     };
     let total = await Goods.find(condi).count();//表总记录数
 
-    let goods = await Goods.find(condi).sort(sorti).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let goods = await Goods.find(condi)
+        .sort(sorti)
+        .limit(pageSize)
+        .skip((pageNo-1)*pageSize)
+        .populate('gpics');
     // console.log(goods);
     let hasMore=total-pageNo*pageSize>0;
     return {

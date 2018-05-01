@@ -23,6 +23,9 @@ exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
 exports.ENV = config['ENV'];
 
+exports.MCH_ID = config['MCH_ID'];
+exports.API_KEY = config['API_KEY'];
+exports.CERT_PATH = config['CERT_PATH'];
 
 exports.SA_APP_ID = config['SA_APP_ID'];
 exports.SA_SECRET = config['SA_SECRET'];
@@ -35,8 +38,25 @@ exports.CONSTANT = {
         THU:3,
         OTHER: 1,
     },
+    ORDER_STATUS:{
+        TOPAY: 0,
+        PAID: 1,
+        COMPLET: 2,
+    },
+    PAY_STATUS: {
+        INIT: 0,
+        SUCCEED: 1,
+        FAILED: 2,
+        TIMEOUT: 3
+    },
+    REFUND_STATUS: {
+        INIT: 0,
+        APPLYING: 1,
+        SUCCEED: 2,
+        FAILED: 3,
+    },
     SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学"]
-}
+};
 
 let PUBLIC = exports.PUBLIC = {
     root: path.join(__dirname, '..', config['PUBLIC']),

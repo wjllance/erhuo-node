@@ -1,18 +1,39 @@
 require('should');
 let _ = require('lodash');
-const xml2js = require('xml2js');
 let utils = require('utility');
 let superagent = require('superagent');
-let fs = require('fs');
-let path = require('path');
 let config = require('../config');
-let {User, AccessToken, Comment} = require('../models')
-let moment = require('moment')
-moment.locale('zh-cn');
-
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
+let tools = require("./tools");
+let moment = require('moment')
+moment.locale('zh-cn');
+/*-----------------------------------------------*/
 
+
+let auth = require('./auth');
+const xml2js = require('xml2js');
+let fs = require('fs');
+let path = require('path');
+let {User, AccessToken, Comment, Order} = require('../models')
+const tenpay = require('tenpay');
+const pay_config = {
+    appid: config.APP_ID,
+    mchid: ""+config.MCH_ID,
+    partnerKey: config.API_KEY,
+    pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.pem"),
+    notify_url: 'notify',
+    // spbill_create_ip: 'ip'
+};
+// const pay_config = {
+//     appid: "wxeedf8d0cba505192",
+//     mchid: "1491171192",
+//     partnerKey: "OinKiHAr51RyvfCdjSECVCQ91OIC1SJM",
+//     pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.pem"),
+//     notify_url: 'notify',
+//     // spbill_create_ip: 'ip'
+// };
+const api =  new tenpay(pay_config);
 const ERR_CODE = 985;
 const TYPE_SA = 0;
 const TYPE_MINA = 1;
@@ -272,7 +293,7 @@ exports.qrcode = async(mina_scene, mina_path) => {
     let stream = fs.createWriteStream(ret);
     await superagent.post(api_url).send({
         scene: mina_scene,
-        path: mina_path,
+        page: mina_path,
         width: 60
     }).pipe(stream);
     return filename;
@@ -280,3 +301,39 @@ exports.qrcode = async(mina_scene, mina_path) => {
     // console.log(res);
     // return res;
 };
+
+exports.getPayParams = async (order_id) => {
+    let order = await Order.findOne({_id: order_id}).populate('buyer');
+    console.log(order.goodsInfo);
+    auth.assert(order, "订单不存在！");
+    console.log(pay_config);
+
+    let res = await api.getPayParams({
+        out_trade_no: order.sn,
+        body: order.goodsInfo.gname,
+        total_fee: order.price*100,
+        openid: order.buyer.openid
+    });
+    console.log(res);
+    return res;
+}
+
+exports.queryOrder = async (order_id)=>{
+    let order = await Order.findOne({_id: order_id});
+
+    let res = await api.orderQuery({
+        out_trade_no: order.sn,
+    });
+    console.log(res);
+}
+
+
+exports.checkMchSig = (sig, data)=>{
+    let keys = _.keys(data).sort();
+    let sigString = "";
+    keys = keys.map(k=>{
+        return k+"="+data.k;
+    })
+
+}
+

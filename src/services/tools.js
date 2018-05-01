@@ -1,9 +1,11 @@
-
 let _ = require('lodash');
 require('should');
 let moment = require('moment')
-
+let config = require('../config');
 moment.locale('zh-cn');
+
+
+
 exports.bindFindByXX = (objs, XX) => {
     objs.should.be.instanceOf(Array);
     XX.should.be.a.String();
@@ -66,4 +68,11 @@ exports.dateStr = (date) => {
         return moment(date).format('ll')
         // return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
     }
+}
+
+exports.completeImgUrl = (img_path) => {
+    if(!img_path.startsWith("http")){
+        img_path = config.SERVER.URL_PREFIX + '/' + img_path;
+    }
+    return img_path;
 }
