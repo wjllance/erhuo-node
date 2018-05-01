@@ -9,8 +9,6 @@ let tools = require("./tools");
 let moment = require('moment')
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
-
-
 let auth = require('./auth');
 const xml2js = require('xml2js');
 let fs = require('fs');
@@ -328,12 +326,15 @@ exports.queryOrder = async (order_id)=>{
 }
 
 
-exports.checkMchSig = (sig, data)=>{
+exports.checkMchSig = (data)=>{
+    let sig = data.sign;
+    _.unset(data,'sign');
     let keys = _.keys(data).sort();
-    let sigString = "";
-    keys = keys.map(k=>{
-        return k+"="+data.k;
-    })
-
+    let paramArr = keys.map(k=>{
+        return k+"="+data[k][0];
+    });
+    paramArr.push('key='+config.API_KEY);
+    let signed = utils.md5(paramArr.join('&')).toUpperCase();
+    return sig == signed;
 }
 

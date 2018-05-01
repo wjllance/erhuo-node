@@ -4,12 +4,12 @@ let Router = require('koa-router');
 
 let _ = require('lodash');
 
+let utils = require('utility');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
-const crypto = require('crypto')
 
 const router = module.exports = new Router();
 
@@ -32,9 +32,7 @@ router.get('/wechat', async (ctx, next) => {
     // 字典排序
     const arr = [token, timestamp, nonce].sort()
     console.log(arr);
-    const sha1 = crypto.createHash('sha1')
-    sha1.update(arr.join(''))
-    const result = sha1.digest('hex')
+    const result = utils.sha1(arr.join('')).toUpperCase();
 
     if (result === signature) {
         ctx.body = params.echostr
@@ -137,15 +135,14 @@ router.post('/wechat/notify', async(ctx, next) => {
     logger.info(xmlData);
     console.log(xmlData);
 
+
+    auth.assert(wechat.checkMchSig(xmlData), '签名错误1');
     let out_trade_no = xmlData.out_trade_no;
 
-    auth.assert(xmlData.sign == utils.sha1(xmlData.rawData + ctx.state.user.session_key), '签名错误1');
-
-    auth.assert(order_id, "oid miss")
-    let res = await wechat.getPayParams(order_id);
+    // auth.assert(order_id, "oid miss")
+    // let res = await wechat.getPayParams(order_id);
     ctx.body = {
         success:1,
-        data: res
     }
 });
 
