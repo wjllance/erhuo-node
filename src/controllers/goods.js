@@ -173,6 +173,15 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     let goods = await srv_goods.getBaseById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
     auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
+
+    let images = await Image.find({_id: ctx.request.body.gpics});
+    auth.assert(images.length == ctx.request.body.gpics.length, '图片不正确');
+
+    for(let i = 0; i < images.length; i ++) {
+        auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
+    }
+
+    goods.gpics = images.map(x => x._id);
     _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
     goods.updated_date = Date.now();
     await goods.save();
