@@ -20,12 +20,16 @@ let imageSchema = new mongoose.Schema({
 });
 
 imageSchema.methods.url = function() {
-	return config.SERVER.URL_PREFIX + '/' + this.filename;
+	return {
+		url: config.SERVER.URL_PREFIX + '/' + this.filename,
+		thumb: config.SERVER.URL_PREFIX + '/' + this.thumbnails,
+        _id: this._id
+    }
 }
 
 imageSchema.methods.urlwithid = function() {
     let ret =  {
-    	url: config.SERVER.URL_PREFIX + '/' + this.filename,
+    	url: config.SERVER.URL_PREFIX + '/' + this.thumbnails,
 		_id: this._id
     };
 	console.log(ret);
