@@ -7,7 +7,7 @@ let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
 let auth = require('./auth');
-let moment = require('moment')
+let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
@@ -60,6 +60,7 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
         .skip((pageNo-1)*pageSize)
         .populate('buyer')
         .populate('seller');
+    orders = _.map(orders, o => o.cardInfo());
     return orders;
 }
 
