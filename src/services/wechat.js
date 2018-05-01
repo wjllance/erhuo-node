@@ -20,7 +20,7 @@ const pay_config = {
     mchid: ""+config.MCH_ID,
     partnerKey: config.API_KEY,
     pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.pem"),
-    notify_url: 'notify',
+    notify_url: config.SERVER.URL_PREFIX + '/wechat/notify',
     // spbill_create_ip: 'ip'
 };
 // const pay_config = {
@@ -302,10 +302,7 @@ exports.qrcode = async(mina_scene, mina_path) => {
 
 exports.getPayParams = async (order_id) => {
     let order = await Order.findOne({_id: order_id}).populate('buyer');
-    console.log(order.goodsInfo);
-    auth.assert(order, "订单不存在！");
     console.log(pay_config);
-
     let res = await api.getPayParams({
         out_trade_no: order.sn,
         body: order.goodsInfo.gname,

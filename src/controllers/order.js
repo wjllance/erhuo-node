@@ -74,6 +74,7 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
     let order = await srv_order.findOrCreate(goods, ctx.state.user);
+    console.log(order);
     let res = await srv_wechat.getPayParams(order._id);
     ctx.body = {
         success: 1,

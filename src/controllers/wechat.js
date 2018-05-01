@@ -118,9 +118,8 @@ router.post('/wechat/qrcode', async (ctx, next) => {
 
 router.post('/wechat/pay', async(ctx, next) => {
 
-    let order_id = ctx.request.body.oid;
-    auth.assert(order_id, "oid miss")
-    let res = await wechat.getPayParams(order_id);
+    auth.assert(ctx.request.body.oid, "miss oid")
+    let res = await wechat.getPayParams(ctx.request.body.oid);
     ctx.body = {
         success:1,
         data: res

@@ -46,9 +46,8 @@ exports.findOrCreate = async function(goods, user) {
         order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
         order.goodsInfo.img = goods.gpics[0].thumbnails;
         order.markModified('goodsInfo');
-        order.save();
+        await order.save();
     }
-    console.log(order);
     return order;
 };
 
