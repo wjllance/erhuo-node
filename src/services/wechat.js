@@ -19,7 +19,7 @@ const pay_config = {
     appid: config.APP_ID,
     mchid: ""+config.MCH_ID,
     partnerKey: config.API_KEY,
-    pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.pem"),
+    pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.p12"),
     notify_url: config.SERVER.URL_PREFIX + '/wechat/notify',
     // spbill_create_ip: 'ip'
 };
@@ -333,6 +333,25 @@ exports.checkMchSig = (data)=>{
     paramArr.push('key='+config.API_KEY);
     let signed = utils.md5(paramArr.join('&')).toUpperCase();
     return sig == signed;
+}
+
+
+exports.withdraw = async (partner_trade_no, openid, amount) => {
+    let res = await api.transfers({
+        check_name: "NO_CHECK",
+        partner_trade_no: utils.md5(partner_trade_no.toString()),
+        openid: openid,
+        amount:amount,
+        desc: "二货兔提现"
+    });
+    console.log(res);
+    if(res.return_code == "SUCCESS" && res.result_code == "SUCCESS"){
+        return true;
+    }else{
+        logger.error(res);
+        auth(false, "提现失败");
+    }
+    return res;
 }
 
 

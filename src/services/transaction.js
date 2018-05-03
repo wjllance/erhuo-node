@@ -28,8 +28,23 @@ exports.incomeByOrder = async (order) => {
         }
     });
     transaction.markModified('info');
-    await transaction.save();
 
     account.balance = account.balance + order.priceGet;
     await account.save();
+    return await transaction.save();
+};
+
+exports.withdraw = async (user, amount) =>{
+    let account = await Account.findOneOrCreate({userID:user._id});
+    auth.assert(amount <= account.balance, "余额不足");
+    let transaction = new Transaction({
+        accountId:account._id,
+        type: 0,
+        amount:amount,
+    });
+
+
+    account.balance = account.balance - amount;
+    await account.save();
+    return await transaction.save();
 };

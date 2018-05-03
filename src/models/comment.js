@@ -26,7 +26,7 @@ let commentSchema = new mongoose.Schema({
     secret: Boolean,
     read_date: {type: Date, default: null},
     created_date: { type: Date, default: Date.now },
-});
+},{versionKey:false});
 
 
 commentSchema.methods.getFullInfo = function() {

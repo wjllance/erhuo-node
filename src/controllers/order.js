@@ -153,7 +153,9 @@ router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
     auth.assert(order, "订单不存在");
     // auth.assert(order.buyer == ctx.state.user._id, "无权限");
     await srv_order.confirm(order);
-    await srv_transaction.incomeByOrder(order);
+    let transac = await srv_transaction.incomeByOrder(order);
+    transac.status = 1;
+    await transac.save();
     ctx.body = {
         success:1,
     }

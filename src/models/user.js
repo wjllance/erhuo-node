@@ -42,7 +42,7 @@ let userSchema = new mongoose.Schema({
 
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },
-});
+},{versionKey:false});
 
 userSchema.methods.toOBJ = function(){
 	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender"]);

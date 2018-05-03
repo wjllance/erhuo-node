@@ -32,7 +32,7 @@ let goodsSchema = new mongoose.Schema({
     removed_date: { type: Date, default: null},   // 下架
     deleted_date: { type: Date, default: null},   // 删除
     updated_date: { type: Date, default: Date.now},
-});
+},{versionKey:false});
 
 
 goodsSchema.methods.baseInfo = function(fullPic) {

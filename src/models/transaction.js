@@ -15,6 +15,10 @@ let transactionSchema = new Schema({
     type: Number,
     amount: Number,
     info: Schema.Types.Mixed,
+    status: {
+        type:Number,
+        default: 0
+    },
     created_date: { type: Date, default: Date.now },
 });
 
