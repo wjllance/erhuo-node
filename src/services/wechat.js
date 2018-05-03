@@ -303,12 +303,16 @@ exports.qrcode = async(mina_scene, mina_path) => {
 exports.getPayParams = async (order_id) => {
     let order = await Order.findOne({_id: order_id}).populate('buyer');
     console.log(pay_config);
-    let res = await api.getPayParams({
+    let params = {
         out_trade_no: order.sn,
         body: order.goodsInfo.gname,
         total_fee: order.price*100,
         openid: order.buyer.openid
-    });
+    };
+    if(config.ENV == 'local'){
+        params.total_fee = 1;
+    }
+    let res = await api.getPayParams(params);
     console.log(res);
     return res;
 }

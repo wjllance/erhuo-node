@@ -88,7 +88,8 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
         await order.save();
         logger.error("金额不对");
         console.error("金额不对");
-        return;
+        if(config.ENV != "local")
+            return;
     }
     order.pay_status = PAY_STATUS.SUCCEED;
     order.paid_at = moment();
