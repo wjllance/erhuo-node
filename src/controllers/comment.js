@@ -30,7 +30,7 @@ const router = module.exports = new Router();
  *
  */
 router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
-    let goods = await srv_goods.getBaseById(ctx.params.goods_id);
+    let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
     let cmt_str = ctx.request.body.comment;
     auth.assert(cmt_str, '评论不能为空');

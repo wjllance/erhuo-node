@@ -30,6 +30,10 @@ let generateSerialNumber = () => {
     return datetime + rand + No + ts;
 };
 
+exports.findById = async (id) => {
+    await Order.findOne({_id:id});
+}
+
 exports.findOrCreate = async function(goods, user) {
 
     let order = await Order.findOne({
@@ -62,6 +66,12 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
         .populate('seller');
     orders = _.map(orders, o => o.cardInfo());
     return orders;
+}
+
+exports.confirm = async (order) => {
+    auth.assert(order.order_status == ORDER_STATUS.PAID, "不可确认收货");
+    order.order_status = ORDER_STATUS.COMPLET;
+    await order.save();
 }
 
 exports.checkPay = async (out_trade_no, result_code, fee)=>{

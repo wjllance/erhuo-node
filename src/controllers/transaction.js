@@ -16,9 +16,11 @@ const schools = config.CONSTANT.SCHOOL
 const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 
-router.get('/wallet/withdraw', async (ctx, next) => {
+router.get('/transaction/withdraw', async (ctx, next) => {
 
 
 });
+
+
 
 

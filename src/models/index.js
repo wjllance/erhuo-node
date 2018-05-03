@@ -18,8 +18,9 @@ let AccessToken = exports.AccessToken = require('./access_token');
 
 let Order = exports.Order = require('./order');
 
-let Wallet = exports.Wallet = require('./wallet');
+let Account = exports.Account = require('./account');
 
+let Transactino = exports.Transaction = require('./transaction');
 
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {

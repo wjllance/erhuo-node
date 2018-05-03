@@ -5,8 +5,13 @@ let _ = require('lodash');
 // let school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 // 钱包
-let walletSchema = new Schema({
+let accountSchema = new Schema({
 
+    userID: {
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
     balance: {
         type: Number,
         default: 0
@@ -20,4 +25,13 @@ let walletSchema = new Schema({
 
 });
 
-module.exports = mongoose.model("Wallet", walletSchema);
+accountSchema.statics.findOneOrCreate = async function(cond, doc){
+    const one = await this.findOne(cond);
+    if(!doc){
+        doc = cond;
+    }
+    return one || this.create(doc);
+};
+
+
+let Account = module.exports = mongoose.model("Account", accountSchema);

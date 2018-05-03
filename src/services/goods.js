@@ -94,10 +94,6 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     return g;
 };
 
-// 获取商品详情
-let getBaseById = exports.getBaseById = async function(goods_id) {
-    return await Goods.findById(goods_id);
-};
 
 let getCardInfoById = exports.getCardInfoById = async function(goods_id) {
     return await Goods.findById(goods_id)

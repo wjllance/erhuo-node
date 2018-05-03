@@ -170,7 +170,7 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
-    let goods = await srv_goods.getBaseById(ctx.params.goods_id);
+    let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
     auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
 

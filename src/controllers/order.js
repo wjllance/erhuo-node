@@ -11,7 +11,8 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_order = require('../services/order');
 let srv_wechat = require('../services/wechat');
-let { User, Image, Goods } = require('../models');
+let srv_transaction = require('../services/transaction');
+let { User, Image, Goods, Order } = require('../models');
 
 const router = module.exports = new Router();
 const schools = config.CONSTANT.SCHOOL
@@ -127,6 +128,7 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
     auth.assert(goods, "商品不存在");
     let order = await srv_order.findOrCreate(goods, ctx.state.user);
     console.log(order);
+    auth.assert(order.order_status == config.CONSTANT.ORDER_STATUS.TOPAY, "订单已支付");
     let res = await srv_wechat.getPayParams(order._id);
     ctx.body = {
         success: 1,
@@ -146,7 +148,15 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
  *
  */
 router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
-
+    //原子性！！！！！？？？？
+    let order = await Order.findById(ctx.request.body.orderId);
+    auth.assert(order, "订单不存在");
+    // auth.assert(order.buyer == ctx.state.user._id, "无权限");
+    await srv_order.confirm(order);
+    await srv_transaction.incomeByOrder(order);
+    ctx.body = {
+        success:1,
+    }
 });
 
 
