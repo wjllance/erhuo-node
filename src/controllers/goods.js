@@ -61,6 +61,7 @@ router.get('/goods/index', async (ctx, next) => {
  *
  * @apiParam    {Array}     gpics    图片id列表
  * @apiParam    {String}    gname
+ * @apiParam    {String}    gsummary
  * @apiParam    {String}    glabel
  * @apiParam    {Number}    gprice
  * @apiParam    {String}    gstype
@@ -154,16 +155,15 @@ router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 
 /**
  * @api {put} /goods/:goods_id  编辑商品
- * @apiName     GoodsEdit   暂不支持修改图片
+ * @apiName     GoodsEdit
  * @apiGroup    Goods
  *
  * @apiParam    {String}    gname
+ * @apiParam    {String}    gsummary
  * @apiParam    {String}    glabel
  * @apiParam    {Number}    gprice
- * @apiParam    {String}    gstype
- * @apiParam    {String}    glocation
  * @apiParam    {Number}    gcost
- * @apiParam    {Number}    gcity
+ * @apiParam    {Array}     gpics    图片id列表
  *
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
@@ -182,7 +182,7 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     }
 
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gcost']));
     goods.updated_date = Date.now();
     await goods.save();
 
