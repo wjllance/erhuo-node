@@ -143,6 +143,9 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
  * @apiName     OrderConfirm
  * @apiGroup    Order
  *
+ *
+ * @apiParam    {String}    orderId
+ *
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
  *

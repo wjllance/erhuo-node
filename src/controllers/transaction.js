@@ -17,9 +17,21 @@ const schools = config.CONSTANT.SCHOOL
 const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 
+
+/**
+ * @api     {post}  /transaction/withdraw/  提现
+ * @apiName     TransactionWithdraw
+ * @apiGroup    Transaction
+ *
+ * @apiParam    {Number}    amount  数量，最多两位小数
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
 router.post('/transaction/withdraw', auth.loginRequired, async (ctx, next) => {
     auth.assert(ctx.request.body.amount, "amount miss");
-    let transac = await  srv_transaction.withdraw(ctx.state.user, ctx.request.body.amount);
+    let transac = await  srv_transaction.withdraw(ctx.state.user, ctx.request.body.amount*100);
     let res = await srv_wechat.withdraw(transac._id, ctx.state.user.openid,ctx.request.body.amount);
     transac.status = 1;
     await transac.save();
