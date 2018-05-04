@@ -100,13 +100,29 @@ let getOrderState = (o) => {
 orderSchema.methods.cardInfo = function() {
 
     let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn',
-        'order_status', 'pay_status', 'refund_status'])
+        'order_status', 'pay_status', 'refund_status']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
         o.buyer = _.pick(this.buyer, ['_id', 'nickName', 'avatarUrl'])
     }
     if(this.seller){
         o.seller = _.pick(this.seller, ['_id', 'nickName', 'avatarUrl'])
+    }
+    o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
+    o.state = getOrderState(this);
+    return o;
+};
+
+orderSchema.methods.detailInfo = function() {
+
+    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn',
+        'order_status', 'pay_status', 'refund_status']);
+    o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
+    if(this.buyer){
+        o.buyer = this.buyer.toOBJ();
+    }
+    if(this.seller){
+        o.seller = this.seller.toOBJ();
     }
     o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
     o.state = getOrderState(this);

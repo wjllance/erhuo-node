@@ -172,8 +172,11 @@ router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
  *
  */
 router.get('/order/detail/:order_id', auth.loginRequired, async (ctx, next) => {
-
-
+    let order = await srv_order.getDetailById(ctx.params.order_id);
+    ctx.body = {
+        success:1,
+        data: order
+    }
 });
 
 

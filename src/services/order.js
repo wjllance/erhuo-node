@@ -96,3 +96,13 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
     order.order_status = ORDER_STATUS.PAID;
     await order.save();
 };
+
+
+exports.getDetailById = async (id) => {
+    let order = await Order.findById(id)
+        .populate('buyer')
+        .populate('seller');
+
+    let detail = order.detailInfo();
+    return detail;
+}
