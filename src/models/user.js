@@ -44,7 +44,7 @@ let userSchema = new mongoose.Schema({
     updated_date: { type: Date, default: Date.now },
 },{versionKey:false});
 
-userSchema.methods.toOBJ = function(){
+userSchema.methods.baseInfo = function(){
 	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender"]);
 	output.location = school_map[this.location];
 	return output;

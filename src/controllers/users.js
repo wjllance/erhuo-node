@@ -10,6 +10,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
+let srv_user = require('../services/user');
 let { User } = require('../models');
 let { Goods } = require('../models');
 const schools = config.CONSTANT.SCHOOL;
@@ -60,9 +61,10 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
     ctx.state.user.updated_date = moment();
     let user = await ctx.state.user.save();
 
+    let userIndex = await srv_user.indexInfo(user._id);
     ctx.body = {
         success: 1,
-        data: user.toOBJ()
+        data: userIndex
     };
 });
 
@@ -82,9 +84,20 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
     console.log(ctx.state.user);
     let user = await ctx.state.user.save();
 
+    let userIndex = await srv_user.indexInfo(user._id);
     ctx.body = {
         success: 1,
-        data: user.toOBJ()
+        data: userIndex
+    };
+});
+
+
+router.get('/user/index', auth.loginRequired, async (ctx, next) => {
+
+    let userIndex = await srv_user.indexInfo(ctx.state.user._id);
+    ctx.body = {
+        success: 1,
+        data: userIndex
     };
 });
 

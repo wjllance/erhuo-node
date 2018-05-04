@@ -7,6 +7,7 @@ let config = require('../config');
 let { log } = require('../config');
 let { User } = require('../models');
 let { Visit } = require('../models');
+let { Account } = require('../models');
 
 const ERR_CODE = 978;
 
@@ -74,6 +75,7 @@ exports.login = async function(ctx, code) {
         user = await User.findOneAndUpdate({openid: data.openid}, data, {new: true, upsert: true});
     }
     ctx.session.user_id = user._id;
+    await Account.findOneOrCreate({userID: user._id});
 }
 
 /// 需用户登录

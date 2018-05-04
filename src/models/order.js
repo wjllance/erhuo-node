@@ -119,10 +119,10 @@ orderSchema.methods.detailInfo = function() {
         'order_status', 'pay_status', 'refund_status']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
-        o.buyer = this.buyer.toOBJ();
+        o.buyer = this.buyer.baseInfo();
     }
     if(this.seller){
-        o.seller = this.seller.toOBJ();
+        o.seller = this.seller.baseInfo();
     }
     o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
     o.state = getOrderState(this);
