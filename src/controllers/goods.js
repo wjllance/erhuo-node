@@ -10,6 +10,7 @@ let body = require('koa-convert')(require('koa-better-body')());
 let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
+let srv_order = require('../services/order');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
@@ -204,6 +205,7 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 router.get('/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
     auth.assert(goods, '商品不存在');
+    goods.trading_status = await srv_order.tradingStatus(ctx.params.goods_id);
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,

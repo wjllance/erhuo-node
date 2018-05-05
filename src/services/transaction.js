@@ -17,6 +17,7 @@ let { Transaction } = require('../models');
 let { Account } = require('../models');
 
 
+//通知！！！
 exports.incomeByOrder = async (order) => {
     let account = await Account.findOneOrCreate({userID:order.seller});
     let transaction = new Transaction({

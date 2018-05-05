@@ -55,12 +55,6 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     if(!goods)
         return goods;
     let g = goods.baseInfo(1); //fullpic
-    // g.gpics = goods.gpics.map(y => y.url());
-
-    // let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
-    // g.state = goods.removed_date ? "已下架" : "在售";
-    // g.created_date = tools.dateStr(goods.created_date);
-    // g.glocation = school_map[goods.glocation] ;
 
     g.user = {
         _id: goods.userID._id,
@@ -73,7 +67,7 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     let condi = {goodsId:goods_id};
     console.log(userid);
     console.log(goods.userID);
-    if(goods.userID._id.toString() != userid.toString()){
+    if(userid != null && (goods.userID._id.toString() != userid.toString())){
         condi.$or = [
             {fromId: userid},
             {toId: userid},

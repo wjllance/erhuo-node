@@ -106,3 +106,24 @@ exports.getDetailById = async (id) => {
     let detail = order.detailInfo();
     return detail;
 }
+
+
+exports.tradingStatus = async (gid) => {
+    let orders = await Order.find({
+        goodsId: gid,
+        $or : [
+            {order_status: ORDER_STATUS.COMPLET},
+            {
+                order_status: ORDER_STATUS.PAID,
+                refund_status: REFUND_STATUS.INIT
+            }
+        ]
+    });
+    console.log("orders");
+    console.log(orders);
+    if(orders.length > 0){
+        return "已被抢";
+    }else{
+        return "我想要";
+    }
+}
