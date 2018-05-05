@@ -2,6 +2,7 @@
 let mongoose = require('mongoose');
 let _ = require('lodash');
 let school_map = require('../config').CONSTANT.SCHOOL_MAP
+let config = require('../config')
 // 用户
 let userSchema = new mongoose.Schema({
 
@@ -39,7 +40,10 @@ let userSchema = new mongoose.Schema({
 		}],
 		default: []
 	},
-
+	tls_imported: {
+        type: Boolean,
+        default: 0
+    },
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },
 },{versionKey:false});
@@ -48,7 +52,15 @@ userSchema.methods.baseInfo = function(){
 	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender"]);
 	output.location = school_map[this.location];
 	return output;
-}
+};
+
+userSchema.methods.tls_id = function(){
+    if(config.ENV == "production"){
+        return "O"+this._id;
+    }else{
+        return "D"+this._id;
+    }
+};
 
 
 module.exports = mongoose.model("User", userSchema);

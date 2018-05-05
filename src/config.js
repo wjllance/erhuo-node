@@ -18,6 +18,7 @@ if ('MONGO_HOST' in process.env) { // for docker
 } else {
 	exports.MONGODB_URL = `mongodb://${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
 }
+let ROOTPATH = exports.ROOT_PATH = path.join(__dirname, '../');
 
 exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
@@ -25,11 +26,14 @@ exports.ENV = config['ENV'];
 
 exports.MCH_ID = config['MCH_ID'];
 exports.API_KEY = config['API_KEY'];
-exports.CERT_PATH = config['CERT_PATH'];
+exports.CERT_PATH = path.join(ROOTPATH, config['CERT_PATH']);
 
 exports.SA_APP_ID = config['SA_APP_ID'];
 exports.SA_SECRET = config['SA_SECRET'];
 exports.SA_TOKEN = config['SA_TOKEN'];
+
+exports.IMSDK_APPID = config['IMSDK_APPID'];
+
 
 exports.CONSTANT = {
     SCHOOL:{
@@ -59,6 +63,7 @@ exports.CONSTANT = {
     },
     SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学"]
 };
+
 
 let PUBLIC = exports.PUBLIC = {
     root: path.join(__dirname, '..', config['PUBLIC']),
