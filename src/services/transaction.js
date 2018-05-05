@@ -44,7 +44,6 @@ exports.withdraw = async (user, amount) =>{
         amount:amount,
     });
 
-
     account.balance = account.balance - amount;
     await account.save();
     return await transaction.save();

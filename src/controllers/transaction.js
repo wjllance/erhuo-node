@@ -31,8 +31,10 @@ const school_map = require('../config').CONSTANT.SCHOOL_MAP
  */
 router.post('/transaction/withdraw', auth.loginRequired, async (ctx, next) => {
     auth.assert(ctx.request.body.amount, "amount miss");
-    let transac = await  srv_transaction.withdraw(ctx.state.user, ctx.request.body.amount*100);
-    let res = await srv_wechat.withdraw(transac._id, ctx.state.user.openid,ctx.request.body.amount);
+    let amount = ctx.request.body.amount*100;
+    //TODO: 原子性！！！！
+    let transac = await  srv_transaction.withdraw(ctx.state.user, amount);
+    let res = await srv_wechat.withdraw(transac._id, ctx.state.user.openid,amount);
     transac.status = 1;
     await transac.save();
     ctx.body = {

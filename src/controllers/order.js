@@ -151,7 +151,8 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
  *
  */
 router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
-    //原子性！！！！！？？？？
+
+    //TODO: 原子性！！！！
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
     // auth.assert(order.buyer == ctx.state.user._id, "无权限");
