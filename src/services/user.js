@@ -41,7 +41,9 @@ exports.walletInfo = async(uid) => {
     orders.forEach((item) => {
         sum += item.priceGet || item.price;
     });
-    account.undergoing = sum;
+    account.balance /= 100;
+    account.undergoing = sum / 100;
     account.total = sum + account.balance;
+
     return account;
 }
