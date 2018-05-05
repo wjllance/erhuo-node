@@ -42,5 +42,6 @@ exports.walletInfo = async(uid) => {
         sum += item.priceGet || item.price;
     });
     account.undergoing = sum;
+    account.total = sum + account.balance;
     return account;
 }
