@@ -8,6 +8,7 @@ let auth = require('../services/auth');
 let { log } = require('../config');
 let { User } = require('../models');
 let { Account } = require('../models');
+let { Order } = require('../models');
 
 
 exports.indexInfo = async (uid) => {
@@ -26,4 +27,20 @@ let withAccount = exports.withAccount = async (uid) => {
     _.unset(userAccount, 'userID');
     user.account = userAccount;
     return user;
+}
+
+exports.walletInfo = async(uid) => {
+    let account = await Account.findOne({userID: uid});
+    account = account.baseInfo();
+    let orders = await Order.find({
+        seller: uid,
+        order_status: config.CONSTANT.ORDER_STATUS.PAID,
+        refund_status: config.CONSTANT.REFUND_STATUS.INIT
+    });
+    sum = 0;
+    orders.forEach((item) => {
+        sum += item.priceGet || item.price;
+    });
+    account.undergoing = sum;
+    return account;
 }

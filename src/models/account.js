@@ -33,5 +33,8 @@ accountSchema.statics.findOneOrCreate = async function(cond, doc){
     return one || this.create(doc);
 };
 
+accountSchema.methods.baseInfo = function(){
+    return _.pick(this, ['_id', 'balance', 'bonus']);
+};
 
 let Account = module.exports = mongoose.model("Account", accountSchema);

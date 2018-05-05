@@ -30,11 +30,17 @@ let generateSerialNumber = () => {
     return datetime + rand + No + ts;
 };
 
-exports.findById = async (id) => {
-    await Order.findOne({_id:id});
-}
-
 exports.findOrCreate = async function(goods, user) {
+
+    let orders = await Order.find({
+        goodsId: goods._id,
+        refund_status: REFUND_STATUS.INIT,
+        order_status: {
+            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE]
+        }
+    })
+    auth.assert(orders.length == 0, "商品交易中，不可下单")
+
 
     let order = await Order.findOne({
         goodsId: goods._id,
@@ -70,7 +76,7 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
 
 exports.confirm = async (order) => {
     auth.assert(order.order_status == ORDER_STATUS.PAID, "不可确认收货");
-    order.order_status = ORDER_STATUS.COMPLET;
+    order.order_status = ORDER_STATUS.COMPLETE;
     await order.save();
 }
 
@@ -111,13 +117,10 @@ exports.getDetailById = async (id) => {
 exports.tradingStatus = async (gid) => {
     let orders = await Order.find({
         goodsId: gid,
-        $or : [
-            {order_status: ORDER_STATUS.COMPLET},
-            {
-                order_status: ORDER_STATUS.PAID,
-                refund_status: REFUND_STATUS.INIT
-            }
-        ]
+        refund_status: REFUND_STATUS.INIT,
+        order_status: {
+            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE]
+        }
     });
     console.log("orders");
     console.log(orders);

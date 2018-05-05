@@ -8,6 +8,7 @@ let _ = require('lodash');
 
 let config = require('../config');
 let auth = require('../services/auth');
+let tools = require('../services/tools');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_user = require('../services/user');
@@ -78,7 +79,7 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
 
     let userInfo = ctx.request.body.userInfo;
     if(userInfo.location){
-        userInfo.location = locationTransform(userInfo.location);
+        userInfo.location = tools.locationTransform(userInfo.location);
     }
     _.assign(ctx.state.user, _.pick(userInfo, ['nickName', 'avatarUrl', 'gender', 'location']));
     console.log(ctx.state.user);
@@ -169,13 +170,14 @@ router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) 
 });
 
 
-let locationTransform = (location) => {
-    if(location == "北京大学" || Number(location) == 2)
-        return 2;
-    if(location == "清华大学" || Number(location) == 3)
-        return 3;
-    if(location == "其他院校" || Number(location) == 1)
-        return 1;
-    return 0;
-}
+router.get('/users/wallet', auth.loginRequired, async (ctx, next) => {
+
+    let user = ctx.state.user;
+
+    let res = await srv_user.walletInfo(user._id);
+    ctx.body = {
+        success: 1,
+        data: res
+    }
+});
 

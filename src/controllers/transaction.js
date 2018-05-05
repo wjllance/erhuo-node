@@ -13,8 +13,8 @@ let srv_wechat = require('../services/wechat');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
-const schools = config.CONSTANT.SCHOOL
-const school_map = require('../config').CONSTANT.SCHOOL_MAP
+const schools = config.CONSTANT.SCHOOL;
+const school_map = require('../config').CONSTANT.SCHOOL_MAP;
 
 
 

@@ -15,6 +15,7 @@ let transactionSchema = new Schema({
     type: Number,
     amount: Number,
     info: Schema.Types.Mixed,
+    desc: String,
     status: {
         type:Number,
         default: 0

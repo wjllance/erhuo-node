@@ -41,7 +41,8 @@ exports.CONSTANT = {
     ORDER_STATUS:{
         TOPAY: 0,
         PAID: 1,
-        COMPLET: 2,
+        CONFIRM: 3,
+        COMPLETE: 2,
     },
     PAY_STATUS: {
         INIT: 0,

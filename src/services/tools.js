@@ -76,3 +76,13 @@ exports.completeImgUrl = (img_path) => {
     }
     return img_path;
 }
+
+exports.locationTransform = (location) => {
+    if(location == "北京大学" || Number(location) == 2)
+        return 2;
+    if(location == "清华大学" || Number(location) == 3)
+        return 3;
+    if(location == "其他院校" || Number(location) == 1)
+        return 1;
+    return 0;
+}
