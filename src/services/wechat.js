@@ -341,13 +341,15 @@ exports.checkMchSig = (data)=>{
 
 
 exports.withdraw = async (partner_trade_no, openid, amount) => {
-    let res = await api.transfers({
+    let param = {
         check_name: "NO_CHECK",
         partner_trade_no: utils.md5(partner_trade_no.toString()),
         openid: openid,
         amount:amount,
         desc: "二货兔提现"
-    });
+    };
+    logger.info(param);
+    let res = await api.transfers(param);
     console.log(res);
     if(res.return_code == "SUCCESS" && res.result_code == "SUCCESS"){
         return true;
