@@ -39,7 +39,38 @@ Sig.prototype._genSignContent = function(obj) {
     return ret;
 };
 
-Sig.prototype.genSig = async function(evalSig) {
+
+Sig.prototype.genSig = function(evalSig, callback) {
+    var obj = {
+        'TLS.appid_at_3rd': this.appidAt3rd,
+        'TLS.account_type': this.accountType,
+        'TLS.identifier': this.identifier,
+        'TLS.sdk_appid': this.sdkAppid,
+        'TLS.time': (Math.floor(Date.now() / 1000)).toString(),
+        'TLS.expire_after': this.expireAfter
+    };
+    // console.log(obj);
+    var content = this._genSignContent(obj);
+    try {
+        var signer = crypto.createSign('sha256');
+        signer.update(content, 'utf8');
+        var usrsig = signer.sign(this.privateKey, 'base64');
+    } catch(err) {
+        callback(err);
+        console.error(err);
+        return ;
+    }
+    obj['TLS.sig'] = usrsig;
+    var text = JSON.stringify(obj);
+    var compressed = zlib.deflateSync(new Buffer(text)).toString('base64');
+
+    evalSig(base64url.escape(compressed), this.expireUntil);
+    if (callback) {
+        callback();
+    }
+};
+
+Sig.prototype.genSigAsync = async function(evalSig) {
     var obj = {
         'TLS.appid_at_3rd': this.appidAt3rd,
         'TLS.account_type': this.accountType,

@@ -33,9 +33,9 @@ router.get('/message/test_multi_import', async (ctx, next) => {
     let reqBody = {Accounts: param};
     console.log(reqBody);
 
-    await tlsapi.init();
+    await tlsapi.initAsync();
 
-    let res = await tlsapi.request(serviceName, commandName, reqBody);
+    let res = await tlsapi.requestAsync(serviceName, commandName, reqBody);
     if(res.ActionStatus == "OK") {
 
         for (var i = 0; i < users.length; i++) {

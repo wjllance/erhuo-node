@@ -71,7 +71,7 @@ var get_group_info = function(api, serviceName, commandName, dataArray) {
     });
 }
 
-function begin_process() {
+async function  begin_process() {
     if (process.argv.length < 4) {
         console.log("usage:");
         console.log("node " + process.argv[1] + " msg_interface.js (server_name) (command) args...eg:");
@@ -108,8 +108,12 @@ function begin_process() {
     for (var i = 4; i < process.argv.length; i++) {
         dataArray[i - 4] = process.argv[i];
     }
-    
+    console.log(process.argv)
     var api = new TimRestAPI(config);
+    // await api.init();
+
+    // commandValue = commandArray[commandKey];
+    // commandValue(api, serviceName, commandName, dataArray);
     api.init(function(err, data) {
         if (err) {
     	// deal error
