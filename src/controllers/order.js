@@ -145,6 +145,21 @@ router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
 });
 
 
+router.post('/order/cancel', auth.loginRequired, async(ctx, next) => {
+
+    //TODO: 原子性！！！！
+    let order = await Order.findById(ctx.request.body.orderId);
+    auth.assert(order, "订单不存在");
+    // auth.assert(order.buyer == ctx.state.user._id, "无权限");
+    // await srv_order.cancel(order);
+    // let transac = await srv_transaction.refund(order);
+    // transac.status = 1;
+    // await transac.save();
+    // ctx.body = {
+    //     success:1,
+    // }
+});
+
 /**
  * @api     {get}  /order/detail/:order_id  订单详情
  * @apiName     OrderDetail

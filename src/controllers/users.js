@@ -126,7 +126,10 @@ router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
         condi.removed_date = null;
     }
     console.log(condi);
-    let goods = await Goods.find(condi).populate('gpics');
+    let goods = await Goods
+        .find(condi)
+        .sort({created_date:-1})
+        .populate('gpics');
     ctx.body = {
         success: 1,
         data: await srv_goods.outputify(goods)
