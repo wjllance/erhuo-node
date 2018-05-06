@@ -43,29 +43,6 @@ router.get('/order/buy/', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-/**
- * @api {get} /order/sell/  我卖出的
- * @apiName     GetOrderBuy
- * @apiGroup    Order
- *
- * @apiSuccess  {Number}    success
- * @apiSuccess  {Object}    data
- *
- */
-router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
-    let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
-    let condi = {
-        seller: ctx.state.user._id
-    };
-    let orders = await srv_order.getOrderList(condi, pageNo, pageSize);
-
-    ctx.body = {
-        success: 1,
-        data: orders
-    };
-
-});
 
 /**
  * @api {get} /order/sell/  我卖出的
@@ -80,8 +57,10 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
     let condi = {
-        seller: ctx.state.user._id
+        seller: ctx.state.user._id,
+        order_status: { $ne: config.CONSTANT.ORDER_STATUS.TOPAY}
     };
+    console.log(condi);
     let orders = await srv_order.getOrderList(condi, pageNo, pageSize);
 
     ctx.body = {
@@ -91,7 +70,7 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
 });
 
 /**
- * @api {post} /order/sell/  下单
+ * @api {post} /order/  下单
  * @apiName     OrderCreate
  * @apiGroup    Order
  *
