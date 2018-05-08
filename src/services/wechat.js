@@ -17,7 +17,7 @@ let {User, AccessToken, Comment, Order} = require('../models')
 const tenpay = require('tenpay');
 const pay_config = {
     appid: config.APP_ID,
-    mchid: ""+config.MCH_ID,
+    mchid: config.MCH_ID,
     partnerKey: config.API_KEY,
     pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.p12"),
     notify_url: config.SERVER.URL_PREFIX + '/wechat/notify',
