@@ -102,6 +102,15 @@ router.get('/user/index', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+router.get('/user/friend/:uid', async (ctx, next) => {
+
+    let friend = await User.findById(ctx.params.uid)
+    ctx.body = {
+        success: 1,
+        data: friend.baseInfo()
+    };
+});
+
 
 // 我的发布tobe migrate
 /**
@@ -112,7 +121,7 @@ router.get('/user/index', auth.loginRequired, async (ctx, next) => {
  * @apiParam    {Number}  [isRemoved]   是否下架
  *
  */
-router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
+router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
     let isRemoved = ctx.query.isRemoved || null;  //默认未下架
     let condi = {
         userID: ctx.state.user._id,
@@ -142,7 +151,7 @@ router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
  * @apiName     Collect
  * @apiGroup    User
  */
-router.post('/users/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
@@ -173,7 +182,7 @@ router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) 
 });
 
 
-router.get('/users/wallet', auth.loginRequired, async (ctx, next) => {
+router.get('/user/wallet', auth.loginRequired, async (ctx, next) => {
 
     let user = ctx.state.user;
 

@@ -79,17 +79,6 @@ router.get('/message/history/', async(ctx, next)=>{
     let res = JSON.parse(text);
     console.log(res);
     logger.info(res);
-    let users = {};
-    for (let i = 0; i < res.length; i++){
-        let uid = res[i].from;
-        if(!users[uid]){
-            let user = await User.findById(uid);
-            users[uid] = user.baseInfo();
-        }
-        res[i].userInfo = users[uid];
-        res[i].content = JSON.parse(res[i].data)._lctext;
-    }
-
     ctx.body = {
         success:1,
         data: res
