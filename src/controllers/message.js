@@ -79,6 +79,10 @@ router.get('/message/history/', async(ctx, next)=>{
     let res = JSON.parse(text);
     console.log(res);
     logger.info(res);
+    res = _.map(res, function (m) {
+        m._lctext = JSON.parse(m.data)._lctext;
+        return m;
+    })
     ctx.body = {
         success:1,
         data: res
