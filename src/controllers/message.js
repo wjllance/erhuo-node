@@ -13,12 +13,15 @@ let wechat = require('../services/wechat');
 let srv_order = require('../services/order');
 let superagent = require('superagent');
 const router = module.exports = new Router();
-let TimRestAPI = require('../libs/tlssdk/lib/TimRestApi.js');
-let tlsapi = new TimRestAPI(require('../libs/tlssdk/config/config'));
+
+// let TimRestAPI = require('../libs/tlssdk/lib/TimRestApi.js');
+// let tlsapi = new TimRestAPI(require('../libs/tlssdk/config/config'));
 
 
 let { User } = require('../models');
 
+
+/*
 router.get('/message/test_multi_import', async (ctx, next) => {
 
     let users = await User.find({
@@ -26,7 +29,7 @@ router.get('/message/test_multi_import', async (ctx, next) => {
     }).limit(50);
     auth.assert(users.length > 0, "没有");
     let env = config.ENV;
-    let param = _.map(users, u => u.tls_id());  //TODO: for ol
+    let param = _.map(users, u => u.tls_id());
 
     let serviceName = 'im_open_login_svc';
     let commandName = 'multiaccount_import';
@@ -54,6 +57,24 @@ router.get('/message/test_multi_import', async (ctx, next) => {
     ctx.body = {
         success:1,
         data:res
+    }
+});
+*/
+
+let api_prefix = "https://eg38eufh.api.lncld.net/1.1/rtm/"
+
+router.get('/message/history/', async(ctx, next)=>{
+    let param = _.pick(ctx.query, ['convid', 'msgid', 'timestamp']);
+    console.log(param);
+    let res = await superagent
+        .get(api_prefix+"messages/history")
+        .query(param)
+        .set("X-LC-Id", config.LEAN_APPID)
+        .set("X-LC-Key", config.LEAN_MASTERKEY);
+    console.log(res);
+    ctx.body = {
+        success:1,
+        data:eval(res.text)
     }
 });
 

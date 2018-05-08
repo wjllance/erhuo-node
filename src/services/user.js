@@ -5,6 +5,8 @@ let utils = require('utility');
 let superagent = require('superagent');
 let config = require('../config');
 let auth = require('../services/auth');
+let myUtil = require('../myUtils/myUtil');
+
 let { log } = require('../config');
 let { User } = require('../models');
 let { Account } = require('../models');
@@ -13,11 +15,12 @@ let { Order } = require('../models');
 
 exports.indexInfo = async (uid) => {
     let user = await withAccount(uid);
+    // let sig = await myUtil.getIMSig(user.tls_id());
     let account = user.account;
     user = user.baseInfo();
     user.balance = (account.balance / 100).toFixed(2);
     return user;
-}
+};
 
 let withAccount = exports.withAccount = async (uid) => {
 

@@ -24,15 +24,19 @@ exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
 exports.ENV = config['ENV'];
 
-exports.MCH_ID = config['MCH_ID'];
+exports.MCH_ID = ""+config['MCH_ID'];
 exports.API_KEY = config['API_KEY'];
 exports.CERT_PATH = path.join(ROOTPATH, config['CERT_PATH']);
 
-exports.SA_APP_ID = config['SA_APP_ID'];
+exports.SA_APP_ID = ""+config['SA_APP_ID'];
 exports.SA_SECRET = config['SA_SECRET'];
 exports.SA_TOKEN = config['SA_TOKEN'];
 
-exports.IMSDK_APPID = config['IMSDK_APPID'];
+// exports.IMSDK_APPID = ""+config['IMSDK_APPID'];
+// exports.IMACCOUNT_TYPE = ""+config['IMACCOUNT_TYPE'];
+
+exports.LEAN_APPID = config['LEAN_APPID'];
+exports.LEAN_MASTERKEY = config['LEAN_MASTERKEY'];
 
 
 exports.CONSTANT = {

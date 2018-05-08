@@ -8,7 +8,7 @@ let path = require('path');
 let session = require('koa-session');
 let config = require('./config');
 let { log, SERVER, PUBLIC } = require('./config');
-const logUtil = require('./services/log_util');
+const logUtil = require('./myUtils/logUtil');
 let app = new Koa();
 
 
