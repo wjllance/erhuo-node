@@ -71,7 +71,8 @@ router.get('/message/history/', async(ctx, next)=>{
         .query(param)
         .set("X-LC-Id", config.LEAN_APPID)
         .set("X-LC-Key", config.LEAN_MASTERKEY);
-    console.log(res);
+    console.log(res.text);
+    logger.info(res.text);
     ctx.body = {
         success:1,
         data:eval(res.text)
