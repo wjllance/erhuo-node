@@ -11,6 +11,9 @@ let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
 let srv_order = require('../services/order');
+let srv_user = require('../services/user');
+let {User} = require('../models');
+
 let superagent = require('superagent');
 const router = module.exports = new Router();
 
@@ -18,7 +21,6 @@ const router = module.exports = new Router();
 // let tlsapi = new TimRestAPI(require('../libs/tlssdk/config/config'));
 
 
-let { User } = require('../models');
 
 
 /*
@@ -61,21 +63,36 @@ router.get('/message/test_multi_import', async (ctx, next) => {
 });
 */
 
-let api_prefix = "https://eg38eufh.api.lncld.net/1.1/rtm/"
+let api_prefix = "https://eg38eufh.api.lncld.net/1.2/rtm/"
 
 router.get('/message/history/', async(ctx, next)=>{
     let param = _.pick(ctx.query, ['convid', 'msgid', 'timestamp']);
     console.log(param);
-    let res = await superagent
-        .get(api_prefix+"messages/history")
+    let {text} = await superagent
+        .get(api_prefix+"conversations/"+param.convid+"/messages")
         .query(param)
         .set("X-LC-Id", config.LEAN_APPID)
-        .set("X-LC-Key", config.LEAN_MASTERKEY);
-    console.log(res.text);
-    logger.info(res.text);
+        .set("X-LC-Key", config.LEAN_MASTERKEY)
+        .set("Content-Type","application/json");
+
+
+    let res = JSON.parse(text);
+    console.log(res);
+    logger.info(res);
+    let users = {};
+    for (let i = 0; i < res.length; i++){
+        let uid = res[i].from;
+        if(!users[uid]){
+            let user = await User.findById(uid);
+            users[uid] = user.baseInfo();
+        }
+        res[i].userInfo = users[uid];
+        res[i].content = JSON.parse(res[i].data)._lctext;
+    }
+
     ctx.body = {
         success:1,
-        data:eval(res.text)
+        data: res
     }
 });
 
