@@ -64,7 +64,13 @@ let getOrderState = (o) => {
             state = "已支付";
             break;
         case 2:
+            state = "已发货";
+            break;
+        case 3:
             state = "已完成";
+            break;
+        case 4:
+            state = "已取消";
             break;
     }
     if(o.pay_status > 1){

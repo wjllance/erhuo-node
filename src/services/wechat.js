@@ -360,4 +360,9 @@ exports.withdraw = async (partner_trade_no, openid, amount) => {
     return res;
 }
 
+exports.refund = async function (sn) {
+    //TODO....
+    console.log("refunding。。。")
+}
+
 

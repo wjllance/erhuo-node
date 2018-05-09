@@ -15,9 +15,9 @@ let { User  } = require('../models');
 let { Order } = require('../models');
 let { Goods } = require('../models');
 
-const ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
-const PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
-const REFUND_STATUS = require('../config').CONSTANT.REFUND_STATUS;
+let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
+let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
+let REFUND_STATUS = exports.REFUND_STATUS = require('../config').CONSTANT.REFUND_STATUS;
 
 let SNnumber = 0;
 
@@ -65,7 +65,8 @@ exports.findOrCreate = async function(goods, user) {
 
 let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
     let orders = await Order.find(condi)
-        .sort({order_status:1,created_date:-1})
+        // .sort({order_status:1,created_date:-1})
+        .sort({created_date:-1})
         .limit(pageSize)
         .skip((pageNo-1)*pageSize)
         .populate('buyer')
@@ -74,11 +75,6 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
     return orders;
 }
 
-exports.confirm = async (order) => {
-    auth.assert(order.order_status == ORDER_STATUS.PAID, "不可确认收货");
-    order.order_status = ORDER_STATUS.COMPLETE;
-    await order.save();
-}
 
 exports.checkPay = async (out_trade_no, result_code, fee)=>{
     let order = await Order.findOne({sn:out_trade_no});
@@ -128,5 +124,37 @@ exports.tradingStatus = async (gid) => {
         return "已被抢";
     }else{
         return "我想要";
+    }
+}
+
+exports.cancel = async (order)=>{
+    auth.assert(order.order_status != order.COMPLETE, "不能取消");
+    order.order_status = ORDER_STATUS.CANCEL;
+    await order.save();
+    // TODO REFUND ; NOTIFY
+}
+
+
+exports.confirm = async (order) => {
+    auth.assert(order.order_status == ORDER_STATUS.PAID, "不能确认");
+    order.order_status = ORDER_STATUS.CONFIRM;
+    await order.save();
+
+    // TODO NOTIFY
+}
+
+
+exports.complete = async (order) => {
+    auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
+    order.order_status = ORDER_STATUS.COMPLETE;
+    await order.save();
+
+    //TODO NOTIFY
+}
+
+exports.autorefund = async (order) => {
+    console.log("auto refunding...", order);
+    if(order.order_status != ORDER_STATUS.TOPAY && order.refund_status != REFUND_STATUS.SUCCEED){
+        await srv_wechat.refund(order.sn);
     }
 }

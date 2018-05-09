@@ -17,7 +17,7 @@ let { Transaction } = require('../models');
 let { Account } = require('../models');
 
 
-//通知！！！
+//TODO: 通知！！！
 exports.incomeByOrder = async (order) => {
     let account = await Account.findOneOrCreate({userID:order.seller});
     let transaction = new Transaction({
@@ -30,7 +30,7 @@ exports.incomeByOrder = async (order) => {
     });
     transaction.markModified('info');
 
-    account.balance = account.balance + order.priceGet;
+    account.balance = account.balance + order.price;
     await account.save();
     return await transaction.save();
 };
