@@ -145,12 +145,45 @@ router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
     }
 });
 
+router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
+    let isRemoved = ctx.query.isRemoved || null;  //默认未下架
+    let condi = {
+        userID: ctx.state.user._id,
+        deleted_date: null
+    };  //未删除筛选
+
+    if(isRemoved == '1'){
+        condi.removed_date = {$ne: null};
+    }
+    else if(isRemoved == '0'){
+        condi.removed_date = null;
+    }
+    console.log(condi);
+    let goods = await Goods.find(condi).populate('gpics');
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.outputify(goods)
+    }
+});
+
 // 收藏
 /**
  * @api {post}   /user/collect/:goods_id   收藏
  * @apiName     Collect
  * @apiGroup    User
  */
+router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let user = ctx.state.user;
+    let goods = await Goods.findById(ctx.params.goods_id);
+    auth.assert(goods, '商品不存在');
+    auth.assert(!_.some(user.collections, x => goods._id.equals(x)), '已经收藏');
+    user.collections.push(goods._id);
+    await user.save();
+    ctx.body = {
+        success: 1,
+    }
+});
+
 router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
     let goods = await Goods.findById(ctx.params.goods_id);
@@ -170,6 +203,18 @@ router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => 
  * @apiGroup    User
  */
 router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let user = ctx.state.user;
+    let goods = await Goods.findById(ctx.params.goods_id);
+    auth.assert(goods, '商品不存在');
+    auth.assert(_.some(user.collections, x => goods._id.equals(x)), '已经收藏');
+    user.collections = user.collections.filter(x => !goods._id.equals(x));
+    await user.save();
+    ctx.body = {
+        success: 1,
+    }
+});
+
+router.post('/user/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
