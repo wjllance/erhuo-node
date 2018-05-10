@@ -118,7 +118,7 @@ router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
 
 
 /**
- * @api     {post}  /order/complete/  确认收货
+ * @api     {post}  /order/complete/  买家确认收货
  * @apiName     OrderComplete
  * @apiGroup    Order
  *
@@ -134,7 +134,7 @@ router.post('/order/complete', auth.loginRequired, async(ctx, next) => {
     //TODO: 原子性！！！！
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
-    auth.assert(order.buyer == ctx.state.user._id, "无权限");
+    auth.assert(order.buyer.toString() == ctx.state.user._id.toString(), "无权限");
     await srv_order.complete(order);
     let transac = await srv_transaction.incomeByOrder(order);
     transac.status = 1;
@@ -147,7 +147,7 @@ router.post('/order/complete', auth.loginRequired, async(ctx, next) => {
 
 
 /**
- * @api     {post}  /order/confirm/  确认收货
+ * @api     {post}  /order/confirm/  卖家发货（确认订单）
  * @apiName     OrderConfirm
  * @apiGroup    Order
  *
@@ -161,7 +161,8 @@ router.post('/order/complete', auth.loginRequired, async(ctx, next) => {
 router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
-    auth.assert(order.seller == ctx.state.user._id, "无权限");
+    console.log(order);
+    auth.assert(order.seller.toString() == ctx.state.user._id.toString(), "无权限");
     await srv_order.confirm(order);
     ctx.body = {
         success:1,
@@ -170,7 +171,7 @@ router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
 
 
 /**
- * @api     {post}  /order/cancel/  确认收货
+ * @api     {post}  /order/cancel/  取消订单
  * @apiName     OrderConcel
  * @apiGroup    Order
  *
@@ -186,9 +187,9 @@ router.post('/order/cancel', auth.loginRequired, async(ctx, next) => {
     //TODO: 原子性！！！！
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
-    let uid = ctx.state.user._id;
-    auth.assert(uid == order.buyer || uid == order.seller, "无权限");
-    if(uid == order.buyer){
+    let uid = ctx.state.user._id.toString();
+    auth.assert(uid == order.buyer.toString() || uid == order.seller.toString(), "无权限");
+    if(uid == order.buyer.toString()){
         auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY
             || order.order_status == srv_order.ORDER_STATUS.PAID, "现在不能取消")
     }
