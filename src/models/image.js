@@ -19,12 +19,16 @@ let imageSchema = new mongoose.Schema({
 	created_date: { type: Date, default: Date.now },
 });
 
-imageSchema.methods.url = function() {
+imageSchema.methods.urlV2 = function() {
 	return {
 		url: config.SERVER.URL_PREFIX + '/' + this.filename,
 		thumb: config.SERVER.URL_PREFIX + '/' + this.thumbnails,
         _id: this._id
     }
+}
+
+imageSchema.methods.url = function() {
+    return config.SERVER.URL_PREFIX + '/' + this.filename;
 }
 
 imageSchema.methods.urlwithid = function() {

@@ -35,10 +35,10 @@ let goodsSchema = new mongoose.Schema({
 },{versionKey:false});
 
 
-goodsSchema.methods.baseInfo = function(fullPic) {
+goodsSchema.methods.baseInfoV2 = function(fullPic) {
 	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
 	if(fullPic){
-        g.gpics = this.gpics.map(y => y.url());
+        g.gpics = this.gpics.map(y => y.urlV2());
 	}else{
         g.gpics = [];
         g.gpics[0] = this.gpics[0].thumb();
@@ -47,6 +47,20 @@ goodsSchema.methods.baseInfo = function(fullPic) {
     g.created_date = tools.dateStr(this.created_date);
     g.glocation = school_map[this.glocation] ;
 	return g;
+};
+
+goodsSchema.methods.baseInfo = function(fullPic) {
+    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
+    if(fullPic){
+        g.gpics = this.gpics.map(y => y.url());
+    }else{
+        g.gpics = [];
+        g.gpics[0] = this.gpics[0].thumb();
+    }
+    g.state = this.removed_date ? "已下架" : "在售";
+    g.created_date = tools.dateStr(this.created_date);
+    g.glocation = school_map[this.glocation] ;
+    return g;
 };
 
 module.exports = mongoose.model("Goods", goodsSchema);
