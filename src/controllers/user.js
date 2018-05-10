@@ -145,7 +145,7 @@ router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
     }
 });
 
-router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
+router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
     let isRemoved = ctx.query.isRemoved || null;  //默认未下架
     let condi = {
         userID: ctx.state.user._id,
@@ -184,7 +184,7 @@ router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => 
     }
 });
 
-router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.post('/users/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
@@ -202,7 +202,7 @@ router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => 
  * @apiName     Uncollect
  * @apiGroup    User
  */
-router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.post('/user/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
@@ -214,7 +214,7 @@ router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) 
     }
 });
 
-router.post('/user/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.post('/users/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
     let user = ctx.state.user;
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
