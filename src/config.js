@@ -16,7 +16,7 @@ let SERVER = exports.SERVER = _.pick(config['SERVER'], ['ADDRESS', 'PORT', 'URL_
 if ('MONGO_HOST' in process.env) { // for docker
 	exports.MONGODB_URL = `mongodb://${process.env['MONGO_HOST']}/${config['MONGODB']['DATABASE']}`;
 } else {
-	exports.MONGODB_URL = `mongodb://${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
+	exports.MONGODB_URL = `mongodb://${config['MONGODB']['USERNAME']}:${config['MONGODB']['PASSWORD']}@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
 }
 
 exports.APP_ID = config['APP_ID'];
