@@ -5,9 +5,11 @@ SERVER:
   SECRET_KEYS: 'this is secret key' # 加密session用的key
   MAXAGE: 0 # 静态资源缓存时间,单位ms,推荐在正式服务器上启用
 
-MONGODB: # mongodb配置
+MONGODB: # mongodb配置DEV
   HOSTNAME: 127.0.0.1:27017
   DATABASE: c2c
+  USERNAME: erhuo
+  PASSWORD: fighting
 
 ENV: local
 
