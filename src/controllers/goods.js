@@ -15,7 +15,6 @@ let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
 const schools = config.CONSTANT.SCHOOL
-const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
@@ -193,6 +192,31 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+
+/**
+ * @api {post} /goods/update/:goods_id  商品改价
+ * @apiName     GoodsEdit
+ * @apiGroup    Goods
+ *
+ * @apiParam    {Number}    gprice
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+// router.post('/goods/update/:goods_id', auth.loginRequired, async (ctx, next) => {
+//     let goods = await Goods.findOne({_id: ctx.params.goods_id});
+//     auth.assert(goods, '商品不存在');
+//     auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
+//
+//     _.assign(goods, _.pick(ctx.request.body, ['gprice']));
+//     await goods.save();
+//     ctx.body = {
+//         success: 1,
+//         data: goods
+//     };
+// });
+
 /**
  * @api {get} /goods/detail/:goods_id  获取商品详情
  * @apiName     GetGoodsDetail
@@ -204,7 +228,7 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  */
 router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user);
-    auth.assert(goods, '商品不存在');
+    // auth.assert(goods, '商品不存在');
     goods.trading_status = await srv_order.tradingStatus(ctx.params.goods_id);
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
@@ -215,7 +239,6 @@ router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
 
 router.get('/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
-    auth.assert(goods, '商品不存在');
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,
@@ -236,13 +259,14 @@ router.get('/goods/detail/:goods_id', async (ctx, next) => {
  */
 router.get('/goods/base/:goods_id', async (ctx, next) => {
 
-    let goods = await srv_goods.getCardInfoById(ctx.params.goods_id);
-    auth.assert(goods, '商品不存在');
-    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
-    g.gpics = goods.gpics.map(y=>y.urlwithid());
-    g.glocation = school_map[goods.glocation] ;
+    let goods = await srv_goods.getBaseInfoById(ctx.params.goods_id);
     ctx.body = {
         success: 1,
-        data: g
+        data: goods
     };
 });
+
+
+
+
+

@@ -30,6 +30,45 @@ let generateSerialNumber = () => {
     return datetime + rand + No + ts;
 };
 
+
+//goods:CardInfo
+exports.findOrCreateV2 = async function(goods, user) {
+
+
+
+    let order = await Order.findOne({
+        goodsId: goods._id,
+        buyer: user._id,
+        order_status : {$ne: ORDER_STATUS.CANCEL}
+    });
+    if(order) return order;
+
+    let orders = await Order.find({ //检查交易中的订单
+        goodsId: goods._id,
+        refund_status: REFUND_STATUS.INIT,
+        order_status: {
+            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+        }
+    });
+    console.log(orders);
+    auth.assert(orders.length == 0, "商品交易中，不可下单")
+
+
+    console.log(orders);
+    order = new Order({
+        goodsId: goods._id,
+        seller: goods.userID,
+        buyer: user._id,
+        price: goods.gprice,
+        // sn: generateSerialNumber()
+    });
+    order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
+    order.goodsInfo.img = goods.gpics[0].thumbnails;
+    order.markModified('goodsInfo');
+    await order.save();
+
+    return order;
+};
 exports.findOrCreate = async function(goods, user) {
 
     let orders = await Order.find({
@@ -62,6 +101,22 @@ exports.findOrCreate = async function(goods, user) {
     return order;
 };
 
+
+exports.preparePay = async function (order) {
+    auth.assert(order.order_status == ORDER_STATUS.TOPAY, "不可支付");
+
+    order.sn = generateSerialNumber();
+    let buyer = await User.findById(order.buyer);
+    await order.save();
+    let price = (config.ENV == 'local') ? 1 : order.price*100;
+    let ret = {
+        out_trade_no: order.sn,
+        body: order.goodsInfo.gname,
+        total_fee: price,
+        openid: buyer.openid
+    };
+    return ret
+}
 
 let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
     let orders = await Order.find(condi)

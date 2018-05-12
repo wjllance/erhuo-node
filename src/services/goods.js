@@ -5,8 +5,10 @@ let { User  } = require('../models');
 let { Comment } = require('../models');
 let { Goods } = require('../models');
 
+let auth = require('../services/auth');
 let tools = require('./tools')
 const schools = require('../config').CONSTANT.SCHOOL;
+const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
@@ -52,8 +54,8 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
         .findById(goods_id)
         .populate('gpics')
         .populate('userID');
-    if(!goods)
-        return goods;
+    auth.assert(goods, '商品不存在');
+
     let g = goods.baseInfoV2(1); //fullpic
 
     g.user = {
@@ -96,8 +98,8 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
         .findById(goods_id)
         .populate('gpics')
         .populate('userID');
-    if(!goods)
-        return goods;
+    auth.assert(goods, '商品不存在');
+
     let g = goods.baseInfo(1); //fullpic
     // g.gpics = goods.gpics.map(y => y.url());
 
@@ -140,6 +142,17 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
 let getCardInfoById = exports.getCardInfoById = async function(goods_id) {
     return await Goods.findById(goods_id)
         .populate('gpics');
+};
+
+
+let getBaseInfoById = exports.getBaseInfoById = async function(goods_id) {
+    let goods = await getCardInfoById(goods_id);
+    auth.assert(goods, '商品不存在');
+
+    let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'gprice', 'glocation', 'gcost']);
+    g.gpics = goods.gpics.map(y=>y.urlwithid());
+    g.glocation = school_map[goods.glocation] ;
+    return g;
 };
 
 //商品未下架过滤层

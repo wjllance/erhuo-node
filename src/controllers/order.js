@@ -79,16 +79,38 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.post('/order/', auth.loginRequired, async(ctx, next) => {
+    // console.log(ctx.request.body.goodsId);
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
 
-    let order = await srv_order.findOrCreate(goods, ctx.state.user);
-
+    let order = await srv_order.findOrCreateV2(goods, ctx.state.user);
+    console.log(order);
     ctx.body = {
         success: 1,
         data: order._id
     };
+});
 
+/**
+ * @api   {get} /order/pay  获取支付参数
+ * @apiName     OrderPay
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.get('/order/pay/:orderId', auth.loginRequired, async(ctx, next) => {
+    console.log(ctx.params.orderId);
+
+    let order = await Order.findById(ctx.params.orderId);
+    auth.assert(order, "订单不存在")
+    let params = await srv_order.preparePay(order);
+    let res = await srv_wechat.getPayParamsV2(params);
+    ctx.body = {
+        success:1,
+        data: res
+    };
 });
 
 
