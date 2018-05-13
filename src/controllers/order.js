@@ -74,6 +74,8 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
  * @apiName     OrderCreate
  * @apiGroup    Order
  *
+ * @apiParam    {String}    goodsId
+ *
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
  *
@@ -92,7 +94,7 @@ router.post('/order/', auth.loginRequired, async(ctx, next) => {
 });
 
 /**
- * @api   {get} /order/pay  获取支付参数
+ * @api   {get} /order/pay/:orderId  获取支付参数
  * @apiName     OrderPay
  * @apiGroup    Order
  *
