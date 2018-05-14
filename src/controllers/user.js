@@ -238,3 +238,22 @@ router.get('/user/wallet', auth.loginRequired, async (ctx, next) => {
     }
 });
 
+
+/***
+ * @api {post}   /user/save_formids/  取消收藏
+ * @apiName     SaveFormIds
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {Object}   formIds   formIds:{key:expire_time}
+ */
+router.post('/user/save_formids', auth.loginRequired, async(ctx, next)=>{
+    let formIds = ctx.request.body.formIds;
+    let total = await srv_user.pushFormIds(ctx.state.user._id, formIds);;
+    console.log(formIds);
+    ctx.body = {
+        success:1,
+        data: total
+    }
+})
+
