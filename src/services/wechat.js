@@ -300,6 +300,15 @@ exports.qrcode = async(mina_scene, mina_path) => {
     // return res;
 };
 
+
+
+exports.getPayParamsV2 = async (params) => {
+
+    let res = await api.getPayParams(params);
+    console.log(res);
+    return res;
+}
+
 exports.getPayParams = async (order_id) => {
     let order = await Order.findOne({_id: order_id}).populate('buyer');
     console.log(pay_config);
