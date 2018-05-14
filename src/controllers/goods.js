@@ -195,31 +195,6 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-
-/**
- * @api {post} /goods/update/:goods_id  商品改价
- * @apiName     GoodsEdit
- * @apiGroup    Goods
- *
- * @apiParam    {Number}    gprice
- *
- * @apiSuccess  {Number}    success
- * @apiSuccess  {Object}    data
- *
- */
-// router.post('/goods/update/:goods_id', auth.loginRequired, async (ctx, next) => {
-//     let goods = await Goods.findOne({_id: ctx.params.goods_id});
-//     auth.assert(goods, '商品不存在');
-//     auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
-//
-//     _.assign(goods, _.pick(ctx.request.body, ['gprice']));
-//     await goods.save();
-//     ctx.body = {
-//         success: 1,
-//         data: goods
-//     };
-// });
-
 /**
  * @api {get} /goods/detail/:goods_id  获取商品详情
  * @apiName     GetGoodsDetail
@@ -268,8 +243,3 @@ router.get('/goods/base/:goods_id', async (ctx, next) => {
         data: goods
     };
 });
-
-
-
-
-

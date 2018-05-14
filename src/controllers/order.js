@@ -81,7 +81,6 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.post('/order/', auth.loginRequired, async(ctx, next) => {
-    // console.log(ctx.request.body.goodsId);
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
 
