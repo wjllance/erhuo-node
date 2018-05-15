@@ -56,8 +56,12 @@ exports.walletInfo = async(uid) => {
 
 
 exports.pushFormIds = async (user_id, formIds)=>{
+    console.log(formIds);
     for(let key in formIds){
         try{
+            if(key.equals("the formId is a mock one")){
+                continue;
+            }
             let userFormid = new UserFormid();
             userFormid.user_id = user_id;
             userFormid.formid = key;

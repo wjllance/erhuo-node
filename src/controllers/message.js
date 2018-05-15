@@ -89,3 +89,40 @@ router.get('/message/history/', async(ctx, next)=>{
     }
 });
 
+
+
+
+router.get('/message/history/', async(ctx, next)=>{
+    let param = _.pick(ctx.query, ['convid', 'msgid', 'timestamp']);
+    console.log(param);
+    let {text} = await superagent
+        .get(api_prefix+"conversations/"+param.convid+"/messages")
+        .query(param)
+        .set("X-LC-Id", config.LEAN_APPID)
+        .set("X-LC-Key", config.LEAN_MASTERKEY)
+        .set("Content-Type","application/json");
+
+
+    let res = JSON.parse(text);
+    console.log(res);
+    logger.info(res);
+    res = _.map(res, function (m) {
+        m._lctext = JSON.parse(m.data)._lctext;
+        return m;
+    });
+    ctx.body = {
+        success:1,
+        data: res
+    }
+});
+
+
+// router.post('/message/notify', auth.loginRequired , async(ctx, next)=>{
+//     let touser = await User.findById(ctx.request.body.touser);
+//     auth.assert(touser, "没有你");
+//     let content = ctx.request.body.content;
+//     auth.assert(content && !content.equal(""), "消息不能为空");
+//
+//     let user = ctx.state.user;
+//
+// });
