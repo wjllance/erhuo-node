@@ -150,7 +150,6 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
     order.pay_status = PAY_STATUS.SUCCEED;
     order.paid_at = moment();
     order.order_status = ORDER_STATUS.PAID;
-    await order.goodsId.remove();
     await order.save();
 };
 
@@ -203,7 +202,8 @@ exports.complete = async (order) => {
     auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
     order.order_status = ORDER_STATUS.COMPLETE;
     await order.save();
-
+    let goods = Goods.findById(order.goodsId);
+    await goods.remove();
     //TODO NOTIFY
 }
 
