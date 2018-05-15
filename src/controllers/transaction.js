@@ -33,7 +33,7 @@ router.post('/transaction/withdraw', auth.loginRequired, async (ctx, next) => {
     auth.assert(ctx.request.body.amount, "amount miss");
     let amount = ctx.request.body.amount*100;
     //TODO: 原子性！！！！
-    let transac = await  srv_transaction.withdraw(ctx.state.user, amount);
+    let transac = await  srv_transaction.withdraw(ctx.state.user, amount/100);
     let res = await srv_wechat.withdraw(transac._id, ctx.state.user.openid,amount);
     transac.status = 1;
     await transac.save();

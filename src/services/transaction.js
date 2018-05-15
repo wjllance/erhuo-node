@@ -23,7 +23,7 @@ exports.incomeByOrder = async (order) => {
     let transaction = new Transaction({
         accountId: account._id,
         type:1,
-        amount: order.priceGet || order.price,
+        amount: order.price,
         info: {
             orderId: order._id
         }

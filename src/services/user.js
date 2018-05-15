@@ -21,7 +21,7 @@ exports.indexInfo = async (uid) => {
     // let sig = await myUtil.getIMSig(user.tls_id());
     let account = user.account;
     user = user.baseInfo();
-    user.balance = (account.balance / 100).toFixed(2);
+    user.balance = account.balance.toFixed(2);
     return user;
 };
 
