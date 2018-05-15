@@ -47,8 +47,9 @@ exports.walletInfo = async(uid) => {
     orders.forEach((item) => {
         sum += item.price;
     });
-    account.undergoing = sum ;
-    account.total = sum + account.balance;
+    account.undergoing = sum.toFixed(2);
+    account.balance = account.balance.toFixed(2);
+    account.total = account.undergoing + account.balance;
 
     return account;
 };
