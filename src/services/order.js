@@ -131,7 +131,7 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
 
 
 exports.checkPay = async (out_trade_no, result_code, fee)=>{
-    let order = await Order.findOne({sn:out_trade_no}).populate("goodsId");
+    let order = await Order.findOne({sn:out_trade_no});
     auth.assert(order, "订单不存在");
     if(result_code == "FAIL"){
         order.pay_status = PAY_STATUS.FAILED;
