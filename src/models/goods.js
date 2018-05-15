@@ -63,4 +63,9 @@ goodsSchema.methods.baseInfo = function(fullPic) {
     return g;
 };
 
+goodsSchema.methods.remove = async function() {
+	this.removed_date = Date.now();
+	await this.save();
+};
+
 module.exports = mongoose.model("Goods", goodsSchema);

@@ -35,7 +35,6 @@ let generateSerialNumber = () => {
 exports.findOrCreateV2 = async function(goods, user) {
 
 
-
     let order = await Order.findOne({
         goodsId: goods._id,
         buyer: user._id,
@@ -132,7 +131,7 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
 
 
 exports.checkPay = async (out_trade_no, result_code, fee)=>{
-    let order = await Order.findOne({sn:out_trade_no});
+    let order = await Order.findOne({sn:out_trade_no}).populate("goodsId");
     auth.assert(order, "订单不存在");
     if(result_code == "FAIL"){
         order.pay_status = PAY_STATUS.FAILED;
@@ -151,6 +150,7 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
     order.pay_status = PAY_STATUS.SUCCEED;
     order.paid_at = moment();
     order.order_status = ORDER_STATUS.PAID;
+    await order.goodsId.remove();
     await order.save();
 };
 
@@ -170,7 +170,7 @@ exports.tradingStatus = async (gid) => {
         goodsId: gid,
         refund_status: REFUND_STATUS.INIT,
         order_status: {
-            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE]
+            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
         }
     });
     console.log("orders");
