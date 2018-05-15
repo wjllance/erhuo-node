@@ -157,7 +157,7 @@ let getBaseInfoById = exports.getBaseInfoById = async function(goods_id) {
 
 //商品未下架过滤层
 //返回值为true值表示已下架，为null或者false时为未下架
-let isGoodRemoved = exports.isGoodRemoved = async function(good) {
+let isGoodRemoved = exports.isGoodRemoved = function(good) {
     return good.removed_date && good.removed_date < Date.now();
 };
 

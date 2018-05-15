@@ -102,7 +102,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 // 参数：gid
 
 /**
- * @api {put} /goods/remove/:goods_id  商品下架
+ * @api {post} /goods/remove/:goods_id  商品下架
  * @apiName     GoodsDelete
  * @apiGroup    Goods
  *
@@ -113,12 +113,27 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findOne({_id: ctx.params.goods_id});
     auth.assert(myGood, '商品不存在');
-    let isRemoved = await srv_goods.isGoodRemoved(myGood);
-    auth.assert(!isRemoved, '商品已下架');
+    // let isRemoved = await srv_goods.isGoodRemoved(myGood);
+    auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
-    _.assign(myGood, {'removed_date':Date.now()});
-    console.log(myGood);
-    await myGood.save();
+
+    await myGood.remove();
+
+    // _.assign(myGood, {'removed_date':Date.now()});
+    // console.log(myGood);
+    // await myGood.save();
+    ctx.body = {
+        success: 1,
+        data: myGood._id.toString()
+    };
+});
+
+router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
+    let myGood = await Goods.findById(ctx.request.body.goodsId);
+    auth.assert(myGood, '商品不存在');
+    auth.assert(!myGood.removed_date, '商品已下架');
+    auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
+    await myGood.remove();
     ctx.body = {
         success: 1,
         data: myGood._id.toString()
@@ -140,8 +155,12 @@ router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
  */
 router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findOne({_id: ctx.params.goods_id});
+    auth.assert(false, "暂时不能删除商品");
+
+
+
     auth.assert(myGood, '商品不存在');
-    let isRemoved = await srv_goods.isGoodRemoved(myGood);
+    let isRemoved = srv_goods.isGoodRemoved(myGood);
     auth.assert(isRemoved, '商品未下架，不能删除');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限删除商品');
     _.assign(myGood, {'deleted_date':Date.now()});

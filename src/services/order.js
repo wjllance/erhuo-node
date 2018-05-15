@@ -35,7 +35,6 @@ let generateSerialNumber = () => {
 exports.findOrCreateV2 = async function(goods, user) {
 
 
-
     let order = await Order.findOne({
         goodsId: goods._id,
         buyer: user._id,
@@ -139,8 +138,8 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
         await order.save();
         return;
     }
-    order.priceGet = fee;
-    if(order.price != fee){  // 接入退款
+    order.priceGet = fee/100;
+    if(order.price != order.priceGet){  // 接入退款
         order.pay_status = PAY_STATUS.WRONG_FEE;
         await order.save();
         logger.error("金额不对");
@@ -170,7 +169,7 @@ exports.tradingStatus = async (gid) => {
         goodsId: gid,
         refund_status: REFUND_STATUS.INIT,
         order_status: {
-            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE]
+            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
         }
     });
     console.log("orders");
@@ -203,7 +202,8 @@ exports.complete = async (order) => {
     auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
     order.order_status = ORDER_STATUS.COMPLETE;
     await order.save();
-
+    let goods = Goods.findById(order.goodsId);
+    await goods.remove();
     //TODO NOTIFY
 }
 

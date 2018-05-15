@@ -11,7 +11,10 @@ let { log } = require('../config');
 let { User } = require('../models');
 let { Account } = require('../models');
 let { Order } = require('../models');
+let { UserFormid } = require('../models');
 
+let moment = require('moment');
+moment.locale('zh-cn');
 
 exports.indexInfo = async (uid) => {
     let user = await withAccount(uid);
@@ -49,4 +52,26 @@ exports.walletInfo = async(uid) => {
     account.total = sum + account.balance;
 
     return account;
+};
+
+
+exports.pushFormIds = async (user_id, formIds)=>{
+    console.log(formIds);
+    for(let key in formIds){
+        try{
+            if(key == "undefined" && key == "the formId is a mock one"){
+                continue;
+            }
+            let userFormid = new UserFormid();
+            userFormid.user_id = user_id;
+            userFormid.formid = key;
+            userFormid.expire_date = new moment(formIds[key]);
+            await userFormid.save();
+        }catch (e) {
+            console.error(e)
+        }
+
+    }
+    let total = await UserFormid.find({user_id: user_id}).count();
+    return total;
 }
