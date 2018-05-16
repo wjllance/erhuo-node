@@ -59,7 +59,7 @@ exports.pushFormIds = async (user_id, formIds)=>{
     console.log(formIds);
     for(let key in formIds){
         try{
-            if(key == "undefined" && key == "the formId is a mock one"){
+            if(key == "undefined" || key == "the formId is a mock one"){
                 continue;
             }
             let userFormid = new UserFormid();

@@ -11,7 +11,8 @@ let userFormidSchema = new mongoose.Schema({
     },
     formid: {
         type: String,
-        unique: true
+        unique: true,
+        dropDups: true
     },
     expire_date: Date
 },{versionKey:false});
