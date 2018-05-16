@@ -147,6 +147,22 @@ let sendReplyNotice = exports.sendReplyNotice = async function(comment_id) {
 
 };
 
+let sendMinaTempMsg = exports.sendMinaTempMsg = async (touser, template_id, form_id, data, page, color, emphasis_keyword) => {
+    let access_token = await get_access_token(TYPE_MINA);
+    console.log(access_token);
+    let post_url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token="+access_token;
+    let {text} = await superagent.post(post_url).send({
+        touser: touser,
+        template_id: template_id,
+        page: page,
+        data: data,
+        form_id: form_id
+    });
+    let res = JSON.parse(text);
+    console.log(res);
+    return res
+};
+
 let update_service_account_userid = exports.update_service_account_userid = async function(next_openid){
 
 
@@ -373,5 +389,6 @@ exports.refund = async function (sn) {
     //TODO....
     console.log("refunding。。。")
 }
+
 
 
