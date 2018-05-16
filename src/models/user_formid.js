@@ -7,12 +7,13 @@ let userFormidSchema = new mongoose.Schema({
 
     user_id: {
         type : mongoose.Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     formid: {
-        type: String,
+        type: mongoose.Schema.Types.String,
         unique: true,
-        dropDups: true
+        required: true
     },
     expire_date: Date
 },{versionKey:false});
