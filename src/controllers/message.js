@@ -97,6 +97,8 @@ router.get('/message/history/', async(ctx, next)=>{
 router.post('/message/template', auth.loginRequired, async(ctx, next)=>{
     let touserid = ctx.request.body.touser;
     let content = ctx.request.body.content;
+    auth.assert(touserid, "touser miss");
+    auth.assert(content, "content miss");
     let user = ctx.state.user;
     let res = await srv_message.sendTemplate(touserid, content, user);
     ctx.body = {

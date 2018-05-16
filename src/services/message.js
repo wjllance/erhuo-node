@@ -17,13 +17,15 @@ let TEMPLATE_MESSAGE_ID = "bMvVQ3VWf_3-qC9lTmwaWVcGdYK2Qi7eWLoq4ssapkI";
 
 exports.sendTemplate = async (touser_id, content, fromuser) => {
     let touser = await User.findById(touser_id);
-    let formid = await UserFormid.find({
+    let formid = await UserFormid.findOne({
         user_id: touser_id,
         expire_date: {$gt: moment()},
         used: {$ne: 1}
     });
-    if(formid){
+    console.log(formid);
+    if(!formid){
         logger.warn("temp id not enough", fromuser, touser, content);
+        console.error("temp id not enough", fromuser, touser, content);
         return null;
     }
     let data = {
