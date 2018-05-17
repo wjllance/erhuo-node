@@ -57,6 +57,9 @@ let getOrderState = (o) => {
     let state = "";
     switch (o.order_status)
     {
+        case -1:
+            state = "待下单";
+            break;
         case 0:
             state = "待支付";
             break;
@@ -121,7 +124,7 @@ orderSchema.methods.cardInfo = function() {
 
 orderSchema.methods.detailInfo = function() {
 
-    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn',
+    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn', 'price',
         'order_status', 'pay_status', 'refund_status']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
@@ -130,6 +133,16 @@ orderSchema.methods.detailInfo = function() {
     if(this.seller){
         o.seller = this.seller.baseInfo();
     }
+    o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
+    o.state = getOrderState(this);
+    return o;
+};
+
+orderSchema.methods.baseInfo = function() {
+
+    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn', 'price',
+        'order_status', 'pay_status', 'refund_status']);
+    o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
     o.state = getOrderState(this);
     return o;

@@ -107,6 +107,46 @@ router.post('/v2/order/', auth.loginRequired, async(ctx, next) => {
 
 
 /**
+ * @api {patch}   /order/:orderId  修改订单
+ * @apiName     OrderPatch
+ * @apiGroup    Order
+ *
+ * @apiParam    {String}    price 暂只支持修改价格
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.patch('/order/:orderId', auth.loginRequired, async(ctx, next) => {
+    let order = await Order.findById(ctx.params.orderId);
+    auth.assert(order, "订单不存在");
+    console.log(order.seller, ctx.state.user._id);
+    auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
+    _.assign(order, _.pick(ctx.request.body, ['price']));
+    await order.save();
+    console.log(order);
+    ctx.body = {
+        success: 1,
+        data: order.baseInfo()
+    };
+});
+
+router.put('/order/:orderId', auth.loginRequired, async(ctx, next) => {
+    let order = await Order.findById(ctx.params.orderId);
+    auth.assert(order, "订单不存在");
+    console.log(order.seller, ctx.state.user._id);
+    auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
+    _.assign(order, _.pick(ctx.request.body, ['price']));
+    await order.save();
+    console.log(order);
+    ctx.body = {
+        success: 1,
+        data: order.baseInfo()
+    };
+});
+
+
+/**
  * @api   {get} /order/pay/:orderId  获取支付参数
  * @apiName     OrderPay
  * @apiGroup    Order
