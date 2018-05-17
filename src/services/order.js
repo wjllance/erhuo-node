@@ -265,7 +265,8 @@ exports.confirm = async (order) => {
 
 
 exports.complete = async (order) => {
-    auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
+    // auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
+    auth.assert(order.order_status == ORDER_STATUS.CONFIRM || order.order_status == ORDER_STATUS.PAID, "不可确认收货");
     order.order_status = ORDER_STATUS.COMPLETE;
     await order.save();
     let goods = Goods.findById(order.goodsId);
