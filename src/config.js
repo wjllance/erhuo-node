@@ -52,7 +52,8 @@ exports.CONSTANT = {
         PAID: 1,
         CONFIRM: 2,
         COMPLETE: 3,
-        CANCEL: 4
+        CANCEL: 4,
+        INIT: -1
     },
     PAY_STATUS: {
         INIT: 0,

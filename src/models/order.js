@@ -34,15 +34,15 @@ let orderSchema = new Schema({
     priceGet: Number,
     order_status: {
         type: Number,
-        default: 0
+        default: -1   //INIT
     },
     pay_status: {
         type: Number,
-        default: 0,
+        default: 0,     //INIT
     },
     refund_status:{
         type: Number,
-        default: 0,
+        default: 0,     //INIT
     },
     paid_at: Date,
     refunded_at: Date,
