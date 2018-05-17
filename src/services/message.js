@@ -21,7 +21,7 @@ exports.sendTemplate = async (touser_id, content, fromuser) => {
         user_id: touser_id,
         expire_date: {$gt: moment()},
         used: {$ne: 1}
-    });
+    }).sort({expire_date:1});
     console.log(formid);
     if(!formid){
         logger.warn("temp id not enough", fromuser, touser, content);
