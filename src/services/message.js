@@ -33,7 +33,7 @@ exports.sendTemplate = async (touser_id, content, fromuser) => {
             value: content
         },
         keyword2: {
-            value: touser.nickName
+            value: fromuser.nickName
         }
     };
     formid.used = 1;
