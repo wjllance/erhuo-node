@@ -4,7 +4,7 @@ moment.locale('zh-cn');
 const {Transaction} = require('./models');
 const srv_transaction = require('./services/transaction')
 
-let config = require('../config');
+let config = require('./config');
 
 function scheduleCronstyle(){
     schedule.scheduleJob('30 * * * * *', function(){
