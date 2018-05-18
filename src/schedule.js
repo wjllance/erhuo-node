@@ -18,7 +18,7 @@ function scheduleCronstyle(){
 exports.register = function () {
     console.log("register!");
     if(config.ENV == "local") {
-        schedule.scheduleJob('*/10 * * * * *', async function(){
+        schedule.scheduleJob('*/30 * * * * *', async function(){
             console.log('checking normal order countdown...');
             let transactions = await Transaction.find({
                 countdown_date: {
@@ -33,7 +33,7 @@ exports.register = function () {
             }
         });
     }else{
-        schedule.scheduleJob('* */10 * * * *', async function(){
+        schedule.scheduleJob('0 */10 * * * *', async function(){
             console.log('checking normal order countdown...');
             let transactions = await Transaction.find({
                 countdown_date: {
@@ -51,7 +51,7 @@ exports.register = function () {
     }
 
 
-    schedule.scheduleJob('* */1 * * * *', async function(){
+    schedule.scheduleJob('0 */1 * * * *', async function(){
     // schedule.scheduleJob('*/5 * * * * *', async function(){
         console.log('checking order timeout...');
         let orders = await Order.find({

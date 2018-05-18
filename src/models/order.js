@@ -99,7 +99,7 @@ let getOrderState = (o) => {
     if(o.refund_status > 0){
         switch (o.refund_status){
             case 1:
-                state = "审核中";
+                state = "申请退款中";
                 break;
             case 2:
                 state = "退款成功";
