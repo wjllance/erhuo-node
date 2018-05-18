@@ -202,7 +202,7 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
     if(result_code == "FAIL"){
         order.pay_status = PAY_STATUS.FAILED;
         await order.save();
-        return;
+        return null;
     }
     order.priceGet = fee/100;
     if(order.price != order.priceGet){  // 接入退款
@@ -211,12 +211,13 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
         logger.error("金额不对");
         console.error("金额不对");
         if(config.ENV != "local")
-            return;
+            return null;
     }
     order.pay_status = PAY_STATUS.SUCCEED;
     order.paid_at = moment();
     order.order_status = ORDER_STATUS.PAID;
-    await order.save();
+    return await order.save();
+
 };
 
 
@@ -248,7 +249,8 @@ exports.tradingStatus = async (gid) => {
 }
 
 exports.cancel = async (order)=>{
-    auth.assert(order.order_status != order.COMPLETE, "不能取消");
+    // auth.assert(order.order_status != order.COMPLETE, "不能取消");
+    auth.assert(!order.finished_date, "不能取消");
     order.order_status = ORDER_STATUS.CANCEL;
     await order.save();
     // TODO REFUND ; NOTIFY
@@ -266,8 +268,10 @@ exports.confirm = async (order) => {
 
 exports.complete = async (order) => {
     // auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
-    auth.assert(order.order_status == ORDER_STATUS.CONFIRM || order.order_status == ORDER_STATUS.PAID, "不可确认收货");
+
+    // auth.assert(order.order_status == ORDER_STATUS.CONFIRM || order.order_status == ORDER_STATUS.PAID, "不可确认收货");
     order.order_status = ORDER_STATUS.COMPLETE;
+    order.completed_date = moment();
     await order.save();
     let goods = Goods.findById(order.goodsId);
     await goods.remove();
@@ -279,4 +283,4 @@ exports.autorefund = async (order) => {
     if(order.order_status != ORDER_STATUS.TOPAY && order.refund_status != REFUND_STATUS.SUCCEED){
         await srv_wechat.refund(order.sn);
     }
-}
+};

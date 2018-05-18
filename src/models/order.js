@@ -48,6 +48,8 @@ let orderSchema = new Schema({
     refunded_at: Date,
     created_date: { type: Date, default: Date.now},
     updated_date: { type: Date, default: Date.now},
+    completed_date: Date,   //确认收货
+    finished_date: Date   //到账时间
 
 
     // gcost: Number,
@@ -70,7 +72,7 @@ let getOrderState = (o) => {
             state = "已发货";
             break;
         case 3:
-            state = "已完成";
+            state = "已收货";
             break;
         case 4:
             state = "已取消";
@@ -102,6 +104,9 @@ let getOrderState = (o) => {
                 state = "退款失败";
                 break;
         }
+    }
+    if(o.finished_date){
+        state = "已完成";
     }
     return state;
 }

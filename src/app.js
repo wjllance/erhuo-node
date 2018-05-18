@@ -10,9 +10,9 @@ let config = require('./config');
 let { log, SERVER, PUBLIC } = require('./config');
 const logUtil = require('./myUtils/logUtil');
 let app = new Koa();
-
-
 const router2controller = require('./router2controller.js');
+let schedule = require('./schedule');
+
 
 const xmlParser = require('koa-xml-body');
 app.use(xmlParser()).use((ctx,next) => {
@@ -77,6 +77,7 @@ app.use(require('koa-static')(PUBLIC.root, {
 
 
 logUtil.initLogPath();
+schedule.register();
 
 app.listen(SERVER.PORT, SERVER.ADDRESS);
 

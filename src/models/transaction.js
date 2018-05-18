@@ -16,11 +16,17 @@ let transactionSchema = new Schema({
     amount: Number,
     info: Schema.Types.Mixed,
     desc: String,
+    orderId: {
+        type : mongoose.Schema.ObjectId,
+        ref : 'Order'
+    },
     status: {
         type:Number,
         default: 0
     },
     created_date: { type: Date, default: Date.now },
+    countdown_date: Date,
+    finished_date: Date
 });
 
 module.exports = mongoose.model("Transaction", transactionSchema);
