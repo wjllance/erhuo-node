@@ -11,9 +11,7 @@ let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
-let { User  } = require('../models');
-let { Order } = require('../models');
-let { Goods } = require('../models');
+let { User, Order, Goods, Transaction } = require('../models');
 
 let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
 let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
@@ -284,3 +282,26 @@ exports.autorefund = async (order) => {
         await srv_wechat.refund(order.sn);
     }
 };
+
+exports.refund_apply = async(order) =>{
+    auth.assert(order.refund_status == REFUND_STATUS.INIT && order.pay_status == PAY_STATUS.SUCCEED, "不可申请退款");
+    auth.assert(!order.finished_date, "订单已结束，申请退款请私下联系或联系客服");
+    order.refund_status = REFUND_STATUS.APPLYING;
+    await order.save();
+    //TODO SEND NOTIFY
+};
+
+exports.refund_confirm = async(order) =>{
+    auth.assert(order.refund_status == REFUND_STATUS.APPLYING, "不可确认退款");
+    order.refund_status = REFUND_STATUS.SUCCEED;
+    await order.save();
+    //TODO SEND NOTIFY
+};
+
+exports.finish = async(orderId) => {
+    let order = await Order.findById(orderId);
+    auth.assert(order, "订单不存在");
+    auth.assert(order.refund_status == REFUND_STATUS.INIT && order.order_status == ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
+    order.finished_date = moment();
+    await order.save();
+}

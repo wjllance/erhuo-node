@@ -224,7 +224,7 @@ router.post('/order/complete', auth.loginRequired, async(ctx, next) => {
     //TODO: 原子性！！！！
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
-    auth.assert(order.buyer.toString() == ctx.state.user._id.toString(), "无权限");
+    auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
     await srv_order.complete(order);
     let transac = await srv_transaction.incomeByOrder(order);
     transac.status = 1;
@@ -267,7 +267,7 @@ router.post('/order/confirm', auth.loginRequired, async(ctx, next) => {
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
     console.log(order);
-    auth.assert(order.seller.toString() == ctx.state.user._id.toString(), "无权限");
+    auth.assert(order.seller.equals(ctx.state.user._id), "无权限");
     await srv_order.confirm(order);
     ctx.body = {
         success:1,
@@ -293,10 +293,9 @@ router.post('/order/cancel', auth.loginRequired, async(ctx, next) => {
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
     let uid = ctx.state.user._id.toString();
-    auth.assert(uid == order.buyer.toString() || uid == order.seller.toString(), "无权限");
-    if(uid == order.buyer.toString()){
-        auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY
-            || order.order_status == srv_order.ORDER_STATUS.PAID, "现在不能取消")
+    auth.assert(order.buyer.equals(uid) || order.seller.equals(uid), "无权限");
+    if(order.buyer.equals(uid)){
+        auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY, "现在不能取消")
     }
     await srv_order.cancel(order);
 
@@ -326,6 +325,35 @@ router.get('/order/detail/:order_id', auth.loginRequired, async (ctx, next) => {
         data: order
     }
 });
+
+
+router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
+    let order = await Order.findById(ctx.request.body.orderId);
+    auth.assert(order, "订单不存在");
+    auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
+    let res = await srv_order.refund_apply(order);
+    let transaction = await srv_transaction.createRefund(order);
+    console.log("create refund transaction ", transaction);
+    ctx.body = {
+        success:1,
+        data: res
+    }
+});
+
+router.post('/order/refund/confirm', auth.loginRequired, async(ctx, next)=>{
+    let order = await Order.findById(ctx.request.body.orderId);
+    auth.assert(order, "订单不存在");
+    auth.assert(order.seller.equals(ctx.state.user._id), "无权限");
+    let res = await srv_order.refund_confirm(order);
+    let transaction = await srv_transaction.refundConfirm(order);
+    console.log("confirm refund transaction ", transaction);
+    ctx.body = {
+        success:1,
+        data: res
+    }
+});
+
+
 
 
 

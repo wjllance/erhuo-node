@@ -6,6 +6,8 @@ let mzfs = require('mz/fs');
 let path = require('path');
 let body = require('koa-convert')(require('koa-better-body')());
 
+let moment = require('moment');
+moment.locale('zh-cn');
 let config = require('../config');
 let auth = require('../services/auth');
 let srv_transaction = require('../services/transaction');
@@ -36,6 +38,7 @@ router.post('/transaction/withdraw', auth.loginRequired, async (ctx, next) => {
     let transac = await  srv_transaction.withdraw(ctx.state.user, amount/100);
     let res = await srv_wechat.withdraw(transac._id, ctx.state.user.openid,amount);
     transac.status = 1;
+    transac.finished_date = moment();
     await transac.save();
     ctx.body = {
         success:1,

@@ -96,4 +96,5 @@ router.get('/center/test_update_service_account_user', async (ctx, next) => {
         success: 1,
         data: res
     }
-})
+});
+

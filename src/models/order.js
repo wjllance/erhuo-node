@@ -78,6 +78,10 @@ let getOrderState = (o) => {
             state = "已取消";
             break;
     }
+
+    if(o.finished_date){
+        state = "已完成";
+    }
     if(o.pay_status > 1){
         switch (o.pay_status){
             case 2:
@@ -104,9 +108,6 @@ let getOrderState = (o) => {
                 state = "退款失败";
                 break;
         }
-    }
-    if(o.finished_date){
-        state = "已完成";
     }
     return state;
 }
