@@ -40,8 +40,7 @@
     "should": "^13.2.1",
     "superagent": "^3.8.2",
     "tenpay": "^2.1.4",
-    "utility": "^1.13.1",
-    "ws":"1.1.1"
+    "utility": "^1.13.1"
   },
   "apidoc": {
     "name": "erhuotwo",

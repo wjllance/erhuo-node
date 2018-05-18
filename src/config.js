@@ -18,7 +18,6 @@ if ('MONGO_HOST' in process.env) { // for docker
 } else {
     exports.MONGODB_URL = `mongodb://${config['MONGODB']['USERNAME']}:${config['MONGODB']['PASSWORD']}@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
     //exports.MONGODB_URL = `mongodb://@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
-
 }
 let ROOTPATH = exports.ROOT_PATH = path.join(__dirname, '../');
 
