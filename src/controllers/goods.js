@@ -84,7 +84,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+    _.assign(goods, _.pick(ctx.request.body, ['name', 'studentID', 'school']));
 
     if(!goods.glocation){
         goods.glocation = ctx.state.user.location || schools.ALL;
