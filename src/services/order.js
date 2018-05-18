@@ -103,9 +103,8 @@ exports.findOrCreateV3 = async function(goods, user) {
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
     order.goodsInfo.img = goods.gpics[0].thumbnails;
     order.markModified('goodsInfo');
-    await order.save();
-
-    return order;
+    order.updated_date = moment();
+    return await order.save();
 };
 
 
@@ -251,7 +250,8 @@ exports.cancel = async (order)=>{
     auth.assert(!order.finished_date, "不能取消");
     order.order_status = ORDER_STATUS.CANCEL;
     await order.save();
-    // TODO REFUND ; NOTIFY
+
+    // TODO NOTIFY
 }
 
 

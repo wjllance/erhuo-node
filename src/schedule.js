@@ -1,7 +1,7 @@
 const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
-const {Transaction} = require('./models');
+const {Transaction, Order} = require('./models');
 const srv_transaction = require('./services/transaction')
 const srv_order = require('./services/order')
 
@@ -49,6 +49,22 @@ exports.register = function () {
         });
 
     }
+
+
+    // schedule.scheduleJob('* */5 * * * *', async function(){
+    schedule.scheduleJob('*/5 * * * * *', async function(){
+        console.log('checking order timeout...');
+        let orders = await Order.find({
+            updated_date: {
+                $lt: moment().subtract(15, 'm')
+            },
+            order_status: config.CONSTANT.ORDER_STATUS.TOPAY
+        });
+        console.log(orders);
+        for(let i = 0; i< orders.length; i++){
+            await srv_order.cancel(orders[i]);
+        }
+    });
 
 };
 

@@ -114,7 +114,7 @@ router.get('/user/friend/:uid', async (ctx, next) => {
 
 // 我的发布tobe migrate
 /**
- * @api {get}   /users/mypublish   我的发布
+ * @api {get}   /user/mypublish   我的发布
  * @apiName     MyPublish
  * @apGroup     User
  *
@@ -122,23 +122,17 @@ router.get('/user/friend/:uid', async (ctx, next) => {
  *
  */
 router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
-    let isRemoved = ctx.query.isRemoved || null;  //默认未下架
+    let isRemoved = parseInt(ctx.query.isRemoved) || 0;  //默认未下架
     let condi = {
         userID: ctx.state.user._id,
         deleted_date: null
     };  //未删除筛选
-
-    if(isRemoved == '1'){
+    condi.removed_date = null;
+    if(isRemoved){
         condi.removed_date = {$ne: null};
     }
-    else if(isRemoved == '0'){
-        condi.removed_date = null;
-    }
     console.log(condi);
-    let goods = await Goods
-        .find(condi)
-        .sort({created_date:-1})
-        .populate('gpics');
+    let goods = await Goods.find(condi).populate('gpics');
     ctx.body = {
         success: 1,
         data: await srv_goods.outputify(goods)
@@ -146,17 +140,14 @@ router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
 });
 
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
-    let isRemoved = ctx.query.isRemoved || null;  //默认未下架
+    let isRemoved = parseInt(ctx.query.isRemoved) || 0;  //默认未下架
     let condi = {
         userID: ctx.state.user._id,
         deleted_date: null
     };  //未删除筛选
-
-    if(isRemoved == '1'){
+    condi.removed_date = null;
+    if(isRemoved){
         condi.removed_date = {$ne: null};
-    }
-    else if(isRemoved == '0'){
-        condi.removed_date = null;
     }
     console.log(condi);
     let goods = await Goods.find(condi).populate('gpics');

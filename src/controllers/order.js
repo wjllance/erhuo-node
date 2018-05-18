@@ -33,7 +33,8 @@ router.get('/order/buy/', auth.loginRequired, async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
     let condi = {
-        buyer: ctx.state.user._id
+        buyer: ctx.state.user._id,
+        order_status: {$ne: srv_order.ORDER_STATUS.INIT}
     };
     let orders = await srv_order.getOrderList(condi, pageNo, pageSize);
 
@@ -58,7 +59,13 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
     let condi = {
         seller: ctx.state.user._id,
-        order_status: { $ne: srv_order.ORDER_STATUS.TOPAY}
+        order_status: {
+            $in: [
+                srv_order.ORDER_STATUS.PAID,
+                srv_order.ORDER_STATUS.COMPLETE,
+                srv_order.ORDER_STATUS.CONFIRM,
+            ]
+        }
     };
     console.log(condi);
     let orders = await srv_order.getOrderList(condi, pageNo, pageSize);
@@ -326,7 +333,16 @@ router.get('/order/detail/:order_id', auth.loginRequired, async (ctx, next) => {
     }
 });
 
-
+/**
+ * @api     {post}  /order/refund/apply  申请退款
+ * @apiName     RefundApply
+ * @apiGroup    Order
+ *
+ * @apiParam    {String}    orderId
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ */
 router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
@@ -340,6 +356,16 @@ router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
     }
 });
 
+/**
+ * @api     {post}  /order/refund/confirm  确认退款
+ * @apiName     RefundConfirm
+ * @apiGroup    Order
+ *
+ * @apiParam    {String}    orderId
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ */
 router.post('/order/refund/confirm', auth.loginRequired, async(ctx, next)=>{
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
