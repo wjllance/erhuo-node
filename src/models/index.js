@@ -24,6 +24,8 @@ let Transaction = exports.Transaction = require('./transaction');
 
 let UserFormid = exports.UserFormid = require('./user_formid');
 
+let Identity = exports.Identity = require('./identity');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {
