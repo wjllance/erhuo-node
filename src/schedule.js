@@ -33,11 +33,11 @@ exports.register = function () {
             }
         });
     }else{
-        schedule.scheduleJob('* */30 * * * *', async function(){
+        schedule.scheduleJob('* */10 * * * *', async function(){
             console.log('checking normal order countdown...');
             let transactions = await Transaction.find({
                 countdown_date: {
-                    $lt: moment().subtract(71, 'h').subtract(30, 'm')
+                    $lt: moment().subtract(71, 'h').subtract(50, 'm')
                 },
                 finished_date: {$exists: false}
             });
@@ -51,8 +51,8 @@ exports.register = function () {
     }
 
 
-    // schedule.scheduleJob('* */5 * * * *', async function(){
-    schedule.scheduleJob('*/5 * * * * *', async function(){
+    schedule.scheduleJob('* */1 * * * *', async function(){
+    // schedule.scheduleJob('*/5 * * * * *', async function(){
         console.log('checking order timeout...');
         let orders = await Order.find({
             updated_date: {
