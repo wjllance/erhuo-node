@@ -20,7 +20,9 @@ let Order = exports.Order = require('./order');
 
 let Account = exports.Account = require('./account');
 
-let Transactino = exports.Transaction = require('./transaction');
+let Transaction = exports.Transaction = require('./transaction');
+
+let Identity = exports.Identity = require('./identity');
 
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {

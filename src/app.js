@@ -3,12 +3,14 @@
 let _ = require('lodash');
 let Koa = require('koa');
 let mount = require('koa-mount');
+let WebSocket=require('ws');
 let bodyParser = require('koa-bodyparser');
 let path = require('path');
 let session = require('koa-session');
 let config = require('./config');
 let { log, SERVER, PUBLIC } = require('./config');
 const logUtil = require('./services/log_util');
+
 let app = new Koa();
 
 
@@ -78,7 +80,64 @@ app.use(require('koa-static')(PUBLIC.root, {
 
 logUtil.initLogPath();
 
-app.listen(SERVER.PORT, SERVER.ADDRESS);
+let server=app.listen(SERVER.PORT, SERVER.ADDRESS);
+
+const WebSocketServer=WebSocket.Server;
+const wss =new WebSocketServer(
+  {
+    server: server
+  }
+)
+function onClose()
+{
+
+    console.log(`[Server] close()`);
+
+}
+function sendMessage(wss, data)
+{
+    // console.log(wss);
+     wss.clients.forEach(function each(client) {
+    client.send(data);
+    });
+
+
+};
+
+wss.on('connection',function(ws,req)
+{
+    console.log(wss.clients);
+    console.log(`[SERVER] connection()` );
+    const ip = req.connection.remoteAddress;
+    console.log(ip);
+    ws.on('message', onMessage);
+    ws.on('close', onClose);
+    
+})
+
+function onMessage(message)
+{
+    console.log(wss.clients.client);
+    console.log(`[SERVER]Received: ${message}`);
+    this.send(`ECHO: ${message}`,(err)=>{
+            if(err){
+                console.log(`[SERVER] error: $[err]`);
+            }
+        });
+    // sendMessage(this,message);
+    //console.log(this.clients);
+     //this.clients.forEach(function each(client) {
+        // client.send(data);
+    // });
+}
+
+function storeMessage()
+{
+
+}
+
+
+
 
 log.info(`listen on http://${SERVER.ADDRESS}:${SERVER.PORT}`);
 
