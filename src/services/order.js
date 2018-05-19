@@ -169,7 +169,8 @@ exports.preparePayV2 = async function (order) {
     //TO BE REMOVE in a few time later
 
     let buyer = await User.findById(order.buyer);
-    let price = (config.ENV == 'local') ? 1 : order.price*100;
+    // let price = (config.ENV == 'local') ? 1 : order.price*100;
+    let price = order.price*100;
     let ret = {
         out_trade_no: order.sn,
         body: order.goodsInfo.gname,
