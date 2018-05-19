@@ -139,11 +139,11 @@ exports.refundConfirm = async(order)=>{
     await transaction.save();
 
 
-    let account = await Account.findById(transaction.accountId);
-    account.balance = account.balance + transaction.amount;
+    let account = await Account.findById(r_transaction.accountId);
+    r_transaction.balance = account.balance + r_transaction.amount;
     await account.save();
 
-    console.log("countdown end...已入账", moment(), transaction);
+    console.log("countdown end...已入账", moment(), r_transaction);
     return ret;
     // transaction.markModified('info');
 
