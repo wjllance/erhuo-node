@@ -31,7 +31,7 @@ let userSchema = new mongoose.Schema({
 	province: String,
 	country: String,
 	language: String,
-
+	isAdmin: Boolean,
 	// 收藏
 	collections: {
 		type: [{
