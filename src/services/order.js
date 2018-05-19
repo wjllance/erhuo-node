@@ -221,7 +221,7 @@ exports.getDetailById = async (id) => {
     let order = await Order.findById(id)
         .populate('buyer')
         .populate('seller');
-
+    auth.assert(order, "订单不存在");
     let detail = order.detailInfo();
     return detail;
 }
