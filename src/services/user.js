@@ -41,9 +41,11 @@ exports.walletInfo = async(uid) => {
         finished_date: {
             $exists: false
         },
+        type: {$ne: config.CONSTANT.TRANSACTION_TYPE.WITHDRAW},
         status: config.CONSTANT.TRANSACTION_STATUS.INIT
     });
 
+    console.log("running transactions", transactions);
 
     let sum = 0;
     // let orders = await Order.find({

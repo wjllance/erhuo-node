@@ -160,16 +160,15 @@ exports.preparePay = async function (order) {
 exports.preparePayV2 = async function (order) {
     if(order.order_status == ORDER_STATUS.INIT){
         order.order_status = ORDER_STATUS.TOPAY;
-        // order.sn = generateSerialNumber();
-
+        order.sn = generateSerialNumber();
+        await order.save();
     }
     auth.assert(order.order_status == ORDER_STATUS.TOPAY, "不可支付");
 
-    order.sn = generateSerialNumber();
+    // order.sn = generateSerialNumber();
     //TO BE REMOVE in a few time later
 
     let buyer = await User.findById(order.buyer);
-    await order.save();
     let price = (config.ENV == 'local') ? 1 : order.price*100;
     let ret = {
         out_trade_no: order.sn,
