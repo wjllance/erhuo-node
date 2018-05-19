@@ -57,6 +57,7 @@ exports.findOrCreateV2 = async function(goods, user) {
         seller: goods.userID,
         buyer: user._id,
         price: goods.gprice,
+        order_status: ORDER_STATUS.TOPAY
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
@@ -97,7 +98,6 @@ exports.findOrCreateV3 = async function(goods, user) {
         seller: goods.userID,
         buyer: user._id,
         price: goods.gprice,
-        order_status: ORDER_STATUS.INIT
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);

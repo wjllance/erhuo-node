@@ -167,7 +167,8 @@ router.get('/order/pay/:orderId', auth.loginRequired, async(ctx, next) => {
 
     let order = await Order.findById(ctx.params.orderId);
     auth.assert(order, "订单不存在")
-    let params = await srv_order.preparePay(order);
+    // let params = await srv_order.preparePay(order);
+    let params = await srv_order.preparePayV2(order);
     let res = await srv_wechat.getPayParamsV2(params);
     ctx.body = {
         success:1,
