@@ -115,7 +115,7 @@ let getOrderState = (o) => {
 orderSchema.methods.cardInfo = function() {
 
     let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn',
-        'order_status', 'pay_status', 'refund_status']);
+        'order_status', 'pay_status', 'refund_status', 'finished_date']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
         o.buyer = _.pick(this.buyer, ['_id', 'nickName', 'avatarUrl'])

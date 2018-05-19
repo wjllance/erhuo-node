@@ -72,7 +72,11 @@ exports.CONSTANT = {
         WITHDRAW: 0,
         INCOME: 1,
         REFUND: 2,
-
+    },
+    TRANSACTION_STATUS:{
+        INIT: 0,
+        SUCCEED: 1,
+        FAILED: 2
     },
     SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学"]
 };

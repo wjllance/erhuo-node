@@ -8,10 +8,7 @@ let auth = require('../services/auth');
 let myUtil = require('../myUtils/myUtil');
 
 let { log } = require('../config');
-let { User } = require('../models');
-let { Account } = require('../models');
-let { Order } = require('../models');
-let { UserFormid } = require('../models');
+let { User, Account, Order, UserFormid, Transaction } = require('../models');
 
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -38,14 +35,28 @@ let withAccount = exports.withAccount = async (uid) => {
 exports.walletInfo = async(uid) => {
     let account = await Account.findOne({userID: uid});
     account = account.baseInfo();
-    let orders = await Order.find({
-        seller: uid,
-        order_status: config.CONSTANT.ORDER_STATUS.PAID,
-        refund_status: config.CONSTANT.REFUND_STATUS.INIT
+
+    let transactions = await Transaction.find({
+        accountId: account._id,
+        finished_date: {
+            $exists: false
+        },
+        status: config.CONSTANT.TRANSACTION_STATUS.INIT
     });
-    sum = 0;
-    orders.forEach((item) => {
-        sum += item.price;
+
+
+    let sum = 0;
+    // let orders = await Order.find({
+    //     seller: uid,
+    //     order_status: config.CONSTANT.ORDER_STATUS.PAID,
+    //     refund_status: config.CONSTANT.REFUND_STATUS.INIT
+    // });
+    // orders.forEach((item) => {
+    //     sum += item.price;
+    // });
+
+    transactions.forEach((item) => {
+        sum += item.amount;
     });
 
     account.total = (sum + account.balance).toFixed(2);
