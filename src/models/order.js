@@ -34,20 +34,22 @@ let orderSchema = new Schema({
     priceGet: Number,
     order_status: {
         type: Number,
-        default: 0
+        default: -1   //INIT
     },
     pay_status: {
         type: Number,
-        default: 0,
+        default: 0,     //INIT
     },
     refund_status:{
         type: Number,
-        default: 0,
+        default: 0,     //INIT
     },
     paid_at: Date,
     refunded_at: Date,
     created_date: { type: Date, default: Date.now},
     updated_date: { type: Date, default: Date.now},
+    completed_date: Date,   //确认收货
+    finished_date: Date   //到账时间
 
 
     // gcost: Number,
@@ -57,6 +59,9 @@ let getOrderState = (o) => {
     let state = "";
     switch (o.order_status)
     {
+        case -1:
+            state = "待下单";
+            break;
         case 0:
             state = "待支付";
             break;
@@ -67,11 +72,15 @@ let getOrderState = (o) => {
             state = "已发货";
             break;
         case 3:
-            state = "已完成";
+            state = "已收货";
             break;
         case 4:
             state = "已取消";
             break;
+    }
+
+    if(o.finished_date){
+        state = "已完成";
     }
     if(o.pay_status > 1){
         switch (o.pay_status){
@@ -90,7 +99,7 @@ let getOrderState = (o) => {
     if(o.refund_status > 0){
         switch (o.refund_status){
             case 1:
-                state = "审核中";
+                state = "申请退款中";
                 break;
             case 2:
                 state = "退款成功";
@@ -106,7 +115,7 @@ let getOrderState = (o) => {
 orderSchema.methods.cardInfo = function() {
 
     let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn',
-        'order_status', 'pay_status', 'refund_status']);
+        'order_status', 'pay_status', 'refund_status', 'finished_date']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
         o.buyer = _.pick(this.buyer, ['_id', 'nickName', 'avatarUrl'])
@@ -121,7 +130,7 @@ orderSchema.methods.cardInfo = function() {
 
 orderSchema.methods.detailInfo = function() {
 
-    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn',
+    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn', 'price',
         'order_status', 'pay_status', 'refund_status']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
@@ -130,6 +139,16 @@ orderSchema.methods.detailInfo = function() {
     if(this.seller){
         o.seller = this.seller.baseInfo();
     }
+    o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
+    o.state = getOrderState(this);
+    return o;
+};
+
+orderSchema.methods.baseInfo = function() {
+
+    let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn', 'price',
+        'order_status', 'pay_status', 'refund_status']);
+    o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     o.goodsInfo.img = config.SERVER.URL_PREFIX + '/' + o.goodsInfo.img;
     o.state = getOrderState(this);
     return o;

@@ -69,7 +69,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
     let condi = {goodsId:goods_id};
     console.log(userid);
     console.log(goods.userID);
-    if(userid != null && (goods.userID._id.toString() != userid.toString())){
+    if(userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)){
         condi.$or = [
             {fromId: userid},
             {toId: userid},
@@ -117,12 +117,11 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     let userid = userInfo ? userInfo._id : null;
 
     let condi = {goodsId:goods_id};
-    if(userid !=null && goods.userID._id.toString() != userid.toString()){
+    if(userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)){
         condi.$or = [
             {fromId: userid},
             {toId: userid},
-            {secret: null},
-            {secret: false}
+            {secret: {$ne: true}}
         ]
     }
     console.log(condi);

@@ -52,7 +52,8 @@ exports.CONSTANT = {
         PAID: 1,
         CONFIRM: 2,
         COMPLETE: 3,
-        CANCEL: 4
+        CANCEL: 4,
+        INIT: -1
     },
     PAY_STATUS: {
         INIT: 0,
@@ -66,6 +67,16 @@ exports.CONSTANT = {
         APPLYING: 1,
         SUCCEED: 2,
         FAILED: 3,
+    },
+    TRANSACTION_TYPE: {
+        WITHDRAW: 0,
+        INCOME: 1,
+        REFUND: 2,
+    },
+    TRANSACTION_STATUS:{
+        INIT: 0,
+        SUCCEED: 1,
+        FAILED: 2
     },
     SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学"]
 };

@@ -11,6 +11,8 @@ let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
 let srv_order = require('../services/order');
+let srv_transaction = require('../services/transaction');
+let {Order} = require('../models');
 
 const router = module.exports = new Router();
 
@@ -141,7 +143,10 @@ router.post('/wechat/notify', async(ctx, next) => {
 
     auth.assert(wechat.checkMchSig(xmlData), '签名错误1');
     if(xmlData.return_code[0] == "SUCCESS"){
-        let res = await srv_order.checkPay(xmlData.out_trade_no[0], xmlData.result_code[0], xmlData.total_fee[0]);
+        let order = await srv_order.checkPay(xmlData.out_trade_no[0], xmlData.result_code[0], xmlData.total_fee[0]);
+        if(order){
+            await srv_transaction.createIncome(order);
+        }
         ret_body = '<xml>\n' +
             '  <return_code><![CDATA[SUCCESS]]></return_code>\n' +
             '  <return_msg><![CDATA[OK]]></return_msg>\n' +
@@ -153,6 +158,25 @@ router.post('/wechat/notify', async(ctx, next) => {
     ctx.res.end(ret_body)
     // auth.assert(order_id, "oid miss")
     // let res = await wechat.getPayParams(order_id);
+});
+
+
+/**
+ * mock wechat notify
+ */
+router.post('/mock/wechat/notify', async(ctx, next) => {
+    if(config.ENV != "local"){
+        return;
+    }
+    let order = await Order.findById(ctx.request.body.orderId)
+    order = await srv_order.checkPay(order.sn, "SUCCESS", order.price*100);
+    if(order){
+        await srv_transaction.createIncome(order);
+    }
+    ctx.body = {
+        success:1
+    }
+
 });
 
 router.get('/wechat/query_order', async(ctx, next) => {

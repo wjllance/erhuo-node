@@ -11,9 +11,7 @@ let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
-let { User  } = require('../models');
-let { Order } = require('../models');
-let { Goods } = require('../models');
+let { User, Order, Goods, Transaction } = require('../models');
 
 let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
 let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
@@ -68,6 +66,48 @@ exports.findOrCreateV2 = async function(goods, user) {
 
     return order;
 };
+
+
+
+//goods:CardInfo
+exports.findOrCreateV3 = async function(goods, user) {
+
+
+    let order = await Order.findOne({
+        goodsId: goods._id,
+        buyer: user._id,
+        order_status : {$ne: ORDER_STATUS.CANCEL}
+    });
+    if(order) return order;
+
+    let orders = await Order.find({ //检查交易中的订单
+        goodsId: goods._id,
+        refund_status: REFUND_STATUS.INIT,
+        order_status: {
+            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+        }
+    });
+    console.log(orders);
+    auth.assert(orders.length == 0, "商品交易中，不可下单")
+
+
+    console.log(orders);
+    order = new Order({
+        goodsId: goods._id,
+        seller: goods.userID,
+        buyer: user._id,
+        price: goods.gprice,
+        order_status: ORDER_STATUS.INIT
+        // sn: generateSerialNumber()
+    });
+    order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
+    order.goodsInfo.img = goods.gpics[0].thumbnails;
+    order.markModified('goodsInfo');
+    order.updated_date = moment();
+    return await order.save();
+};
+
+
 exports.findOrCreate = async function(goods, user) {
 
     let orders = await Order.find({
@@ -117,6 +157,29 @@ exports.preparePay = async function (order) {
     return ret
 }
 
+exports.preparePayV2 = async function (order) {
+    if(order.order_status == ORDER_STATUS.INIT){
+        order.order_status = ORDER_STATUS.TOPAY;
+        order.sn = generateSerialNumber();
+        await order.save();
+    }
+    auth.assert(order.order_status == ORDER_STATUS.TOPAY, "不可支付");
+
+    // order.sn = generateSerialNumber();
+    //TO BE REMOVE in a few time later
+
+    let buyer = await User.findById(order.buyer);
+    // let price = (config.ENV == 'local') ? 1 : order.price*100;
+    let price = order.price*100;
+    let ret = {
+        out_trade_no: order.sn,
+        body: order.goodsInfo.gname,
+        total_fee: price,
+        openid: buyer.openid
+    };
+    return ret
+}
+
 let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
     let orders = await Order.find(condi)
         // .sort({order_status:1,created_date:-1})
@@ -136,7 +199,7 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
     if(result_code == "FAIL"){
         order.pay_status = PAY_STATUS.FAILED;
         await order.save();
-        return;
+        return null;
     }
     order.priceGet = fee/100;
     if(order.price != order.priceGet){  // 接入退款
@@ -145,12 +208,13 @@ exports.checkPay = async (out_trade_no, result_code, fee)=>{
         logger.error("金额不对");
         console.error("金额不对");
         if(config.ENV != "local")
-            return;
+            return null;
     }
     order.pay_status = PAY_STATUS.SUCCEED;
     order.paid_at = moment();
     order.order_status = ORDER_STATUS.PAID;
-    await order.save();
+    return await order.save();
+
 };
 
 
@@ -158,7 +222,7 @@ exports.getDetailById = async (id) => {
     let order = await Order.findById(id)
         .populate('buyer')
         .populate('seller');
-
+    auth.assert(order, "订单不存在");
     let detail = order.detailInfo();
     return detail;
 }
@@ -182,10 +246,12 @@ exports.tradingStatus = async (gid) => {
 }
 
 exports.cancel = async (order)=>{
-    auth.assert(order.order_status != order.COMPLETE, "不能取消");
+    // auth.assert(order.order_status != order.COMPLETE, "不能取消");
+    auth.assert(!order.finished_date, "不能取消");
     order.order_status = ORDER_STATUS.CANCEL;
     await order.save();
-    // TODO REFUND ; NOTIFY
+
+    // TODO NOTIFY
 }
 
 
@@ -199,8 +265,11 @@ exports.confirm = async (order) => {
 
 
 exports.complete = async (order) => {
-    auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
+    // auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
+
+    auth.assert(order.order_status == ORDER_STATUS.CONFIRM || order.order_status == ORDER_STATUS.PAID, "不可确认收货");
     order.order_status = ORDER_STATUS.COMPLETE;
+    order.completed_date = moment();
     await order.save();
     let goods = Goods.findById(order.goodsId);
     await goods.remove();
@@ -212,4 +281,27 @@ exports.autorefund = async (order) => {
     if(order.order_status != ORDER_STATUS.TOPAY && order.refund_status != REFUND_STATUS.SUCCEED){
         await srv_wechat.refund(order.sn);
     }
+};
+
+exports.refund_apply = async(order) =>{
+    auth.assert(order.refund_status == REFUND_STATUS.INIT && order.pay_status == PAY_STATUS.SUCCEED, "不可申请退款");
+    auth.assert(!order.finished_date, "订单已结束，申请退款请私下联系或联系客服");
+    order.refund_status = REFUND_STATUS.APPLYING;
+    await order.save();
+    //TODO SEND NOTIFY
+};
+
+exports.refund_confirm = async(order) =>{
+    auth.assert(order.refund_status == REFUND_STATUS.APPLYING, "不可确认退款");
+    order.refund_status = REFUND_STATUS.SUCCEED;
+    await order.save();
+    //TODO SEND NOTIFY
+};
+
+exports.finish = async(orderId) => {
+    let order = await Order.findById(orderId);
+    auth.assert(order, "订单不存在");
+    auth.assert(order.refund_status == REFUND_STATUS.INIT && order.order_status == ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
+    order.finished_date = moment();
+    await order.save();
 }

@@ -15,6 +15,10 @@ let userFormidSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
+    used: {
+        type: Boolean,
+        default: 0
+    },
     expire_date: Date
 },{versionKey:false});
 

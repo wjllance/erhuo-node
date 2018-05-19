@@ -11,6 +11,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
 let srv_order = require('../services/order');
+let srv_message = require('../services/message');
 let srv_user = require('../services/user');
 let {User} = require('../models');
 
@@ -89,3 +90,17 @@ router.get('/message/history/', async(ctx, next)=>{
     }
 });
 
+
+
+router.post('/message/template', auth.loginRequired, async(ctx, next)=>{
+    let touserid = ctx.request.body.touser;
+    let content = ctx.request.body.content;
+    auth.assert(touserid, "touser miss");
+    auth.assert(content, "content miss");
+    let user = ctx.state.user;
+    let res = await srv_message.sendTemplate(touserid, content, user);
+    ctx.body = {
+        success:1,
+        data:res
+    }
+})
