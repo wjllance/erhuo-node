@@ -334,9 +334,9 @@ exports.getPayParams = async (order_id) => {
         total_fee: order.price*100,
         openid: order.buyer.openid
     };
-    if(config.ENV == 'local'){
-        params.total_fee = 1;
-    }
+    // if(config.ENV == 'local'){
+    //     params.total_fee = 1;
+    // }
     let res = await api.getPayParams(params);
     console.log(res);
     return res;
