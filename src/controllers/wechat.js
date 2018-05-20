@@ -10,6 +10,7 @@ let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
+let srv_wxtemplate = require('../services/wechat_template');
 let srv_order = require('../services/order');
 let srv_transaction = require('../services/transaction');
 let {Order} = require('../models');
@@ -146,6 +147,7 @@ router.post('/wechat/notify', async(ctx, next) => {
         let order = await srv_order.checkPay(xmlData.out_trade_no[0], xmlData.result_code[0], xmlData.total_fee[0]);
         if(order){
             await srv_transaction.createIncome(order);
+            await srv_wxtemplate.sendPaidTemplate(order)
         }
         ret_body = '<xml>\n' +
             '  <return_code><![CDATA[SUCCESS]]></return_code>\n' +

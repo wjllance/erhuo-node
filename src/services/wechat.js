@@ -13,7 +13,7 @@ let auth = require('./auth');
 const xml2js = require('xml2js');
 let fs = require('fs');
 let path = require('path');
-let {User, AccessToken, Comment, Order} = require('../models')
+let {User, AccessToken, Comment, Order} = require('../models');
 const tenpay = require('tenpay');
 const pay_config = {
     appid: config.APP_ID,
@@ -33,8 +33,9 @@ const pay_config = {
 // };
 const api =  new tenpay(pay_config);
 const ERR_CODE = 985;
-const TYPE_SA = 0;
-const TYPE_MINA = 1;
+
+const TYPE_SA = exports.TYPE_SA = 0;
+const TYPE_MINA = exports.TYPE_MINA = 1;
 
 
 let updateAccessToken = async function (access_token) {
