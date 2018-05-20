@@ -31,10 +31,10 @@ exports.incomeByOrder = async (order) => {
         // }
     });
     // transaction.markModified('info');
-
+    let ret = await transaction.save();
     account.balance = account.balance + order.price;
     await account.save();
-    return await transaction.save();
+    return ret;
 };
 
 exports.withdraw = async (user, amount) =>{
