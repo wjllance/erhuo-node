@@ -11,6 +11,7 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_order = require('../services/order');
 let srv_wechat = require('../services/wechat');
+let srv_wxtemplate = require('../services/wechat_template');
 let srv_transaction = require('../services/transaction');
 let { User, Image, Goods, Order } = require('../models');
 
@@ -250,6 +251,7 @@ router.post('/v2/order/complete', auth.loginRequired, async(ctx, next) => {
     auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
     await srv_order.complete(order);
     await srv_transaction.countdown(order);
+    await srv_wxtemplate.confirmReceipt(order);
     // transac.status = 1;
     // await transac.save();
     ctx.body = {

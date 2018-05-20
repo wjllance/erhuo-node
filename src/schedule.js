@@ -45,6 +45,7 @@ exports.register = function () {
             for(let i = 0; i< transactions.length; i++){
                 await srv_order.finish(transactions[i].orderId);
                 await srv_transaction.finish(transactions[i]);
+
             }
         });
 

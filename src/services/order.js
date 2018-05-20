@@ -12,7 +12,7 @@ moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
 let { User, Order, Goods, Transaction } = require('../models');
-
+let srv_wxtemplate = require('./wechat_template');
 let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
 let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
 let REFUND_STATUS = exports.REFUND_STATUS = require('../config').CONSTANT.REFUND_STATUS;
@@ -274,7 +274,6 @@ exports.complete = async (order) => {
     await order.save();
     let goods = Goods.findById(order.goodsId);
     await goods.remove();
-    //TODO NOTIFY
 }
 
 exports.autorefund = async (order) => {
@@ -305,4 +304,7 @@ exports.finish = async(orderId) => {
     auth.assert(order.refund_status == REFUND_STATUS.INIT && order.order_status == ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
     order.finished_date = moment();
     await order.save();
+
+    //NOTIFY
+    await srv_wxtemplate.moneyArrive(order);
 }

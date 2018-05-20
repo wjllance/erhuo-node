@@ -50,8 +50,11 @@ let getFormid = async(userid) => {
 };
 
 exports.sendPaidTemplate = async(order) => {
-    let touser = await User.findById(order.seller);
-    let buyer = await  User.findById(order.buyer);
+    let seller_id = order.seller._id || order.seller;
+    let buyer_id = order.buyer._id || order.buyer;
+
+    let touser = await User.findById(seller_id);
+    let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
     let template_id = "YguybxI3FIF3xffJsWQX6qoETcDhmCDpeLblF_yENMM";
     let page = "pages/news/news";
@@ -88,5 +91,88 @@ exports.sendPaidTemplate = async(order) => {
 
     formid.used = 1;
     await formid.save();
-    return await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
 };
+
+
+exports.confirmReceipt = async(order) =>{
+    let seller_id = order.seller._id || order.seller;
+    let buyer_id = order.buyer._id || order.buyer;
+
+    let touser = await User.findById(seller_id);
+    let buyer = await  User.findById(buyer_id);
+    let formid = await getFormid(touser._id);
+    let template_id = "h-AKhqlnkoDY9GdfRTylKV6oxROCT0Ooo49aLerkHNM";
+    let page = "pages/news/news";
+    let data = {
+        //温馨提示
+        keyword1:{
+            value: "买家已收货，为确保双方权益，订单金额72小时之后方可提现"
+        },
+        //订单状态
+        keyword2:{
+            value: "已收货"
+        },
+        //订单号
+        keyword3: {
+            value:order.sn
+        },
+        //物品名称
+        keyword4:{
+            value:order.goodsInfo.gname
+        },
+        //订单金额
+        keyword5:{
+            value: order.price
+        },
+        //收货人
+        keyword6:{
+            value: buyer.nickName
+        },
+        //收货人电话
+        keyword7:{
+            value:"手机号正在接入中"
+        }
+    };
+
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+};
+
+
+exports.moneyArrive = async(order)=>{
+    let seller_id = order.seller._id || order.seller;
+
+    let touser = await User.findById(seller_id);
+    let formid = await getFormid(touser._id);
+    let template_id = "GUJN0AyeyDJjvN6rwSNg_b3HnuzOohBxKkDBGonZGW0";
+    let page = "pages/news/news";
+    let data = {
+        //温馨提示
+        keyword1:{
+            value: "订单金额已到账，可进入我的钱包提现"
+        },
+        //商品名称
+        keyword2:{
+            value: order.goodsInfo.gname
+        },
+        //订单号
+        keyword3: {
+            value: order.sn
+        },
+        //入账金额
+        keyword4:{
+            value: order.price
+        },
+        //入账时间
+        keyword5:{
+            value: moment(order.finished_date).format('lll')
+        },
+    };
+
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+};
+
