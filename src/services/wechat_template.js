@@ -167,7 +167,88 @@ exports.moneyArrive = async(order)=>{
         },
         //入账时间
         keyword5:{
-            value: moment(order.finished_date).format('lll')
+            value: moment().format('lll')
+        },
+    };
+
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+};
+
+
+exports.refundApply = async(order) => {
+    let seller_id = order.seller._id || order.seller;
+    let buyer_id = order.buyer._id || order.buyer;
+
+    let touser = await User.findById(seller_id);
+    let buyer = await  User.findById(buyer_id);
+    let formid = await getFormid(touser._id);
+    let template_id = "8r3D3uYC9Suj-W_Ri4WdupT3t7zO5hz4oaCdBVdhp6M";
+    let page = "pages/news/news";
+    let data = {
+        //温馨提示
+        keyword1:{
+            value: "买家申请退货，请及时处理退货申请或联系客服拒绝退货"
+        },
+        //订单编号
+        keyword2:{
+            value: order.sn
+        },
+        //商品名称
+        keyword3: {
+            value:order.goodsInfo.gname
+        },
+        //退款金额
+        keyword4:{
+            value:order.price
+        },
+        //退款人
+        keyword5:{
+            value: buyer.nickName
+        },
+        //退款人手机
+        keyword6:{
+            value: "手机号正在接入中"
+        },
+        //申请时间
+        keyword7:{
+            value: moment().format('lll')
+        },
+    };
+
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+};
+
+
+exports.refundConfirm = async(order) =>{
+    let buyer_id = order.buyer._id || order.buyer;
+    let touser = await User.findById(buyer_id);
+    let formid = await getFormid(touser._id);
+    let template_id = "gqC4nVJRmqjL_mFAifx4h7-cg9upXxXEmfr5wNYwd3k";
+    let page = "pages/news/news";
+    let data = {
+        //温馨提示
+        keyword1:{
+            value: "退款已到账，可到我的钱包提现"
+        },
+        //订单号
+        keyword2:{
+            value: order.sn
+        },
+        //商品名称
+        keyword3: {
+            value:order.goodsInfo.gname
+        },
+        //退款金额
+        keyword4:{
+            value:order.price
+        },
+        //到账时间
+        keyword5:{
+            value: moment().format('lll')
         },
     };
 
