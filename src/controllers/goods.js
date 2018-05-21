@@ -6,7 +6,8 @@ let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
 let body = require('koa-convert')(require('koa-better-body')());
-
+let moment = require('moment');
+moment.locale('zh-cn');
 let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
@@ -15,7 +16,6 @@ let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
 const schools = config.CONSTANT.SCHOOL
-
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
 
@@ -36,6 +36,18 @@ const schools = config.CONSTANT.SCHOOL
  *
  */
 router.get('/goods/index', async (ctx, next) => {
+
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
+
+    let data = await srv_goods.goodsList(ctx.state.user, pageNo, pageSize);
+    ctx.body = {
+        success: 1,
+        data: data
+    }
+});
+
+router.get('/v2/goods/index', async (ctx, next) => {
     // let condi= {
     //     $or: [
     //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
@@ -45,7 +57,57 @@ router.get('/goods/index', async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
 
-    let data = await srv_goods.goodsList(ctx.state.user, pageNo, pageSize);
+    let cate = ctx.query.category;
+    let condi = {
+        deleted_date:null
+    };
+    let sorti = {};
+    if(!cate)
+    {
+        cate = "推荐";
+    }
+
+    console.log(cate);
+    if(cate === "推荐"){
+        sorti = {
+            gpriority:-1,
+            // removed_date:1,
+            // glocation: -1,
+            updated_date:-1
+        }
+    }
+    else if(cate === "今日"){
+        condi.created_date = {
+            $gt: moment().subtract(1, 'd')
+        };
+        sorti = {
+            gpriority:-1,
+            // removed_date:1,
+            // glocation: -1,
+            updated_date:-1
+        }
+        console.log(condi, sorti);
+    }
+    else if(srv_goods.CATES.indexOf(cate) != -1){
+        condi.category = cate;
+        sorti = {
+            // gpriority:-1,
+            removed_date:1,
+            // glocation: -1,
+            updated_date:-1
+        }
+    }
+    let user = ctx.state.user;
+    if(user){ //not other
+        condi.$or=[{
+            glocation:user.location
+        },{
+            glocation:0
+        }]
+    }
+
+    console.log(condi, sorti);
+    let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
     ctx.body = {
         success: 1,
         data: data
@@ -68,6 +130,7 @@ router.get('/goods/index', async (ctx, next) => {
  * @apiParam    {String}    glocation
  * @apiParam    {Number}    gcost
  * @apiParam    {Number}    gcity
+ * @apiParam    {String}    category
  *
  * @apiSuccess  {Number}    success     1success
  * @apiSuccess  {Object}    data        goods_id
@@ -84,7 +147,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category']));
 
     if(!goods.glocation){
         goods.glocation = ctx.state.user.location || schools.ALL;

@@ -10,6 +10,7 @@ let tools = require('./tools')
 const schools = require('../config').CONSTANT.SCHOOL;
 const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
+const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他"];
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
@@ -193,6 +194,25 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
         glocation: -1,
         updated_date:-1
     };
+    let total = await Goods.find(condi).count();//表总记录数
+
+    let goods = await Goods.find(condi)
+        .sort(sorti)
+        .limit(pageSize)
+        .skip((pageNo-1)*pageSize)
+        .populate('gpics');
+    // console.log(goods);
+    let hasMore=total-pageNo*pageSize>0;
+    return {
+        goods: await outputify(goods, user),
+        hasMore: hasMore,
+        total: total
+    }
+}
+
+
+exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti)=>{
+
     let total = await Goods.find(condi).count();//表总记录数
 
     let goods = await Goods.find(condi)

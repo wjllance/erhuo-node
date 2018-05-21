@@ -20,6 +20,11 @@ let goodsSchema = new mongoose.Schema({
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
 	}],
+	category: {
+		type:String,
+		index: true,
+		default: "其他"
+    },
 	gstype: String,
 	glocation: {
 		type: Number,
