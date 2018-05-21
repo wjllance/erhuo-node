@@ -47,6 +47,24 @@ router.get('/goods/index', async (ctx, next) => {
     }
 });
 
+
+/**
+ * @api {get} /v2/goods/index  商品列表
+ * @apiName     GoodsList
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ * @apiParam    {String}    category    列表类别 ["美妆","女装","女鞋","配饰","包包","日用","其他"]
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页商品列表
+ * @apiSuccess  {Array}     data.goods  商品列表
+ * @apiSuccess  {Boolean}     data.hasMore  还有更多
+ * @apiSuccess  {Number}     data.total  总数
+ *
+ */
 router.get('/v2/goods/index', async (ctx, next) => {
     // let condi= {
     //     $or: [

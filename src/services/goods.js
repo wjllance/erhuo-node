@@ -13,8 +13,11 @@ const school_map = require('../config').CONSTANT.SCHOOL_MAP
 const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他"];
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
+
+    console.log(user);
     if (!user) return {};
     let has_collected = _.some(user.collections, x => goods._id.equals(x));
+    console.log(has_collected);
     return {
         has_collected
     };
@@ -23,9 +26,9 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
     if (!_.isArray(goods)) {
-        return _.assign(goods.baseInfo(), await injectGoods(goods, user));
+        return _.assign(goods.cardInfo(), await injectGoods(goods, user));
     } else {
-        let ugoods = goods.map(x => x.baseInfo());
+        let ugoods = goods.map(x => x.cardInfo());
             // FIXME too slow
         for(let i = 0; i < goods.length; i ++) {
             _.assign(ugoods[i], await injectGoods(goods[i], user));
@@ -33,6 +36,7 @@ let outputify = exports.outputify = async function(goods, user) {
         return ugoods;
     }
 };
+
 
 exports.postComment = async function(goods, user, cmt, toUserId){
     let new_comment = await Comment.create({
@@ -219,7 +223,8 @@ exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti)=>{
         .sort(sorti)
         .limit(pageSize)
         .skip((pageNo-1)*pageSize)
-        .populate('gpics');
+        .populate('gpics')
+        .populate('userID');
     // console.log(goods);
     let hasMore=total-pageNo*pageSize>0;
     return {

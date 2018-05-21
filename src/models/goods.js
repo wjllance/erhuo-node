@@ -68,6 +68,19 @@ goodsSchema.methods.baseInfo = function(fullPic) {
     return g;
 };
 
+goodsSchema.methods.cardInfo = function() {
+    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
+	g.gpics = [];
+	g.gpics[0] = this.gpics[0].thumb();
+    g.state = this.removed_date ? "已下架" : "在售";
+    g.created_date = tools.dateStr(this.created_date);
+    g.glocation = school_map[this.glocation];
+    if(this.userID._id){
+        g.user = _.pick(this.userID, ['_id', 'nickName', 'avatarUrl']);
+    }
+    return g;
+};
+
 goodsSchema.methods.remove = async function() {
 	this.removed_date = Date.now();
 	await this.save();
