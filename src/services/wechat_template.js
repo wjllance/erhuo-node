@@ -56,7 +56,7 @@ exports.sendPaidTemplate = async(order) => {
     let touser = await User.findById(seller_id);
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
-    let template_id = "YguybxI3FIF3xffJsWQX6qoETcDhmCDpeLblF_yENMM";
+    let template_id = "YguybxI3FIF3xffJsWQX6uvMrREN-6--76LLenJ7JMI";
     let page = "pages/news/news";
     let data = {
         //温馨提示
@@ -86,7 +86,10 @@ exports.sendPaidTemplate = async(order) => {
         //收货人电话
         keyword7:{
             value:"手机号正在接入中"
-        }
+        },
+        keyword8:{
+            value: moment().format('lll')
+        },
     };
 
     formid.used = 1;
@@ -102,7 +105,7 @@ exports.confirmReceipt = async(order) =>{
     let touser = await User.findById(seller_id);
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
-    let template_id = "h-AKhqlnkoDY9GdfRTylKV6oxROCT0Ooo49aLerkHNM";
+    let template_id = "h-AKhqlnkoDY9GdfRTylKd6gF1bd8KXfoVQW1uDMk5A";
     let page = "pages/news/news";
     let data = {
         //温馨提示
@@ -117,13 +120,13 @@ exports.confirmReceipt = async(order) =>{
         keyword3: {
             value:order.sn
         },
-        //物品名称
-        keyword4:{
-            value:order.goodsInfo.gname
-        },
         //订单金额
-        keyword5:{
+        keyword4:{
             value: order.price
+        },
+        //物品名称
+        keyword5:{
+            value:order.goodsInfo.gname
         },
         //收货人
         keyword6:{
@@ -132,7 +135,10 @@ exports.confirmReceipt = async(order) =>{
         //收货人电话
         keyword7:{
             value:"手机号正在接入中"
-        }
+        },
+        keyword8:{
+            value: moment().format('lll')
+        },
     };
 
     formid.used = 1;
@@ -156,10 +162,6 @@ exports.moneyArrive = async(order)=>{
         //商品名称
         keyword2:{
             value: order.goodsInfo.gname
-        },
-        //订单号
-        keyword3: {
-            value: order.sn
         },
         //入账金额
         keyword4:{

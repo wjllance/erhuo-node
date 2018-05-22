@@ -158,12 +158,14 @@ exports.preparePay = async function (order) {
 }
 
 exports.preparePayV2 = async function (order) {
-    if(order.order_status == ORDER_STATUS.INIT){
+    if(order.order_status === ORDER_STATUS.INIT){
         order.order_status = ORDER_STATUS.TOPAY;
-        order.sn = generateSerialNumber();
+        if(!order.sn){
+            order.sn = generateSerialNumber();
+        }
         await order.save();
     }
-    auth.assert(order.order_status == ORDER_STATUS.TOPAY, "不可支付");
+    auth.assert(order.order_status === ORDER_STATUS.TOPAY, "不可支付");
 
     // order.sn = generateSerialNumber();
     //TO BE REMOVE in a few time later

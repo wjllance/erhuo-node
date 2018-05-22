@@ -204,10 +204,12 @@ router.get('/v2/order/pay/:orderId', auth.loginRequired, async(ctx, next) => {
 router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
-    let order = await srv_order.findOrCreate(goods, ctx.state.user);
+    let order = await srv_order.findOrCreateV3(goods, ctx.state.user);
     console.log(order);
-    auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY, "订单已支付");
-    let res = await srv_wechat.getPayParams(order._id);
+    // auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY, "订单已支付");
+    let params = await srv_order.preparePayV2(order);
+    let res = await srv_wechat.getPayParamsV2(params);
+    // let res = await srv_wechat.getPayParams(order._id);
     ctx.body = {
         success: 1,
         data: res
@@ -352,6 +354,7 @@ router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
     auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
     let res = await srv_order.refund_apply(order);
     let transaction = await srv_transaction.createRefund(order);
+    await srv_wxtemplate.refundApply(order);
     console.log("create refund transaction ", transaction);
     ctx.body = {
         success:1,
@@ -375,6 +378,7 @@ router.post('/order/refund/confirm', auth.loginRequired, async(ctx, next)=>{
     auth.assert(order.seller.equals(ctx.state.user._id), "无权限");
     let res = await srv_order.refund_confirm(order);
     let transaction = await srv_transaction.refundConfirm(order);
+    await srv_wxtemplate.refundConfirm(order);
     console.log("confirm refund transaction ", transaction);
     ctx.body = {
         success:1,
