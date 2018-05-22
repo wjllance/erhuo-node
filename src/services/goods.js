@@ -13,11 +13,8 @@ const school_map = require('../config').CONSTANT.SCHOOL_MAP
 const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他"];
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
-
-    console.log(user);
     if (!user) return {};
     let has_collected = _.some(user.collections, x => goods._id.equals(x));
-    console.log(has_collected);
     return {
         has_collected
     };
@@ -36,7 +33,6 @@ let outputify = exports.outputify = async function(goods, user) {
         return ugoods;
     }
 };
-
 
 exports.postComment = async function(goods, user, cmt, toUserId){
     let new_comment = await Comment.create({

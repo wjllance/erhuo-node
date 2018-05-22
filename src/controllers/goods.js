@@ -16,6 +16,7 @@ let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
 const schools = config.CONSTANT.SCHOOL
+
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
 
