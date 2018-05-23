@@ -12,11 +12,11 @@ let accountSchema = new Schema({
         ref: 'User',
         required: true
     },
-    balance: {
+    balance: {  //余额
         type: Number,
         default: 0
     },
-    bonus: {
+    bonus: {    //积分，暂时没用
         type: Number,
         default: 0
     },

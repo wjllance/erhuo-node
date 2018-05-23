@@ -1,0 +1,121 @@
+
+users  //用户，不是user!!!
+    // 微信登录验证和标识信息
+    openid: String,
+    session_key: String,
+    unionid: String,
+    //服务号openid
+    sa_openid: String,
+    //当前浏览商品的地区,0全部，1其他，2北大，3清华
+    location: Number,
+
+    // 以下是从微信获取到的用户数据
+    nickName: String,
+    avatarUrl: String,
+    gender: String,
+    city: String,
+    province: String,
+    country: String,
+    language: String,
+
+    //是否管理员
+    isAdmin: Boolean,
+    // 收藏商品id
+    collections: {
+        type: [{
+            type : mongoose.Schema.ObjectId,
+            ref : 'Goods',
+        }],
+        default: []
+    },
+    //没有用了
+    tls_imported: Boolean,
+    created_date: Date,
+    updated_date: Date, 
+-------------------------------------------------以下字段还没有，可以参考加入-----
+    phonenumber： String,
+    realname_verified: Date  //通过实名认证的时间
+    student_verified: Date  //通过学生认证时间
+    offline_verified: Date  //通过线下认证的时间
+
+
+=================================================================================
+goods  //商品
+    userID: {
+        type : mongoose.Schema.ObjectId,
+        ref : 'User',
+        required: true
+    },
+
+    gname: String,  //名字
+    gsummary: String,   //描述
+    glabel: String,     //没用
+    gprice: Number,        //价格
+    gpics: [{               //图片id
+        type : mongoose.Schema.ObjectId,
+        ref : 'Image'
+    }],
+    category: String,   //类别
+    gstype: String,     //没用
+    glocation: {        //发布时的（学校）
+        type: Number,
+        default: 0
+    },
+    gcost: Number,      //原价
+    gcity: String,      //没用
+    gpriority: Number,  //优先级/推荐级别，首页排序需要
+    created_date: { type: Date, default: Date.now },
+    removed_date: { type: Date, default: null},   // 下架
+    deleted_date: { type: Date, default: null},   // 删除
+    updated_date: { type: Date, default: Date.now},
+},{versionKey:false});
+
+
+=================================================================================
+images  //图片，暂时还是存在服务器本地的
+    userID: {   //上传者
+        type : mongoose.Schema.ObjectId,
+        ref : 'User',
+        required: true
+    },
+
+    filename: String,           //名字
+    thumbnails: String,         //缩略图名字
+
+    created_date: { type: Date, default: Date.now },
+});
+
+
+=================================================================================
+comments    //评论
+    content: String,
+    fromId: {   //发送人
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    toId: {     //接受人，可能为空
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User'
+    },
+    goodsId: {  商品id
+        type:  mongoose.Schema.ObjectId,
+        ref: 'Goods'
+    },  
+    secret: Boolean,    //是否私密留言，后续考虑去掉
+    read_date: {type: Date, default: null},     //已读时间
+    created_date: { type: Date, default: Date.now },
+
+
+=================================================================================
+
+accounts  账户
+    userID: {
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    balance: Number, //余额
+    bonus: Number, //积分，暂时没用
+    created_date: Date, 
+    updated_date: Date, 
