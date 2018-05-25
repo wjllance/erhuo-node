@@ -74,7 +74,7 @@ router.get('/v2/goods/index', async (ctx, next) => {
     // };
     // await auth.loginRequired(ctx, next)
     let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
 
     let cate = ctx.query.category;
     let condi = {
