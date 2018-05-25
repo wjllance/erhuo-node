@@ -49,18 +49,42 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 
     console.log("here is update")
 
-    auth.assert(ctx.request.body.signature == utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
+    auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
 
     let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
     let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
 
-    auth.assert(data.openId == ctx.state.user.openid, '签名错误2');
-    auth.assert(data.watermark.appid == config.APP_ID, '水印错误');
-    console.log(data)
+    auth.assert(data.openId === ctx.state.user.openid, '签名错误2');
+    auth.assert(data.watermark.appid === config.APP_ID, '水印错误');
+    console.log(data);
     _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'unionid', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
     ctx.state.user.unionid = data.unionId;
     ctx.state.user.updated_date = moment();
     let user = await ctx.state.user.save();
+
+    let userIndex = await srv_user.indexInfo(user._id);
+    ctx.body = {
+        success: 1,
+        data: userIndex
+    };
+});
+
+
+
+router.post('/user/phone', auth.loginRequired, async (ctx, next) => {
+
+    console.log("here is update phone");
+
+
+    let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
+    let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
+
+    auth.assert(data.watermark.appid === config.APP_ID, '水印错误');
+    console.log(data);
+
+    _.assign(ctx.state.user, _.pick(data, ['phoneNumber']));
+    let user = await ctx.state.user.save();
+    console.log(user);
 
     let userIndex = await srv_user.indexInfo(user._id);
     ctx.body = {

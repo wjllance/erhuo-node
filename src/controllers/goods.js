@@ -74,7 +74,7 @@ router.get('/v2/goods/index', async (ctx, next) => {
     // };
     // await auth.loginRequired(ctx, next)
     let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
 
     let cate = ctx.query.category;
     let condi = {
@@ -157,7 +157,7 @@ router.get('/v2/goods/index', async (ctx, next) => {
  */
 router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let images = await Image.find({_id: ctx.request.body.gpics});
-    auth.assert(images.length == ctx.request.body.gpics.length, '图片不正确');
+    auth.assert(images.length === ctx.request.body.gpics.length, '图片不正确');
 
     for(let i = 0; i < images.length; i ++) {
         auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
@@ -166,7 +166,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category']));
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category', 'remark']));
 
     if(!goods.glocation){
         goods.glocation = ctx.state.user.location || schools.ALL;
@@ -199,7 +199,7 @@ router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
 
-    await myGood.remove();
+    await myGood.myRemove();
 
     // _.assign(myGood, {'removed_date':Date.now()});
     // console.log(myGood);
@@ -215,7 +215,7 @@ router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
     auth.assert(myGood, '商品不存在');
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
-    await myGood.remove();
+    await myGood.myRemove();
     ctx.body = {
         success: 1,
         data: myGood._id.toString()
@@ -308,7 +308,8 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user);
     // auth.assert(goods, '商品不存在');
-    goods.trading_status = await srv_order.tradingStatus(ctx.params.goods_id);
+
+    goods.trading_status = await srv_order.tradingStatus(goods);
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,
