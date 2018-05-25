@@ -280,7 +280,7 @@ exports.complete = async (order) => {
     order.completed_date = moment();
     await order.save();
     let goods = Goods.findById(order.goodsId);
-    await goods.remove();
+    await goods.myRemove();
 }
 
 exports.autorefund = async (order) => {

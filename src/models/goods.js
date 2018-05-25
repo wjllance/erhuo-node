@@ -85,7 +85,7 @@ goodsSchema.methods.cardInfo = function() {
     return g;
 };
 
-goodsSchema.methods.remove = async function() {
+goodsSchema.methods.myRemove = async function() {
 	this.removed_date = Date.now();
 	await this.save();
 };

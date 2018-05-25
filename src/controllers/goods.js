@@ -199,7 +199,7 @@ router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
 
-    await myGood.remove();
+    await myGood.myRemove();
 
     // _.assign(myGood, {'removed_date':Date.now()});
     // console.log(myGood);
@@ -215,7 +215,7 @@ router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
     auth.assert(myGood, '商品不存在');
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
-    await myGood.remove();
+    await myGood.myRemove();
     ctx.body = {
         success: 1,
         data: myGood._id.toString()
