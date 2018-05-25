@@ -157,7 +157,7 @@ router.get('/v2/goods/index', async (ctx, next) => {
  */
 router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let images = await Image.find({_id: ctx.request.body.gpics});
-    auth.assert(images.length == ctx.request.body.gpics.length, '图片不正确');
+    auth.assert(images.length === ctx.request.body.gpics.length, '图片不正确');
 
     for(let i = 0; i < images.length; i ++) {
         auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
@@ -166,7 +166,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category']));
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category', 'remark']));
 
     if(!goods.glocation){
         goods.glocation = ctx.state.user.location || schools.ALL;
