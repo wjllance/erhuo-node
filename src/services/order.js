@@ -238,23 +238,21 @@ exports.getDetailById = async (id) => {
 
 exports.tradingStatus = async (goods) => {
     let gid = goods._id;
-    if(goods.remark.toString().length > 0){
-        return "我想要";
-    }
-    let orders = await Order.find({
-        goodsId: gid,
-        refund_status: REFUND_STATUS.INIT,
-        order_status: {
-            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+    if(!goods.remark){
+        let orders = await Order.find({
+            goodsId: gid,
+            refund_status: REFUND_STATUS.INIT,
+            order_status: {
+                $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+            }
+        });
+        console.log("orders");
+        console.log(orders);
+        if(orders.length > 0){
+            return "已被抢";
         }
-    });
-    console.log("orders");
-    console.log(orders);
-    if(orders.length > 0){
-        return "已被抢";
-    }else{
-        return "我想要";
     }
+    return "我想要";
 }
 
 exports.cancel = async (order)=>{
@@ -284,7 +282,7 @@ exports.complete = async (order) => {
     order.completed_date = moment();
     await order.save();
     let goods = await Goods.findById(order.goodsId);
-    if(goods.remark.toString().length === 0){
+    if(!goods.remark){
         await goods.myRemove();
         console.log("removed", goods);
     }
