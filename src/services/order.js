@@ -78,25 +78,26 @@ exports.findOrCreateV2 = async function(goods, user) {
 exports.findOrCreateV3 = async function(goods, user) {
 
 
-    let order = await Order.findOne({
+    let order = await Order.findOne({  //检查自己的之前订单
         goodsId: goods._id,
         buyer: user._id,
         order_status : {$ne: ORDER_STATUS.CANCEL}
     });
     if(order) return order;
 
-    let orders = await Order.find({ //检查交易中的订单
-        goodsId: goods._id,
-        refund_status: REFUND_STATUS.INIT,
-        order_status: {
-            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
-        }
-    });
-    console.log(orders);
-    auth.assert(orders.length == 0, "商品交易中，不可下单")
+    if(!goods.remark){
+        let orders = await Order.find({ //检查交易中的订单
+            goodsId: goods._id,
+            refund_status: REFUND_STATUS.INIT,
+            order_status: {
+                $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+            }
+        });
+        console.log(orders);
+        auth.assert(orders.length == 0, "商品交易中，不可下单")
+    }
 
 
-    console.log(orders);
     order = new Order({
         goodsId: goods._id,
         seller: goods.userID,
