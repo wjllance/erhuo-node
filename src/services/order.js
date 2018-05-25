@@ -246,8 +246,7 @@ exports.tradingStatus = async (goods) => {
                 $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
             }
         });
-        console.log("orders");
-        console.log(orders);
+        console.log("orders", orders);
         if(orders.length > 0){
             return "已被抢";
         }
