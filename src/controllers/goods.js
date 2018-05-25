@@ -308,7 +308,8 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user);
     // auth.assert(goods, '商品不存在');
-    goods.trading_status = await srv_order.tradingStatus(ctx.params.goods_id);
+
+    goods.trading_status = await srv_order.tradingStatus(goods);
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,

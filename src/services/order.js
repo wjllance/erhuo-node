@@ -236,7 +236,11 @@ exports.getDetailById = async (id) => {
 }
 
 
-exports.tradingStatus = async (gid) => {
+exports.tradingStatus = async (goods) => {
+    let gid = goods._id;
+    if(goods.remark.toString().length > 0){
+        return "我想要";
+    }
     let orders = await Order.find({
         goodsId: gid,
         refund_status: REFUND_STATUS.INIT,
