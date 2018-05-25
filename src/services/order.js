@@ -279,8 +279,11 @@ exports.complete = async (order) => {
     order.order_status = ORDER_STATUS.COMPLETE;
     order.completed_date = moment();
     await order.save();
-    let goods = Goods.findById(order.goodsId);
-    await goods.myRemove();
+    let goods = await Goods.findById(order.goodsId);
+    if(goods.remark.toString().length === 0){
+        await goods.myRemove();
+        console.log("removed", goods);
+    }
 }
 
 exports.autorefund = async (order) => {
