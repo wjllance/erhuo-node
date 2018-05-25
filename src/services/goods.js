@@ -88,6 +88,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
     {
         _.assign(g, await injectGoods(g, userInfo));
     }
+    g.remark = goods.remark;
     return g;
 };
 
