@@ -145,11 +145,11 @@ router.put('/order/:orderId', auth.loginRequired, async(ctx, next) => {
     console.log(order.seller, ctx.state.user._id);
     auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
     _.assign(order, _.pick(ctx.request.body, ['price']));
-    await order.save();
-    console.log(order);
+    let res = await srv_order.updateSN(order);
+    console.log(res);
     ctx.body = {
         success: 1,
-        data: order.baseInfo()
+        data: res.baseInfo()
     };
 });
 

@@ -28,6 +28,10 @@ let generateSerialNumber = () => {
     return datetime + rand + No + ts;
 };
 
+exports.updateSN = async (order) => {
+    order.sn = generateSerialNumber();
+    return await order.save();
+};
 
 //goods:CardInfo
 exports.findOrCreateV2 = async function(goods, user) {
