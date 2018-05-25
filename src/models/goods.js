@@ -45,7 +45,7 @@ let goodsSchema = new mongoose.Schema({
 
 
 goodsSchema.methods.baseInfoV2 = function(fullPic) {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
 	if(fullPic){
         g.gpics = this.gpics.map(y => y.urlV2());
 	}else{
@@ -59,7 +59,7 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
 };
 
 goodsSchema.methods.baseInfo = function(fullPic) {
-    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
+    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
     if(fullPic){
         g.gpics = this.gpics.map(y => y.url());
     }else{
@@ -73,7 +73,7 @@ goodsSchema.methods.baseInfo = function(fullPic) {
 };
 
 goodsSchema.methods.cardInfo = function() {
-    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'updated_date', 'gpriority']);
+    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
 	g.gpics = [];
 	g.gpics[0] = this.gpics[0].thumb();
     g.state = this.removed_date ? "已下架" : "在售";
