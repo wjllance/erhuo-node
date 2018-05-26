@@ -162,12 +162,12 @@ let isGoodRemoved = exports.isGoodRemoved = function(good) {
     return good.removed_date && good.removed_date < Date.now();
 };
 
-exports.collectionList = async function(user_state, pageNo, pageSize)
+exports.collectionList = async function(user, pageNo, pageSize)
 {
 
-    let total = await Goods.find({_id: user_state.collections}).count();//用户总收藏数
+    let total = await Goods.find({_id: user.collections}).count();//用户总收藏数
 
-    let collections = await Goods.find({_id: user_state.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let collections = await Goods.find({_id: user.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
     let ugoods = collections.map(x => x.baseInfo());
     let hasMore=total-pageNo*pageSize>0;
     return {
@@ -214,6 +214,12 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
 
 exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti)=>{
 
+    if(!condi){
+        condi = {}
+    }
+    if(!sorti){
+        sorti = {}
+    }
     let total = await Goods.find(condi).count();//表总记录数
 
     let goods = await Goods.find(condi)

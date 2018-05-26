@@ -91,7 +91,7 @@ router.get('/v2/goods/index', async (ctx, next) => {
         sorti = {
             gpriority:-1,
             // removed_date:1,
-            // glocation: -1,
+            glocation: -1,
             updated_date:-1
         }
     }
@@ -102,17 +102,17 @@ router.get('/v2/goods/index', async (ctx, next) => {
         sorti = {
             gpriority:-1,
             // removed_date:1,
-            // glocation: -1,
+            glocation: -1,
             updated_date:-1
         }
         console.log(condi, sorti);
     }
-    else if(srv_goods.CATES.indexOf(cate) != -1){
+    else if(srv_goods.CATES.indexOf(cate) !== -1){
         condi.category = cate;
         sorti = {
             // gpriority:-1,
             removed_date:1,
-            // glocation: -1,
+            glocation: -1,
             updated_date:-1
         }
     }
