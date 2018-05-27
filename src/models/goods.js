@@ -32,7 +32,7 @@ let goodsSchema = new mongoose.Schema({
     },
 	gcost: Number,
 	gcity: String,
-	gpriority: Number,
+	gpriority:    { type: Number, default: 0},
 	created_date: { type: Date, default: Date.now },
     removed_date: { type: Date, default: null},   // 下架
     deleted_date: { type: Date, default: null},   // 删除
