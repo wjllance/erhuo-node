@@ -31,9 +31,10 @@ users  //用户，不是user!!!
     //没有用了
     tls_imported: Boolean,
     created_date: Date,
-    updated_date: Date, 
+    updated_date: Date,
+    phoneNumber: String
+
 -------------------------------------------------以下字段还没有，可以参考加入-----
-    phonenumber： String,
     realname_verified: Date  //通过实名认证的时间
     student_verified: Date  //通过学生认证时间
     offline_verified: Date  //通过线下认证的时间
@@ -68,6 +69,8 @@ goods  //商品
     removed_date: { type: Date, default: null},   // 下架
     deleted_date: { type: Date, default: null},   // 删除
     updated_date: { type: Date, default: Date.now},
+
+    remark:     //备注，特殊活动用
 },{versionKey:false});
 
 
@@ -119,3 +122,77 @@ accounts  账户
     bonus: Number, //积分，暂时没用
     created_date: Date, 
     updated_date: Date, 
+
+
+
+==================================================================================
+
+orders 订单
+
+    goodsId: {  //商品id
+        type : Schema.ObjectId,
+        ref : 'Goods',
+        required: true
+    },
+    buyer: {    //买家id
+        type : Schema.ObjectId,
+        ref : 'User',
+        required: true
+    },
+    seller: {   //卖家id
+        type : Schema.ObjectId,
+        ref : 'User',
+    },
+    // goods_pic: String,
+
+    goodsInfo: Schema.Types.Mixed,
+            //商品信息快照，
+            //包含 'gname', 'gprice', 'gcost', 'glocation', 'gsummary'， 'img'
+    sn: String, //流水号
+    price: Number,  //订单价格
+    priceGet: Number,   //实际收到支付回调的价格，可以暂时不管这个字段
+    order_status: {     //订单状态，-1未下单，0待支付，1已支付，（2已发货，暂时没用），3已收货，4已取消
+        type: Number,
+        default: -1   //INIT
+    },
+    pay_status: {       //支付状态，0初始，1成功，2失败，3超时，4金额异常
+        type: Number,
+        default: 0,     //INIT
+    },
+    refund_status:{     //退款状态，0初始，1申请中，2成功，3失败
+        type: Number,
+        default: 0,     //INIT
+    },
+    paid_at: Date,      //支付时间
+    refunded_at: Date,  //退款成功时间
+    created_date: { type: Date, default: Date.now},
+    updated_date: { type: Date, default: Date.now},
+    completed_date: Date,   //确认收货时间
+    finished_date: Date   //到账时间
+
+
+============================================================
+
+transactions    交易记录
+    accountId: {    //账户id
+        type : mongoose.Schema.ObjectId,
+        ref : 'Account',
+        required: true
+    },
+    type: Number,       //交易类型，0提现，1订单收入，2订单退款
+    amount: Number,     //金额
+    info: Schema.Types.Mixed,   //交易信息，一般是订单信息，可以暂时不管
+    desc: String,       //描述
+    orderId: {          //对应的订单id（如果有）
+        type : mongoose.Schema.ObjectId,
+        ref : 'Order'
+    },
+    status: {       //交易状态，0初始，1成功，2失败
+        type:Number,
+        default: 0
+    },
+    created_date: { type: Date, default: Date.now },
+    countdown_date: Date,       //针对订单收入类型，开始72倒计时的时间
+    finished_date: Date         //交易完成时间
+
+
