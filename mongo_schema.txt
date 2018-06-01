@@ -56,7 +56,7 @@ goods  //商品
         type : mongoose.Schema.ObjectId,
         ref : 'Image'
     }],
-    category: String,   //类别
+    category: String,   //类别,["美妆","女装","女鞋","配饰","包包","日用","其他"]
     gstype: String,     //没用
     glocation: {        //发布时的（学校）
         type: Number,
