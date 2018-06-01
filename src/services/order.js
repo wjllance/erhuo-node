@@ -200,6 +200,28 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
 }
 
 
+let getOrderListV2 = exports.getOrderListV2 = async (condi, pageNo, pageSize) => {
+    let total = await  Order.find(condi).count();
+
+    let orders = await Order.find(condi)
+    // .sort({order_status:1,created_date:-1})
+        .sort({created_date:-1})
+        .limit(pageSize)
+        .skip((pageNo-1)*pageSize)
+        .populate('buyer')
+        .populate('seller');
+    orders = _.map(orders, o => o.cardInfo());
+
+    let hasMore=total-pageNo*pageSize>0;
+
+    return {
+        items: orders,
+        hasMore: hasMore,
+        total: total
+    };
+}
+
+
 exports.checkPay = async (out_trade_no, result_code, fee)=>{
     let order = await Order.findOne({sn:out_trade_no});
     auth.assert(order, "订单不存在");
