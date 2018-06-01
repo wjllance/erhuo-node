@@ -218,7 +218,7 @@ exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti)=>{
         condi = {}
     }
     if(!sorti){
-        sorti = {}
+        sorti = {created_date:-1}
     }
     let total = await Goods.find(condi).count();//表总记录数
 
