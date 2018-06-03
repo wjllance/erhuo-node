@@ -24,6 +24,7 @@ exports.register = function () {
                 countdown_date: {
                     $lt: moment().subtract(30, 's')
                 },
+                status: config.CONSTANT.TRANSACTION_STATUS.INIT,
                 finished_date: {$exists: false}
             });
             console.log(transactions);
@@ -39,6 +40,7 @@ exports.register = function () {
                 countdown_date: {
                     $lt: moment().subtract(71, 'h').subtract(50, 'm')
                 },
+                status: config.CONSTANT.TRANSACTION_STATUS.INIT,
                 finished_date: {$exists: false}
             });
             console.log(transactions);

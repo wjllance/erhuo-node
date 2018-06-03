@@ -136,6 +136,7 @@ exports.refundConfirm = async(order)=>{
         type: TRANSACTION_TYPE.INCOME
     });
     transaction.status = TRANSACTION_STATUS.FAILED;
+    transaction.finished_date = moment();
     await transaction.save();
 
 

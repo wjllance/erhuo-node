@@ -40,12 +40,7 @@ let getFormid = async(userid) => {
         used: {$ne: 1}
     }).sort({expire_date:1});
     console.log(formid);
-    auth.assert(formid, "temp id not enough");
-    // if(!formid){
-    //     logger.warn("temp id not enough", fromuser, touser, content);
-    //     console.error("temp id not enough", fromuser, touser, content);
-    //     return null;
-    // }
+    auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
     return formid;
 };
 
