@@ -83,6 +83,13 @@ exports.CONSTANT = {
     ERR_CODE: {
         ERROR: 978,
         MSG_FAIL: 985
+    },
+    GOODS_STATUS:{
+        INIT:0,             //待审核
+        PASS:1,             //审核通过
+        REJECT:2,           //审核失败
+        RELEASED:3,         //已发布
+        UNDERCARRIAGE:4     //下架
     }
 };
 

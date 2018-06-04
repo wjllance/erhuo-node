@@ -15,7 +15,8 @@ let srv_order = require('../services/order');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
-const schools = config.CONSTANT.SCHOOL
+const schools = config.CONSTANT.SCHOOL;
+const GOODS_STATUS = config.CONSTANT.GOODS_STATUS;
 
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
@@ -134,19 +135,15 @@ router.get('/v2/goods/index', async (ctx, next) => {
     }
 });
 
+
 router.get('/v3/goods/index', async (ctx, next) => {
-    // let condi= {
-    //     $or: [
-    //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
-    //     ]
-    // };
-    // await auth.loginRequired(ctx, next)
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
 
     let cate = ctx.query.category;
     let condi = {
-        deleted_date:null
+        deleted_date:null,
+        status: GOODS_STATUS.RELEASED,
     };
     let sorti = {};
     if(!cate)
@@ -164,8 +161,13 @@ router.get('/v3/goods/index', async (ctx, next) => {
         }
     }
     else if(cate === "今日"){
+        let ddl = moment({hour:20}).subtract(1,'d');
+        if(moment().isBefore(moment({hour:20}))){
+            ddl = ddl.subtract(1,'d');
+        }
         condi.created_date = {
-            $gt: moment().subtract(1, 'd')
+            // $gt: moment().subtract(1, 'd')
+            $gt: ddl
         };
         sorti = {
             gpriority:-1,
