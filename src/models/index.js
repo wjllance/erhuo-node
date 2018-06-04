@@ -26,8 +26,6 @@ let UserFormid = exports.UserFormid = require('./user_formid');
 
 let Identity = exports.Identity = require('./identity');
 
-let Tel= exports.Tel = require('./tel');
-
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {
