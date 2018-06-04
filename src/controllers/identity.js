@@ -11,7 +11,7 @@ let auth = require('../services/auth');
 
 let { User, Image, Identity} = require('../models');
 
-
+const router = module.exports = new Router();
 
 router.post('/Identity/save', auth.loginRequired,async (ctx, next) => {
 		let identity= new Identity();

@@ -9,9 +9,9 @@ let identitySchema=new Schema({
         ref: 'User',
         required: true
     },
-    name:String
-    studentID:String
-    school:String
+    name:String,
+    studentID:String,
+    school:String,
     cardpics:[{
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
@@ -20,6 +20,7 @@ let identitySchema=new Schema({
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
 	}],
+    status:{ type: Number, default: 0},
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now},
 
