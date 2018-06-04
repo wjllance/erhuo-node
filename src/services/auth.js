@@ -50,12 +50,15 @@ let userM = exports.userM = async function (ctx, next) {
 	}
 }
 
-let assert = exports.assert = function (condition, msg) {
-    msg.should.be.a.String();
+let assert = exports.assert = function (condition, msg, err_code) {
 
+    if(!err_code){
+        err_code = ERR_CODE;
+    }
 	if (!condition) {
+        msg.should.be.a.String();
 		let err = new Error(msg);
-        err.status = ERR_CODE;
+        err.status = err_code;
 		throw err;
 	}
 }

@@ -10,8 +10,6 @@ let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
-
-
 let srv_order = require('../services/order');
 let srv_message = require('../services/message');
 let srv_user = require('../services/user');

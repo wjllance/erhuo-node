@@ -11,6 +11,7 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_order = require('../services/order');
 let srv_wechat = require('../services/wechat');
+let srv_wxtemplate = require('../services/wechat_template');
 let srv_transaction = require('../services/transaction');
 let { User, Image, Goods, Order } = require('../models');
 
@@ -44,6 +45,22 @@ router.get('/order/buy/', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+router.get('/v2/order/buy/', auth.loginRequired, async (ctx, next) => {
+
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+    let condi = {
+        buyer: ctx.state.user._id,
+        order_status: {$ne: srv_order.ORDER_STATUS.INIT}
+    };
+    let orderList = await srv_order.getOrderListV2(condi, pageNo, pageSize);
+
+    ctx.body = {
+        success: 1,
+        data: orderList
+    };
+});
+
 
 /**
  * @api {get} /order/sell/  我卖出的
@@ -73,6 +90,28 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
     ctx.body = {
         success: 1,
         data: orders
+    };
+});
+
+router.get('/v2/order/sell/', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+    let condi = {
+        seller: ctx.state.user._id,
+        order_status: {
+            $in: [
+                srv_order.ORDER_STATUS.PAID,
+                srv_order.ORDER_STATUS.COMPLETE,
+                srv_order.ORDER_STATUS.CONFIRM,
+            ]
+        }
+    };
+    console.log(condi);
+    let orderList = await srv_order.getOrderListV2(condi, pageNo, pageSize);
+
+    ctx.body = {
+        success: 1,
+        data: orderList
     };
 });
 
@@ -144,11 +183,11 @@ router.put('/order/:orderId', auth.loginRequired, async(ctx, next) => {
     console.log(order.seller, ctx.state.user._id);
     auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
     _.assign(order, _.pick(ctx.request.body, ['price']));
-    await order.save();
-    console.log(order);
+    let res = await srv_order.updateSN(order);
+    console.log(res);
     ctx.body = {
         success: 1,
-        data: order.baseInfo()
+        data: res.baseInfo()
     };
 });
 
@@ -167,7 +206,8 @@ router.get('/order/pay/:orderId', auth.loginRequired, async(ctx, next) => {
 
     let order = await Order.findById(ctx.params.orderId);
     auth.assert(order, "订单不存在")
-    let params = await srv_order.preparePay(order);
+    // let params = await srv_order.preparePay(order);
+    let params = await srv_order.preparePayV2(order);
     let res = await srv_wechat.getPayParamsV2(params);
     ctx.body = {
         success:1,
@@ -202,10 +242,12 @@ router.get('/v2/order/pay/:orderId', auth.loginRequired, async(ctx, next) => {
 router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
-    let order = await srv_order.findOrCreate(goods, ctx.state.user);
+    let order = await srv_order.findOrCreateV3(goods, ctx.state.user);
     console.log(order);
-    auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY, "订单已支付");
-    let res = await srv_wechat.getPayParams(order._id);
+    // auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY, "订单已支付");
+    let params = await srv_order.preparePayV2(order);
+    let res = await srv_wechat.getPayParamsV2(params);
+    // let res = await srv_wechat.getPayParams(order._id);
     ctx.body = {
         success: 1,
         data: res
@@ -249,6 +291,7 @@ router.post('/v2/order/complete', auth.loginRequired, async(ctx, next) => {
     auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
     await srv_order.complete(order);
     await srv_transaction.countdown(order);
+    await srv_wxtemplate.confirmReceipt(order);
     // transac.status = 1;
     // await transac.save();
     ctx.body = {
@@ -325,8 +368,8 @@ router.post('/order/cancel', auth.loginRequired, async(ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/order/detail/:order_id', auth.loginRequired, async (ctx, next) => {
-    let order = await srv_order.getDetailById(ctx.params.order_id);
+router.get('/order/detail/:orderId', auth.loginRequired, async (ctx, next) => {
+    let order = await srv_order.getDetailById(ctx.params.orderId);
     ctx.body = {
         success:1,
         data: order
@@ -349,6 +392,7 @@ router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
     auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
     let res = await srv_order.refund_apply(order);
     let transaction = await srv_transaction.createRefund(order);
+    await srv_wxtemplate.refundApply(order);
     console.log("create refund transaction ", transaction);
     ctx.body = {
         success:1,
@@ -372,6 +416,7 @@ router.post('/order/refund/confirm', auth.loginRequired, async(ctx, next)=>{
     auth.assert(order.seller.equals(ctx.state.user._id), "无权限");
     let res = await srv_order.refund_confirm(order);
     let transaction = await srv_transaction.refundConfirm(order);
+    await srv_wxtemplate.refundConfirm(order);
     console.log("confirm refund transaction ", transaction);
     ctx.body = {
         success:1,

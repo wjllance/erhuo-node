@@ -6,7 +6,8 @@ let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
 let body = require('koa-convert')(require('koa-better-body')());
-
+let moment = require('moment');
+moment.locale('zh-cn');
 let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
@@ -36,12 +37,7 @@ const schools = config.CONSTANT.SCHOOL
  *
  */
 router.get('/goods/index', async (ctx, next) => {
-    // let condi= {
-    //     $or: [
-    //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
-    //     ]
-    // };
-    // await auth.loginRequired(ctx, next)
+
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
 
@@ -51,6 +47,146 @@ router.get('/goods/index', async (ctx, next) => {
         data: data
     }
 });
+
+
+/**
+ * @api {get} /v2/goods/index  商品列表
+ * @apiName     GoodsList
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ * @apiParam    {String}    category    列表类别 ["美妆","女装","女鞋","配饰","包包","日用","其他"]
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页商品列表
+ * @apiSuccess  {Array}     data.goods  商品列表
+ * @apiSuccess  {Boolean}     data.hasMore  还有更多
+ * @apiSuccess  {Number}     data.total  总数
+ *
+ */
+router.get('/v2/goods/index', async (ctx, next) => {
+    // let condi= {
+    //     $or: [
+    //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
+    //     ]
+    // };
+    // await auth.loginRequired(ctx, next)
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+
+    let cate = ctx.query.category;
+    let condi = {
+        deleted_date:null
+    };
+    let sorti = {};
+    if(!cate)
+    {
+        cate = "推荐";
+    }
+
+    console.log(cate);
+    if(cate === "推荐"){
+        sorti = {
+            gpriority:-1,
+            // removed_date:1,
+            glocation: -1,
+            updated_date:-1
+        }
+    }
+    else if(cate === "今日"){
+        condi.created_date = {
+            $gt: moment().subtract(1, 'd')
+        };
+        sorti = {
+            gpriority:-1,
+            // removed_date:1,
+            glocation: -1,
+            updated_date:-1
+        }
+        console.log(condi, sorti);
+    }
+    else if(srv_goods.CATES.indexOf(cate) !== -1){
+        condi.category = cate;
+        sorti = {
+            // gpriority:-1,
+            removed_date:1,
+            glocation: -1,
+            updated_date:-1
+        }
+    }
+    let user = ctx.state.user;
+    if(user){ //not other
+        condi.$or=[{
+            glocation:user.location
+        },{
+            glocation:0
+        }]
+    }
+
+    console.log(condi, sorti);
+    let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
+    ctx.body = {
+        success: 1,
+        data: data
+    }
+});
+
+
+/**
+ * @api {get} /goods/search  商品列表
+ * @apiName     GoodsList
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ * @apiParam    {String}    keyword     关键词
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页商品列表
+ * @apiSuccess  {Array}     data.goods  商品列表
+ * @apiSuccess  {Boolean}     data.hasMore  还有更多
+ * @apiSuccess  {Number}     data.total  总数
+ *
+ */
+router.get('/goods/search', async (ctx, next) => {
+    // await auth.loginRequired(ctx, next)
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+
+    let keyword = ctx.query.keyword;
+    let reg = new RegExp(keyword, 'i')
+    let condi = {
+        $or:[
+            {gname: reg},
+            {gsummary: reg}
+        ]
+    };
+    let sorti = {
+        gpriority:-1,
+        // removed_date:1,
+        glocation: -1,
+        updated_date:-1
+    };
+    let user = ctx.state.user;
+    if(user){ //not other
+        condi.$or=[{
+            glocation:user.location
+        },{
+            glocation:0
+        }]
+    }
+
+    console.log(condi, sorti);
+    let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
+    ctx.body = {
+        success: 1,
+        data: data
+    }
+});
+
 
 // 发布
 /**
@@ -68,6 +204,7 @@ router.get('/goods/index', async (ctx, next) => {
  * @apiParam    {String}    glocation
  * @apiParam    {Number}    gcost
  * @apiParam    {Number}    gcity
+ * @apiParam    {String}    category
  *
  * @apiSuccess  {Number}    success     1success
  * @apiSuccess  {Object}    data        goods_id
@@ -75,7 +212,7 @@ router.get('/goods/index', async (ctx, next) => {
  */
 router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let images = await Image.find({_id: ctx.request.body.gpics});
-    auth.assert(images.length == ctx.request.body.gpics.length, '图片不正确');
+    auth.assert(images.length === ctx.request.body.gpics.length, '图片不正确');
 
     for(let i = 0; i < images.length; i ++) {
         auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
@@ -84,7 +221,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     goods.gpics = images.map(x => x._id);
-    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']));
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category', 'remark']));
 
     if(!goods.glocation){
         goods.glocation = ctx.state.user.location || schools.ALL;
@@ -117,7 +254,7 @@ router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
 
-    await myGood.remove();
+    await myGood.myRemove();
 
     // _.assign(myGood, {'removed_date':Date.now()});
     // console.log(myGood);
@@ -133,7 +270,7 @@ router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
     auth.assert(myGood, '商品不存在');
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
-    await myGood.remove();
+    await myGood.myRemove();
     ctx.body = {
         success: 1,
         data: myGood._id.toString()
@@ -226,7 +363,8 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user);
     // auth.assert(goods, '商品不存在');
-    goods.trading_status = await srv_order.tradingStatus(ctx.params.goods_id);
+
+    goods.trading_status = await srv_order.tradingStatus(goods);
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,

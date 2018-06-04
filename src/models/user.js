@@ -9,6 +9,7 @@ let userSchema = new mongoose.Schema({
 	// 微信登录验证和标识信息
 	openid: {
 		type: String,
+		require: true,
 		index: true
 	},
 	session_key: String,
@@ -31,7 +32,7 @@ let userSchema = new mongoose.Schema({
 	province: String,
 	country: String,
 	language: String,
-
+	isAdmin: Boolean,
 	// 收藏
 	collections: {
 		type: [{
@@ -46,16 +47,20 @@ let userSchema = new mongoose.Schema({
     },
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },
-},{versionKey:false});
+
+	phoneNumber: String
+}
+, {versionKey:false}
+);
 
 userSchema.methods.baseInfo = function(){
-	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender"]);
+	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", 'phoneNumber']);
 	output.location = school_map[this.location];
 	return output;
 };
 
 userSchema.methods.tls_id = function(){
-    if(config.ENV == "production"){
+    if(config.ENV === "production"){
         return "O"+this._id;
     }else{
         return "D"+this._id;

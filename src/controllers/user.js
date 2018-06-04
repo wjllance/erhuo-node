@@ -49,18 +49,42 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 
     console.log("here is update")
 
-    auth.assert(ctx.request.body.signature == utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
+    auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
 
     let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
     let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
 
-    auth.assert(data.openId == ctx.state.user.openid, '签名错误2');
-    auth.assert(data.watermark.appid == config.APP_ID, '水印错误');
-    console.log(data)
+    auth.assert(data.openId === ctx.state.user.openid, '签名错误2');
+    auth.assert(data.watermark.appid === config.APP_ID, '水印错误');
+    console.log(data);
     _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'unionid', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
     ctx.state.user.unionid = data.unionId;
     ctx.state.user.updated_date = moment();
     let user = await ctx.state.user.save();
+
+    let userIndex = await srv_user.indexInfo(user._id);
+    ctx.body = {
+        success: 1,
+        data: userIndex
+    };
+});
+
+
+
+router.post('/user/phone', auth.loginRequired, async (ctx, next) => {
+
+    console.log("here is update phone");
+
+
+    let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
+    let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
+
+    auth.assert(data.watermark.appid === config.APP_ID, '水印错误');
+    console.log(data);
+
+    _.assign(ctx.state.user, _.pick(data, ['phoneNumber']));
+    let user = await ctx.state.user.save();
+    console.log(user);
 
     let userIndex = await srv_user.indexInfo(user._id);
     ctx.body = {
@@ -139,6 +163,34 @@ router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
     }
 });
 
+/**
+ * @api {get}   /user/:user_id/publish_list   发布列表
+ * @apiName     UserPublish
+ * @apGroup     User
+ *
+ *
+ */
+router.get('/user/:user_id/publish_list/', auth.loginRequired, async (ctx, next) => {
+
+
+    let condi = {
+        userID: ctx.params.user_id,
+        deleted_date: null,
+        removed_date: null
+    };  //未删除筛选
+
+    console.log(condi);
+
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+    let goods = await srv_goods.goodsListV2(ctx.state.user, pageNo, pageSize, condi);
+    ctx.body = {
+        success: 1,
+        data: goods
+    }
+});
+
+
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
     let isRemoved = parseInt(ctx.query.isRemoved) || 0;  //默认未下架
     let condi = {
@@ -156,6 +208,8 @@ router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
         data: await srv_goods.outputify(goods)
     }
 });
+
+
 
 // 收藏
 /**
@@ -247,4 +301,35 @@ router.post('/user/save_formids', auth.loginRequired, async(ctx, next)=>{
         data: total
     }
 })
+
+
+/**
+ * @api {get}   /user/collections   我的收藏
+ * @apiName     Collections
+ * @apiGroup    Center
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+    console.log(pageNo);
+    console.log(pageSize);
+    let user = ctx.state.user;
+    let condi = {_id:user.collections};
+    let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
+
+    ctx.body = {
+        success: 1,
+        data: goods
+    };
+});
+
+
 

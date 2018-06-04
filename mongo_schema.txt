@@ -1,0 +1,198 @@
+
+users  //用户，不是user!!!
+    // 微信登录验证和标识信息
+    openid: String,
+    session_key: String,
+    unionid: String,
+    //服务号openid
+    sa_openid: String,
+    //当前浏览商品的地区,0全部，1其他，2北大，3清华
+    location: Number,
+
+    // 以下是从微信获取到的用户数据
+    nickName: String,
+    avatarUrl: String,
+    gender: String,
+    city: String,
+    province: String,
+    country: String,
+    language: String,
+
+    //是否管理员
+    isAdmin: Boolean,
+    // 收藏商品id
+    collections: {
+        type: [{
+            type : mongoose.Schema.ObjectId,
+            ref : 'Goods',
+        }],
+        default: []
+    },
+    //没有用了
+    tls_imported: Boolean,
+    created_date: Date,
+    updated_date: Date,
+    phoneNumber: String
+
+-------------------------------------------------以下字段还没有，可以参考加入-----
+    realname_verified: Date  //通过实名认证的时间
+    student_verified: Date  //通过学生认证时间
+    offline_verified: Date  //通过线下认证的时间
+
+
+=================================================================================
+goods  //商品
+    userID: {
+        type : mongoose.Schema.ObjectId,
+        ref : 'User',
+        required: true
+    },
+
+    gname: String,  //名字
+    gsummary: String,   //描述
+    glabel: String,     //没用
+    gprice: Number,        //价格
+    gpics: [{               //图片id
+        type : mongoose.Schema.ObjectId,
+        ref : 'Image'
+    }],
+    category: String,   //类别,["美妆","女装","女鞋","配饰","包包","日用","其他"]
+    gstype: String,     //没用
+    glocation: {        //发布时的（学校）
+        type: Number,
+        default: 0
+    },
+    gcost: Number,      //原价
+    gcity: String,      //没用
+    gpriority: Number,  //优先级/推荐级别，首页排序需要
+    created_date: { type: Date, default: Date.now },
+    removed_date: { type: Date, default: null},   // 下架
+    deleted_date: { type: Date, default: null},   // 删除
+    updated_date: { type: Date, default: Date.now},
+
+    remark:     //备注，特殊活动用
+},{versionKey:false});
+
+
+=================================================================================
+images  //图片，暂时还是存在服务器本地的
+    userID: {   //上传者
+        type : mongoose.Schema.ObjectId,
+        ref : 'User',
+        required: true
+    },
+
+    filename: String,           //名字
+    thumbnails: String,         //缩略图名字
+
+    created_date: { type: Date, default: Date.now },
+});
+
+
+=================================================================================
+comments    //评论
+    content: String,
+    fromId: {   //发送人
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    toId: {     //接受人，可能为空
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User'
+    },
+    goodsId: {  商品id
+        type:  mongoose.Schema.ObjectId,
+        ref: 'Goods'
+    },  
+    secret: Boolean,    //是否私密留言，后续考虑去掉
+    read_date: {type: Date, default: null},     //已读时间
+    created_date: { type: Date, default: Date.now },
+
+
+=================================================================================
+
+accounts  账户
+    userID: {
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    balance: Number, //余额
+    bonus: Number, //积分，暂时没用
+    created_date: Date, 
+    updated_date: Date, 
+
+
+
+==================================================================================
+
+orders 订单
+
+    goodsId: {  //商品id
+        type : Schema.ObjectId,
+        ref : 'Goods',
+        required: true
+    },
+    buyer: {    //买家id
+        type : Schema.ObjectId,
+        ref : 'User',
+        required: true
+    },
+    seller: {   //卖家id
+        type : Schema.ObjectId,
+        ref : 'User',
+    },
+    // goods_pic: String,
+
+    goodsInfo: Schema.Types.Mixed,
+            //商品信息快照，
+            //包含 'gname', 'gprice', 'gcost', 'glocation', 'gsummary'， 'img'
+    sn: String, //流水号
+    price: Number,  //订单价格
+    priceGet: Number,   //实际收到支付回调的价格，可以暂时不管这个字段
+    order_status: {     //订单状态，-1未下单，0待支付，1已支付，（2已发货，暂时没用），3已收货，4已取消
+        type: Number,
+        default: -1   //INIT
+    },
+    pay_status: {       //支付状态，0初始，1成功，2失败，3超时，4金额异常
+        type: Number,
+        default: 0,     //INIT
+    },
+    refund_status:{     //退款状态，0初始，1申请中，2成功，3失败
+        type: Number,
+        default: 0,     //INIT
+    },
+    paid_at: Date,      //支付时间
+    refunded_at: Date,  //退款成功时间
+    created_date: { type: Date, default: Date.now},
+    updated_date: { type: Date, default: Date.now},
+    completed_date: Date,   //确认收货时间
+    finished_date: Date   //到账时间
+
+
+============================================================
+
+transactions    交易记录
+    accountId: {    //账户id
+        type : mongoose.Schema.ObjectId,
+        ref : 'Account',
+        required: true
+    },
+    type: Number,       //交易类型，0提现，1订单收入，2订单退款
+    amount: Number,     //金额
+    info: Schema.Types.Mixed,   //交易信息，一般是订单信息，可以暂时不管
+    desc: String,       //描述
+    orderId: {          //对应的订单id（如果有）
+        type : mongoose.Schema.ObjectId,
+        ref : 'Order'
+    },
+    status: {       //交易状态，0初始，1成功，2失败
+        type:Number,
+        default: 0
+    },
+    created_date: { type: Date, default: Date.now },
+    countdown_date: Date,       //针对订单收入类型，开始72倒计时的时间
+    finished_date: Date         //交易完成时间
+
+

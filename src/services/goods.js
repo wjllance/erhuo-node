@@ -10,6 +10,7 @@ let tools = require('./tools')
 const schools = require('../config').CONSTANT.SCHOOL;
 const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
+const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他"];
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
@@ -22,9 +23,9 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
     if (!_.isArray(goods)) {
-        return _.assign(goods.baseInfo(), await injectGoods(goods, user));
+        return _.assign(goods.cardInfo(), await injectGoods(goods, user));
     } else {
-        let ugoods = goods.map(x => x.baseInfo());
+        let ugoods = goods.map(x => x.cardInfo());
             // FIXME too slow
         for(let i = 0; i < goods.length; i ++) {
             _.assign(ugoods[i], await injectGoods(goods[i], user));
@@ -69,7 +70,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
     let condi = {goodsId:goods_id};
     console.log(userid);
     console.log(goods.userID);
-    if(userid != null && (goods.userID._id.toString() != userid.toString())){
+    if(userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)){
         condi.$or = [
             {fromId: userid},
             {toId: userid},
@@ -87,6 +88,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
     {
         _.assign(g, await injectGoods(g, userInfo));
     }
+    g.remark = goods.remark;
     return g;
 };
 
@@ -117,12 +119,11 @@ let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
     let userid = userInfo ? userInfo._id : null;
 
     let condi = {goodsId:goods_id};
-    if(userid !=null && goods.userID._id.toString() != userid.toString()){
+    if(userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)){
         condi.$or = [
             {fromId: userid},
             {toId: userid},
-            {secret: null},
-            {secret: false}
+            {secret: {$ne: true}}
         ]
     }
     console.log(condi);
@@ -161,12 +162,12 @@ let isGoodRemoved = exports.isGoodRemoved = function(good) {
     return good.removed_date && good.removed_date < Date.now();
 };
 
-exports.collectionList = async function(user_state, pageNo, pageSize)
+exports.collectionList = async function(user, pageNo, pageSize)
 {
 
-    let total = await Goods.find({_id: user_state.collections}).count();//用户总收藏数
+    let total = await Goods.find({_id: user.collections}).count();//用户总收藏数
 
-    let collections = await Goods.find({_id: user_state.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
+    let collections = await Goods.find({_id: user.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
     let ugoods = collections.map(x => x.baseInfo());
     let hasMore=total-pageNo*pageSize>0;
     return {
@@ -201,6 +202,32 @@ exports.goodsList = async (user, pageNo, pageSize)=>{
         .limit(pageSize)
         .skip((pageNo-1)*pageSize)
         .populate('gpics');
+    // console.log(goods);
+    let hasMore=total-pageNo*pageSize>0;
+    return {
+        goods: await outputify(goods, user),
+        hasMore: hasMore,
+        total: total
+    }
+}
+
+
+exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti)=>{
+
+    if(!condi){
+        condi = {}
+    }
+    if(!sorti){
+        sorti = {created_date:-1}
+    }
+    let total = await Goods.find(condi).count();//表总记录数
+
+    let goods = await Goods.find(condi)
+        .sort(sorti)
+        .limit(pageSize)
+        .skip((pageNo-1)*pageSize)
+        .populate('gpics')
+        .populate('userID');
     // console.log(goods);
     let hasMore=total-pageNo*pageSize>0;
     return {

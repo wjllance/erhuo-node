@@ -12,7 +12,7 @@ moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
 let { User, Order, Goods, Transaction } = require('../models');
-
+let srv_wxtemplate = require('./wechat_template');
 let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
 let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
 let REFUND_STATUS = exports.REFUND_STATUS = require('../config').CONSTANT.REFUND_STATUS;
@@ -28,6 +28,10 @@ let generateSerialNumber = () => {
     return datetime + rand + No + ts;
 };
 
+exports.updateSN = async (order) => {
+    order.sn = generateSerialNumber();
+    return await order.save();
+};
 
 //goods:CardInfo
 exports.findOrCreateV2 = async function(goods, user) {
@@ -57,7 +61,7 @@ exports.findOrCreateV2 = async function(goods, user) {
         seller: goods.userID,
         buyer: user._id,
         price: goods.gprice,
-        order_status: ORDER_STATUS.INIT
+        order_status: ORDER_STATUS.TOPAY
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
@@ -74,25 +78,26 @@ exports.findOrCreateV2 = async function(goods, user) {
 exports.findOrCreateV3 = async function(goods, user) {
 
 
-    let order = await Order.findOne({
+    let order = await Order.findOne({  //检查自己的之前订单
         goodsId: goods._id,
         buyer: user._id,
         order_status : {$ne: ORDER_STATUS.CANCEL}
     });
     if(order) return order;
 
-    let orders = await Order.find({ //检查交易中的订单
-        goodsId: goods._id,
-        refund_status: REFUND_STATUS.INIT,
-        order_status: {
-            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
-        }
-    });
-    console.log(orders);
-    auth.assert(orders.length == 0, "商品交易中，不可下单")
+    if(!goods.remark){
+        let orders = await Order.find({ //检查交易中的订单
+            goodsId: goods._id,
+            refund_status: REFUND_STATUS.INIT,
+            order_status: {
+                $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+            }
+        });
+        console.log(orders);
+        auth.assert(orders.length == 0, "商品交易中，不可下单")
+    }
 
 
-    console.log(orders);
     order = new Order({
         goodsId: goods._id,
         seller: goods.userID,
@@ -158,19 +163,21 @@ exports.preparePay = async function (order) {
 }
 
 exports.preparePayV2 = async function (order) {
-    if(order.order_status == ORDER_STATUS.INIT){
+    if(order.order_status === ORDER_STATUS.INIT){
         order.order_status = ORDER_STATUS.TOPAY;
-        // order.sn = generateSerialNumber();
-
+        if(!order.sn){
+            order.sn = generateSerialNumber();
+        }
+        await order.save();
     }
-    auth.assert(order.order_status == ORDER_STATUS.TOPAY, "不可支付");
+    auth.assert(order.order_status === ORDER_STATUS.TOPAY, "不可支付");
 
-    order.sn = generateSerialNumber();
+    // order.sn = generateSerialNumber();
     //TO BE REMOVE in a few time later
 
     let buyer = await User.findById(order.buyer);
-    await order.save();
-    let price = (config.ENV == 'local') ? 1 : order.price*100;
+    // let price = (config.ENV == 'local') ? 1 : order.price*100;
+    let price = order.price*100;
     let ret = {
         out_trade_no: order.sn,
         body: order.goodsInfo.gname,
@@ -193,9 +200,32 @@ let getOrderList = exports.getOrderList = async (condi, pageNo, pageSize) => {
 }
 
 
+let getOrderListV2 = exports.getOrderListV2 = async (condi, pageNo, pageSize) => {
+    let total = await  Order.find(condi).count();
+
+    let orders = await Order.find(condi)
+    // .sort({order_status:1,created_date:-1})
+        .sort({created_date:-1})
+        .limit(pageSize)
+        .skip((pageNo-1)*pageSize)
+        .populate('buyer')
+        .populate('seller');
+    orders = _.map(orders, o => o.cardInfo());
+
+    let hasMore=total-pageNo*pageSize>0;
+
+    return {
+        items: orders,
+        hasMore: hasMore,
+        total: total
+    };
+}
+
+
 exports.checkPay = async (out_trade_no, result_code, fee)=>{
     let order = await Order.findOne({sn:out_trade_no});
     auth.assert(order, "订单不存在");
+    auth.assert(order.pay_status == config.CONSTANT.PAY_STATUS.INIT, "已确认");
     if(result_code == "FAIL"){
         order.pay_status = PAY_STATUS.FAILED;
         await order.save();
@@ -222,27 +252,28 @@ exports.getDetailById = async (id) => {
     let order = await Order.findById(id)
         .populate('buyer')
         .populate('seller');
-
+    auth.assert(order, "订单不存在");
     let detail = order.detailInfo();
     return detail;
 }
 
 
-exports.tradingStatus = async (gid) => {
-    let orders = await Order.find({
-        goodsId: gid,
-        refund_status: REFUND_STATUS.INIT,
-        order_status: {
-            $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+exports.tradingStatus = async (goods) => {
+    let gid = goods._id;
+    if(!goods.remark){
+        let orders = await Order.find({
+            goodsId: gid,
+            refund_status: REFUND_STATUS.INIT,
+            order_status: {
+                $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
+            }
+        });
+        console.log("orders", orders);
+        if(orders.length > 0){
+            return "已被抢";
         }
-    });
-    console.log("orders");
-    console.log(orders);
-    if(orders.length > 0){
-        return "已被抢";
-    }else{
-        return "我想要";
     }
+    return "我想要";
 }
 
 exports.cancel = async (order)=>{
@@ -267,13 +298,15 @@ exports.confirm = async (order) => {
 exports.complete = async (order) => {
     // auth.assert(order.order_status == ORDER_STATUS.CONFIRM, "不可确认收货");
 
-    // auth.assert(order.order_status == ORDER_STATUS.CONFIRM || order.order_status == ORDER_STATUS.PAID, "不可确认收货");
+    auth.assert(order.order_status == ORDER_STATUS.CONFIRM || order.order_status == ORDER_STATUS.PAID, "不可确认收货");
     order.order_status = ORDER_STATUS.COMPLETE;
     order.completed_date = moment();
     await order.save();
-    let goods = Goods.findById(order.goodsId);
-    await goods.remove();
-    //TODO NOTIFY
+    let goods = await Goods.findById(order.goodsId);
+    if(!goods.remark){
+        await goods.myRemove();
+        console.log("removed", goods);
+    }
 }
 
 exports.autorefund = async (order) => {
@@ -284,7 +317,7 @@ exports.autorefund = async (order) => {
 };
 
 exports.refund_apply = async(order) =>{
-    auth.assert(order.refund_status == REFUND_STATUS.INIT && order.pay_status == PAY_STATUS.SUCCEED, "不可申请退款");
+    auth.assert(order.refund_status === REFUND_STATUS.INIT && order.pay_status === PAY_STATUS.SUCCEED, "不可申请退款");
     auth.assert(!order.finished_date, "订单已结束，申请退款请私下联系或联系客服");
     order.refund_status = REFUND_STATUS.APPLYING;
     await order.save();
@@ -292,7 +325,7 @@ exports.refund_apply = async(order) =>{
 };
 
 exports.refund_confirm = async(order) =>{
-    auth.assert(order.refund_status == REFUND_STATUS.APPLYING, "不可确认退款");
+    auth.assert(order.refund_status === REFUND_STATUS.APPLYING, "不可确认退款");
     order.refund_status = REFUND_STATUS.SUCCEED;
     await order.save();
     //TODO SEND NOTIFY
@@ -301,7 +334,10 @@ exports.refund_confirm = async(order) =>{
 exports.finish = async(orderId) => {
     let order = await Order.findById(orderId);
     auth.assert(order, "订单不存在");
-    auth.assert(order.refund_status == REFUND_STATUS.INIT && order.order_status == ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
+    auth.assert(order.refund_status === REFUND_STATUS.INIT && order.order_status === ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
     order.finished_date = moment();
     await order.save();
+
+    //NOTIFY
+    await srv_wxtemplate.moneyArrive(order);
 }

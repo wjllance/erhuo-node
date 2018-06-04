@@ -15,7 +15,8 @@ let { User  } = require('../models');
 let { Order } = require('../models');
 let { Transaction } = require('../models');
 let { Account } = require('../models');
-let TRANSACTION_TYPE = config.CONSTANT.TRANSACTION_TYPE;
+let TRANSACTION_TYPE = exports.TRANSACTION_TYPE = config.CONSTANT.TRANSACTION_TYPE;
+let TRANSACTION_STATUS = exports.TRANSACTION_STATUS = config.CONSTANT.TRANSACTION_STATUS;
 
 //TODO: 通知！！！
 exports.incomeByOrder = async (order) => {
@@ -30,10 +31,10 @@ exports.incomeByOrder = async (order) => {
         // }
     });
     // transaction.markModified('info');
-
+    let ret = await transaction.save();
     account.balance = account.balance + order.price;
     await account.save();
-    return await transaction.save();
+    return ret;
 };
 
 exports.withdraw = async (user, amount) =>{
@@ -120,19 +121,30 @@ exports.createRefund = async(order)=>{
 
 
 exports.refundConfirm = async(order)=>{
-    let transaction = await Transaction.findOne({
+    let r_transaction = await Transaction.findOne({
         orderId:order._id,
         type: TRANSACTION_TYPE.REFUND
     });
-    auth.assert(transaction && !transaction.finished_date, "交易不存在或已结束");
-    transaction.finished_date = moment();
-    let ret = await transaction.save();
+    auth.assert(r_transaction && !r_transaction.finished_date, "交易不存在或已结束");
+    r_transaction.finished_date = moment();
+    let ret = await r_transaction.save();
 
-    let account = await Account.findById(transaction.accountId);
-    account.balance = account.balance + transaction.amount;
+
+    //原始订单的交易信息置为失败
+    let transaction = await Transaction.findOne({
+        orderId:order._id,
+        type: TRANSACTION_TYPE.INCOME
+    });
+    transaction.status = TRANSACTION_STATUS.FAILED;
+    transaction.finished_date = moment();
+    await transaction.save();
+
+
+    let account = await Account.findById(r_transaction.accountId);
+    account.balance = account.balance + r_transaction.amount;
     await account.save();
 
-    console.log("countdown end...已入账", moment(), transaction);
+    console.log("已入账...", moment(), account);
     return ret;
     // transaction.markModified('info');
 
