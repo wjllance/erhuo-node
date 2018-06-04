@@ -60,6 +60,7 @@ let userSchema = new mongoose.Schema({
 userSchema.methods.baseInfo = function(){
 	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", 'phoneNumber']);
 	output.location = school_map[this.location];
+    output.stu_verified = this.stu_verified ? "已认证" : "未认证";
 	return output;
 };
 

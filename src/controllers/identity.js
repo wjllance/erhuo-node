@@ -16,16 +16,16 @@ const router = module.exports = new Router();
 
 
 /**
- * @api {get} /identity/save  商品列表
+ * @api {get} 	/identity/save  上传认证资料
  * @apiName     GoodsList
  * @apiGroup    Goods
  *
  *
- * @apiParam    {Number}    cardpics      	学生证
- * @apiParam    {Number}    withcardpics    手持身份证
- * @apiParam    {Number}    name    		姓名
- * @apiParam    {Number}    studentID       学号
- * @apiParam    {Number}    school    		学校
+ * @apiParam    {String}    cardpics      	学生证图片id
+ * @apiParam    {String}    withcardpics    手持身份证图片id
+ * @apiParam    {String}    name    		姓名
+ * @apiParam    {String}    studentID       学号
+ * @apiParam    {String}    school    		学校
  *
  * @apiSuccess  {Number}    success     1success
  * @apiSuccess  {Object}    data        分页商品列表
