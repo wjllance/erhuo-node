@@ -45,6 +45,7 @@ exports.CONSTANT = {
         ALL:0,
         PKU:2,
         THU:3,
+        BNU: 4,
         OTHER: 1,
     },
     ORDER_STATUS:{
@@ -78,7 +79,7 @@ exports.CONSTANT = {
         SUCCEED: 1,
         FAILED: 2
     },
-    SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学"],
+    SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学", "北京师范大学"],
     ERR_CODE: {
         ERROR: 978,
         MSG_FAIL: 985
