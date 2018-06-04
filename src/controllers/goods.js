@@ -134,7 +134,23 @@ router.get('/v2/goods/index', async (ctx, next) => {
 });
 
 
-
+/**
+ * @api {get} /goods/search  商品列表
+ * @apiName     GoodsList
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ * @apiParam    {String}    keyword     关键词
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页商品列表
+ * @apiSuccess  {Array}     data.goods  商品列表
+ * @apiSuccess  {Boolean}     data.hasMore  还有更多
+ * @apiSuccess  {Number}     data.total  总数
+ *
+ */
 router.get('/goods/search', async (ctx, next) => {
     // await auth.loginRequired(ctx, next)
     let pageNo = ctx.query.pageNo || 1;
