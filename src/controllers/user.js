@@ -163,6 +163,34 @@ router.get('/user/mypublish', auth.loginRequired, async (ctx, next) => {
     }
 });
 
+/**
+ * @api {get}   /user/:user_id/publish_list   发布列表
+ * @apiName     UserPublish
+ * @apGroup     User
+ *
+ *
+ */
+router.get('/user/:user_id/publish_list/', auth.loginRequired, async (ctx, next) => {
+
+
+    let condi = {
+        userID: ctx.params.user_id,
+        deleted_date: null,
+        removed_date: null
+    };  //未删除筛选
+
+    console.log(condi);
+
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+    let goods = await srv_goods.goodsListV2(ctx.state.user, pageNo, pageSize, condi);
+    ctx.body = {
+        success: 1,
+        data: goods
+    }
+});
+
+
 router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
     let isRemoved = parseInt(ctx.query.isRemoved) || 0;  //默认未下架
     let condi = {
@@ -302,4 +330,6 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
         data: goods
     };
 });
+
+
 

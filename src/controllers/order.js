@@ -45,6 +45,22 @@ router.get('/order/buy/', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+router.get('/v2/order/buy/', auth.loginRequired, async (ctx, next) => {
+
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+    let condi = {
+        buyer: ctx.state.user._id,
+        order_status: {$ne: srv_order.ORDER_STATUS.INIT}
+    };
+    let orderList = await srv_order.getOrderListV2(condi, pageNo, pageSize);
+
+    ctx.body = {
+        success: 1,
+        data: orderList
+    };
+});
+
 
 /**
  * @api {get} /order/sell/  我卖出的
@@ -74,6 +90,28 @@ router.get('/order/sell/', auth.loginRequired, async (ctx, next) => {
     ctx.body = {
         success: 1,
         data: orders
+    };
+});
+
+router.get('/v2/order/sell/', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+    let condi = {
+        seller: ctx.state.user._id,
+        order_status: {
+            $in: [
+                srv_order.ORDER_STATUS.PAID,
+                srv_order.ORDER_STATUS.COMPLETE,
+                srv_order.ORDER_STATUS.CONFIRM,
+            ]
+        }
+    };
+    console.log(condi);
+    let orderList = await srv_order.getOrderListV2(condi, pageNo, pageSize);
+
+    ctx.body = {
+        success: 1,
+        data: orderList
     };
 });
 

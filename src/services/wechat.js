@@ -58,18 +58,11 @@ let updateAccessToken = async function (access_token) {
     console.log(text);
 
     let res = JSON.parse(text);
-    if(res.errcode){
 
-        console.log(res);
-        logger.error(res)
-        let err = new Error(res.errmsg);
-        err.status = ERR_CODE;
-        throw err;
-    }else{
-        access_token.token = res.access_token;
-        access_token.expire_date = Date.now()+res.expires_in*1000 / 4;
-        return await access_token.save();
-    }
+    auth.assert(!res.errcode, res.errmsg);
+    access_token.token = res.access_token;
+    access_token.expire_date = Date.now()+res.expires_in*1000 / 4;
+    return await access_token.save();
 }
 
 let get_access_token = exports.get_access_token = async function(type)
@@ -176,19 +169,12 @@ let update_service_account_userid = exports.update_service_account_userid = asyn
     })
     let res = JSON.parse(text)
 
-    if(res.errcode){
-        console.log(res)
-        logger.error(res)
-        let err = new Error(res.errmsg);
-        err.status = ERR_CODE;
-        throw err;
-    }else{
-        let newly_inserted = await update_services_openids(res.data.openid)
-        return {
-            new: newly_inserted,
-            next_openid: res.data.next_openid
-        };
-    }
+    auth.assert(!res.errcode, res.errmsg);
+    let newly_inserted = await update_services_openids(res.data.openid)
+    return {
+        new: newly_inserted,
+        next_openid: res.data.next_openid
+    };
 }
 
 let doit = async function(user_batch){
@@ -261,30 +247,22 @@ let update_userInfo_by_openId = exports.update_userInfo_by_openId = async functi
         lang:'zh_CN'
     });
     let res = JSON.parse(text);
-    if(res.errcode){
-        logger.error(res);
-        console.log(res);
-
-        let err = new Error(res.errmsg);
-        err.status = ERR_CODE;
-        throw err;
-    }else{
-        let userInfo=
-        {
-            sa_openid: res.openid,
-            nickName: res.nickname,
-            gender: res.sex,
-            avatarUrl:res.headimgurl,
-            city:res.city,
-            province:res.province,
-            country: res.country,
-            language: res.language,
-            unionid: res.unionid
-        };
-        console.log(userInfo);
-        let unionid = userInfo.unionid;
-        await User.findOneAndUpdate({unionid: unionid}, userInfo, {new: true, upsert: true});
-    }
+    auth.assert(!res.errcode, res.errmsg)
+    let userInfo=
+    {
+        sa_openid: res.openid,
+        nickName: res.nickname,
+        gender: res.sex,
+        avatarUrl:res.headimgurl,
+        city:res.city,
+        province:res.province,
+        country: res.country,
+        language: res.language,
+        unionid: res.unionid
+    };
+    console.log(userInfo);
+    let unionid = userInfo.unionid;
+    await User.findOneAndUpdate({unionid: unionid}, userInfo, {new: true, upsert: true});
 };
 
 exports.dealText = function(responseMSg, fromUserName, toUserName){
