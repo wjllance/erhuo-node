@@ -22,7 +22,6 @@ let userSchema = new mongoose.Schema({
 		type: Number,
 		default: 0
     },
-	// stu_verified: Boolean,
 
 	// 以下是从微信获取到的用户数据
 	nickName: String,
@@ -48,7 +47,12 @@ let userSchema = new mongoose.Schema({
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },
 
-	phoneNumber: String
+	phoneNumber: String,
+
+
+	stu_verified: Date,
+	realname: String,
+	school: String
 }
 , {versionKey:false}
 );

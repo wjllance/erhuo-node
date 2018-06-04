@@ -13,7 +13,28 @@ let { User, Image, Identity} = require('../models');
 
 const router = module.exports = new Router();
 
-router.post('/Identity/save', auth.loginRequired,async (ctx, next) => {
+
+
+/**
+ * @api {get} /identity/save  商品列表
+ * @apiName     GoodsList
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {Number}    cardpics      	学生证
+ * @apiParam    {Number}    withcardpics    手持身份证
+ * @apiParam    {Number}    name    		姓名
+ * @apiParam    {Number}    studentID       学号
+ * @apiParam    {Number}    school    		学校
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页商品列表
+ * @apiSuccess  {Array}     data.goods  商品列表
+ * @apiSuccess  {Boolean}   data.hasMore  还有更多
+ * @apiSuccess  {Number}    data.total  总数
+ *
+ */
+router.post('/identity/save', auth.loginRequired,async (ctx, next) => {
 		let identity= new Identity();
 		identity.userID=ctx.state.user._id;
 		let cardimage= await Image.findById(ctx.request.body.cardpics);
