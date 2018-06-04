@@ -133,6 +133,45 @@ router.get('/v2/goods/index', async (ctx, next) => {
     }
 });
 
+
+
+router.get('/goods/search', async (ctx, next) => {
+    // await auth.loginRequired(ctx, next)
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+
+    let keyword = ctx.query.keyword;
+    let reg = new RegExp(keyword, 'i')
+    let condi = {
+        $or:[
+            {gname: reg},
+            {gsummary: reg}
+        ]
+    };
+    let sorti = {
+        gpriority:-1,
+        // removed_date:1,
+        glocation: -1,
+        updated_date:-1
+    };
+    let user = ctx.state.user;
+    if(user){ //not other
+        condi.$or=[{
+            glocation:user.location
+        },{
+            glocation:0
+        }]
+    }
+
+    console.log(condi, sorti);
+    let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
+    ctx.body = {
+        success: 1,
+        data: data
+    }
+});
+
+
 // 发布
 /**
  * @api {post} /goods/publish  发布商品
