@@ -16,7 +16,7 @@ const router = module.exports = new Router();
 
 
 /**
- * @api {get} 	/identity/save  上传认证资料
+ * @api {post} 	/identity/save  上传认证资料
  * @apiName     GoodsList
  * @apiGroup    Goods
  *
