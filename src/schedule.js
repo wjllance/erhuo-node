@@ -70,22 +70,22 @@ exports.register = function () {
 
 
 
-        console.log('checking goods passed...');
-        let ddl = moment({hour:20});
-        if(moment().isBefore(ddl)){
-            ddl = ddl.subtract(1,'d');
-        }
-        let condi = {
-            status:config.CONSTANT.GOODS_STATUS.PASS,
-            created_date: {$lt: ddl}
-        };
-        let goods = await Goods.find(condi);
-        if(goods.length > 0){
-            console.log("updating...count:",goods.length);
-            await Goods.updateMany(condi,{
-                status: config.CONSTANT.GOODS_STATUS.RELEASED
-            })
-        }
+        // console.log('checking goods passed...');
+        // let ddl = moment({hour:20});
+        // if(moment().isBefore(ddl)){
+        //     ddl = ddl.subtract(1,'d');
+        // }
+        // let condi = {
+        //     status:config.CONSTANT.GOODS_STATUS.PASS,
+        //     created_date: {$lt: ddl}
+        // };
+        // let goods = await Goods.find(condi);
+        // if(goods.length > 0){
+        //     console.log("updating...count:",goods.length);
+        //     await Goods.updateMany(condi,{
+        //         status: config.CONSTANT.GOODS_STATUS.RELEASED
+        //     })
+        // }
 
     });
 
