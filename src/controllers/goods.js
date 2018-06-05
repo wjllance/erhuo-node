@@ -135,7 +135,7 @@ router.get('/v2/goods/index', async (ctx, next) => {
     }
 });
 
-
+//加入审核状态
 router.get('/v3/goods/index', async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
@@ -205,8 +205,8 @@ router.get('/v3/goods/index', async (ctx, next) => {
 
 
 /**
- * @api {get} /goods/search  商品列表
- * @apiName     GoodsList
+ * @api {get} /goods/search  商品搜索
+ * @apiName     GoodsSearch
  * @apiGroup    Goods
  *
  *
@@ -222,18 +222,22 @@ router.get('/v3/goods/index', async (ctx, next) => {
  *
  */
 router.get('/goods/search', async (ctx, next) => {
-    // await auth.loginRequired(ctx, next)
+    await auth.loginRequired(ctx, next);
+
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
 
     let keyword = ctx.query.keyword;
-    let reg = new RegExp(keyword, 'i')
-    let condi = {
+    let reg = new RegExp(keyword, 'i');
+
+    let condi = {$and:[]}; //审核
+    condi.$and.push({
         $or:[
             {gname: reg},
             {gsummary: reg}
         ]
-    };
+    });
+
     let sorti = {
         gpriority:-1,
         // removed_date:1,
@@ -242,14 +246,14 @@ router.get('/goods/search', async (ctx, next) => {
     };
     let user = ctx.state.user;
     if(user){ //not other
-        condi.$or=[{
-            glocation:user.location
-        },{
-            glocation:0
-        }]
+        condi.$and.push({
+            $or:[
+                {glocation:user.location},
+                {glocation:0}
+            ]
+        });
     }
-
-    console.log(condi, sorti);
+    console.log(JSON.stringify(condi.$and), sorti);
     let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
     ctx.body = {
         success: 1,
