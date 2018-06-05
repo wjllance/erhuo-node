@@ -33,13 +33,7 @@ exports.register = function () {
                 await srv_transaction.finish(transactions[i]);
             }
         });
-
-
-
-
-
     }else{
-
         schedule.scheduleJob('0 */10 * * * *', async function(){
             console.log('checking normal order countdown...');
             let transactions = await Transaction.find({
@@ -94,7 +88,6 @@ exports.register = function () {
         }
 
     });
-
 
 };
 
