@@ -1,7 +1,7 @@
 const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
-const {Transaction, Order} = require('./models');
+const {Transaction, Order, Goods} = require('./models');
 const srv_transaction = require('./services/transaction')
 const srv_order = require('./services/order')
 
@@ -66,6 +66,27 @@ exports.register = function () {
         for(let i = 0; i< orders.length; i++){
             await srv_order.cancel(orders[i]);
         }
+
+
+
+
+        console.log('checking goods passed...');
+        let ddl = moment({hour:20});
+        if(moment().isBefore(ddl)){
+            ddl = ddl.subtract(1,'d');
+        }
+        let condi = {
+            status:config.CONSTANT.GOODS_STATUS.PASS,
+            created_date: {$lt: ddl}
+        };
+        let goods = await Goods.find(condi);
+        if(goods.length > 0){
+            console.log("updating...count:",goods.length);
+            await Goods.updateMany(condi,{
+                status: config.CONSTANT.GOODS_STATUS.RELEASED
+            })
+        }
+
     });
 
 };
