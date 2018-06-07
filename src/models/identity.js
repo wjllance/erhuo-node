@@ -12,14 +12,14 @@ let identitySchema=new Schema({
     name:String,
     studentID:String,
     school:String,
-    cardpics:[{
+    cardpics:{
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
-	}],
-    withcardpics:[{
+	},
+    withcardpics:{
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
-	}],
+	},
     status:{ type: Number, default: 0},
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now},
