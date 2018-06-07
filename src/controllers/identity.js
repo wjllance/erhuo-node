@@ -52,3 +52,12 @@ router.post('/identity/save', auth.loginRequired,async (ctx, next) => {
 			data:identity._id
 		}
 });
+
+router.get('/identity/info', auth.loginRequired,async (ctx, next) => {
+    let identity= await Identity.findOne({userID:ctx.state.user._id}).sort({created_date:-1});
+    auth.assert(identity, "没有审核资料");
+    ctx.body={
+        success:1,
+        data:identity
+    }
+});
