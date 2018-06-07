@@ -43,8 +43,8 @@ router.post('/identity/save', auth.loginRequired,async (ctx, next) => {
 		auth.assert(withcardimage, "withcardimage image not found");
 
 		_.assign(identity, _.pick(ctx.request.body, ['name','studentID','school']));
-		identity.cardpics = cardimage._id;
-		identity.withcardpics=withcardimage._id;
+		identity.cardpics = ctx.request.body.cardpics;
+		identity.withcardpics= ctx.request.body.withcardpics;
 
 		await identity.save();
 		ctx.body={
