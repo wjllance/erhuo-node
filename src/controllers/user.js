@@ -14,7 +14,8 @@ let srv_comment = require('../services/comment');
 let srv_user = require('../services/user');
 let { User } = require('../models');
 let { Goods } = require('../models');
-const schools = config.CONSTANT.SCHOOL;
+// const schools = config.CONSTANT.SCHOOL;
+const school_map = config.CONSTANT.SCHOOL_MAP;
 let moment = require('moment');
 const router = module.exports = new Router();
 
@@ -103,7 +104,9 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
 
     let userInfo = ctx.request.body.userInfo;
     if(userInfo.location){
-        userInfo.location = tools.locationTransform(userInfo.location);
+        let locationIndex = school_map.indexOf(userInfo.location);
+        userInfo.location =  locationIndex > 0 ? locationIndex : 0;
+        // userInfo.location = tools.locationTransform(userInfo.location);
     }
     _.assign(ctx.state.user, _.pick(userInfo, ['nickName', 'avatarUrl', 'gender', 'location']));
     console.log(ctx.state.user);

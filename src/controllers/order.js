@@ -16,8 +16,6 @@ let srv_transaction = require('../services/transaction');
 let { User, Image, Goods, Order } = require('../models');
 
 const router = module.exports = new Router();
-const schools = config.CONSTANT.SCHOOL
-const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 
 /**

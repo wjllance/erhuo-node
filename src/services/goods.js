@@ -7,7 +7,6 @@ let { Goods } = require('../models');
 
 let auth = require('../services/auth');
 let tools = require('./tools')
-const schools = require('../config').CONSTANT.SCHOOL;
 const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他"];

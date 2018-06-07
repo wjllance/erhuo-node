@@ -43,10 +43,10 @@ exports.LEAN_MASTERKEY = config['LEAN_MASTERKEY'];
 exports.CONSTANT = {
     SCHOOL:{
         ALL:0,
+        OTHER: 1,
         PKU:2,
         THU:3,
-        BNU: 4,
-        OTHER: 1,
+        BNU:4,
     },
     ORDER_STATUS:{
         TOPAY: 0,
@@ -79,7 +79,27 @@ exports.CONSTANT = {
         SUCCEED: 1,
         FAILED: 2
     },
-    SCHOOL_MAP:["全部", "其他院校","北京大学","清华大学", "北京师范大学"],
+    SCHOOL_MAP:[
+        "全部",   //0
+        "其他院校",
+        "北京大学",
+        "清华大学",
+        "北京师范大学",   //4
+        "中国人民大学",
+        "北京林业大学",
+        "中国农业大学",
+        "北京交通大学",
+        "中央民族大学",
+        "首都师范大学",
+        "北京工商大学",
+        "中国矿业大学",
+        "中国地质大学",
+        "北京语言大学",
+        "北京邮电大学",
+        "北京科技大学",
+        "北京化工大学"
+
+    ],
     ERR_CODE: {
         ERROR: 978,
         MSG_FAIL: 985

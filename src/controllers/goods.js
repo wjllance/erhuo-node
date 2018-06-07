@@ -15,7 +15,6 @@ let srv_order = require('../services/order');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
-const schools = config.CONSTANT.SCHOOL;
 const GOODS_STATUS = config.CONSTANT.GOODS_STATUS;
 
 // 首页, 参数为pageNo(默认为1), pageSize(默认为6)
@@ -322,7 +321,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category', 'remark']));
 
     if(!goods.glocation){
-        goods.glocation = ctx.state.user.location || schools.ALL;
+        goods.glocation = ctx.state.user.location || 0;
     }
     await goods.save();
 
