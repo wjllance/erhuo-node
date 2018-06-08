@@ -200,6 +200,23 @@ router.get('/user/:user_id/publish_list/', auth.loginRequired, async (ctx, next)
 });
 
 
+router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
+    let isRemoved = parseInt(ctx.query.isRemoved) || 0;  //默认未下架
+    let condi = {
+        userID: ctx.state.user._id,
+        deleted_date: null
+    };  //未删除筛选
+    condi.removed_date = null;
+    if(isRemoved){
+        condi.removed_date = {$ne: null};
+    }
+    console.log(condi);
+    let goods = await Goods.find(condi).populate('gpics');
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.outputify(goods)
+    }
+});
 
 
 
