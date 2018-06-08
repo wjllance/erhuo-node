@@ -142,7 +142,12 @@ router.get('/v3/goods/index', async (ctx, next) => {
     let cate = ctx.query.category;
     let condi = {
         deleted_date:null,
-        status: GOODS_STATUS.RELEASED,
+        status: {
+            $in: [
+                GOODS_STATUS.RELEASED,
+                GOODS_STATUS.UNDERCARRIAGE
+            ]
+        }
     };
     let sorti = {};
     if(!cate)

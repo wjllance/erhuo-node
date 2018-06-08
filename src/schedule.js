@@ -7,14 +7,6 @@ const srv_order = require('./services/order')
 
 let config = require('./config');
 
-function scheduleCronstyle(){
-    schedule.scheduleJob('30 * * * * *', function(){
-        console.log('scheduleCronstyle:' + new Date());
-    });
-}
-
-// scheduleCronstyle();
-
 exports.register = function () {
     console.log("register!");
 
