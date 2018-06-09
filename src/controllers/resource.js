@@ -1,7 +1,7 @@
 
 require('should');
 let Router = require('koa-router');
-
+let fs = require('fs');
 let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
@@ -12,6 +12,15 @@ let auth = require('../services/auth');
 let { User, Image } = require('../models');
 const sharp = require('sharp');
 const router = module.exports = new Router();
+let moment = require('moment');
+moment.locale('zh-cn');
+
+const AV = require('leancloud-storage');
+AV.init({
+    appId: config.LEAN_APPID,
+    appKey: config.LEAN_APPKEY,
+    masterKey: config.LEAN_MASTERKEY
+});
 
 // 上传图片
 router.post('/images/upload', auth.loginRequired, body, async (ctx, next) => {
@@ -61,5 +70,23 @@ router.post('/images/uploadByAdmin/:openid', body, async (ctx, next) => {
     ctx.body = {
         success: 1,
         data: image._id.toString()
+    };
+});
+
+
+router.post('/v2/images/upload', auth.loginRequired, body, async (ctx, next) => {
+
+    let image_file = ctx.request.fields.image ? ctx.request.fields.image[0] : null;
+    auth.assert(image_file, '没有图片文件');
+    console.log(image_file);
+
+    let img = fs.readFileSync(image_file.path);
+    let file = new AV.File(image_file.name, img);
+    // let file = new AV.File.withURL(image_file.name, "https://two.jicunbao.com/images/5acb72b8af80de2edf632d16.jpg");
+    let res = await file.save();
+    console.log(res);
+    ctx.body = {
+        success: 1,
+        data: res.url()
     };
 });
