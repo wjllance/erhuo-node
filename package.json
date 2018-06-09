@@ -30,6 +30,7 @@
     "koa-session": "^5.8.1",
     "koa-static": "^4.0.2",
     "koa-xml-body": "^2.0.0",
+    "leancloud-storage": "^2.5.4",
     "lodash": "^4.17.5",
     "log": "^1.4.0",
     "log4js": "^2.5.3",
