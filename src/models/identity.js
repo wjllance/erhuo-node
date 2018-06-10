@@ -16,10 +16,13 @@ let identitySchema=new Schema({
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
 	},
+    ncard: String,
     withcardpics:{
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
 	},
+    nwithcard: String,
+
     status:{ type: Number, default: 0},
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now},

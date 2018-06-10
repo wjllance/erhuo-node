@@ -92,7 +92,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
 };
 
 
-// 获取商品详情
+// 获取商品详情 deprecated
 let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
 
     let goods = await Goods
@@ -167,7 +167,7 @@ exports.collectionList = async function(user, pageNo, pageSize)
     let total = await Goods.find({_id: user.collections}).count();//用户总收藏数
 
     let collections = await Goods.find({_id: user.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
-    let ugoods = collections.map(x => x.baseInfo());
+    let ugoods = collections.map(x => x.baseInfoV2());
     let hasMore=total-pageNo*pageSize>0;
     return {
         collections: ugoods,

@@ -78,15 +78,33 @@ router.post('/v2/images/upload', auth.loginRequired, body, async (ctx, next) => 
 
     let image_file = ctx.request.fields.image ? ctx.request.fields.image[0] : null;
     auth.assert(image_file, '没有图片文件');
-    console.log(image_file);
 
     let img = fs.readFileSync(image_file.path);
     let file = new AV.File(image_file.name, img);
-    // let file = new AV.File.withURL(image_file.name, "https://two.jicunbao.com/images/5acb72b8af80de2edf632d16.jpg");
     let res = await file.save();
     console.log(res);
     ctx.body = {
         success: 1,
         data: res.url()
     };
+});
+
+
+router.post('/v2/images/uploadByAdmin/:openid', body, async (ctx, next) => {
+    let image_file = ctx.request.fields.image ? ctx.request.fields.image[0] : null;
+    auth.assert(image_file, '没有图片文件');
+    let user = await User.findOne({openid: ctx.params.openid});
+    console.log(user);
+    auth.assert(user && user.isAdmin, "不是管理员");
+
+
+    let img = fs.readFileSync(image_file.path);
+    let file = new AV.File(image_file.name, img);
+    let res = await file.save();
+    console.log(res);
+    ctx.body = {
+        success: 1,
+        data: res.url()
+    };
+
 });

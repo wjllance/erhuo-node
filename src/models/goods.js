@@ -21,6 +21,7 @@ let goodsSchema = new mongoose.Schema({
 		type : mongoose.Schema.ObjectId,
 		ref : 'Image'
 	}],
+    npics: [String],
 	category: {
 		type:String,
 		index: true,
@@ -48,12 +49,27 @@ let goodsSchema = new mongoose.Schema({
 
 goodsSchema.methods.baseInfoV2 = function(fullPic) {
 	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
-	if(fullPic){
-        g.gpics = this.gpics.map(y => y.urlV2());
-	}else{
-        g.gpics = [];
-        g.gpics[0] = this.gpics[0].thumb();
+	if(this.npics){
+	    if(fullPic){
+            g.gpics = this.npics.map(x=>{
+                return {
+                    url: x,
+                    thumb: x+"?imageMogr2/thumbnail/200x",
+                }
+            });
+        }else{
+            g.gpics = [];
+            g.gpics[0] = this.npics[0]+"?imageMogr2/thumbnail/200x";
+        }
+    }else if(this.gpics){
+        if(fullPic){
+            g.gpics = this.gpics.map(y => y.urlV2());
+        }else{
+            g.gpics = [];
+            g.gpics[0] = this.gpics[0].thumb();
+        }
     }
+
     // g.state = this.removed_date ? "已下架" : "在售";
     g.created_date = tools.dateStr(this.created_date);
     g.glocation = school_map[this.glocation] ;
@@ -62,6 +78,7 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
 	return g;
 };
 
+//deprecated
 goodsSchema.methods.baseInfo = function(fullPic) {
     let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
     if(fullPic){
@@ -69,6 +86,7 @@ goodsSchema.methods.baseInfo = function(fullPic) {
     }else{
         g.gpics = [];
         g.gpics[0] = this.gpics[0].thumb();
+
     }
     // g.state = this.removed_date ? "已下架" : "在售";
     g.created_date = tools.dateStr(this.created_date);
@@ -80,9 +98,15 @@ goodsSchema.methods.baseInfo = function(fullPic) {
 
 goodsSchema.methods.cardInfo = function() {
     let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
-	g.gpics = [];
-	g.gpics[0] = this.gpics[0].thumb();
+	if(this.npics){
+        g.gpics = [];
+        g.gpics[0] = this.npics[0] + "?imageMogr2/thumbnail/200x";
+    }
+    else if(this.gpics){
+        g.gpics = [];
+    	g.gpics[0] = this.gpics[0].thumb();
     // g.state = this.removed_date ? "已下架" : "在售";
+    }
 
     g.created_date = tools.dateStr(this.created_date);
     g.glocation = school_map[this.glocation];
