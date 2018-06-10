@@ -66,19 +66,14 @@ let scheduleOldPicsUpload = () =>{
             for (let i = 0; i < goods.gpics.length; i++){
                 let name = goods.gpics[i]._id+".jpg";
                 let fpath = path.join(config.PUBLIC.root, goods.gpics[i].filename);
-                console.log(fpath);
                 try{
                     let img = fs.readFileSync(fpath);
                     let file = new AV.File(name, img);
                     let res = await file.save();
-                    console.log(res);
-
                     npics.push(res.url());
                 }catch (e) {
                     console.error(goods._id, e)
-
                 }
-
             }
             goods.npics = npics;
             await goods.save();
