@@ -60,7 +60,7 @@ let scheduleOldPicsUpload = () =>{
         let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics');
         console.log("checking old pics upload...");
         console.log(goodsall.length);
-        for (let j = 0; j < 3 && j < goodsall.length; j++) {
+        for (let j = 0; j < 10 && j < goodsall.length; j++) {
             let goods = goodsall[j];
             let npics = [];
             for (let i = 0; i < goods.gpics.length; i++){
@@ -75,7 +75,8 @@ let scheduleOldPicsUpload = () =>{
 
                     npics.push(res.url());
                 }catch (e) {
-                    console.error(e)
+                    console.error(goods._id, e)
+
                 }
 
             }
