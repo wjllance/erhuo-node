@@ -49,7 +49,7 @@ let goodsSchema = new mongoose.Schema({
 
 goodsSchema.methods.baseInfoV2 = function(fullPic) {
 	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
-	if(this.npics){
+    if(this.npics && this.npics.length > 0){
 	    if(fullPic){
             g.gpics = this.npics.map(x=>{
                 return {
@@ -98,7 +98,7 @@ goodsSchema.methods.baseInfo = function(fullPic) {
 
 goodsSchema.methods.cardInfo = function() {
     let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
-	if(this.npics){
+	if(this.npics && this.npics.length > 0){
         g.gpics = [];
         g.gpics[0] = this.npics[0] + "?imageMogr2/thumbnail/200x";
     }

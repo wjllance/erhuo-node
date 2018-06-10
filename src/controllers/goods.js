@@ -292,7 +292,7 @@ router.get('/goods/hot_words', async (ctx, next) => {
 
 // 发布
 /**
- * @api {post} /goods/publish  发布商品
+ * @api {post} /v2/goods/publish  发布商品
  * @apiName     GoodsPublish
  * @apiGroup    Goods
  *
