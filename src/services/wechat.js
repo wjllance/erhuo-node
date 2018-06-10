@@ -15,14 +15,14 @@ let fs = require('fs');
 let path = require('path');
 let {User, AccessToken, Comment, Order} = require('../models');
 const tenpay = require('tenpay');
-const pay_config = {
-    appid: config.APP_ID,
-    mchid: config.MCH_ID,
-    partnerKey: config.API_KEY,
-    pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.p12"),
-    notify_url: config.SERVER.URL_PREFIX + '/wechat/notify',
-    // spbill_create_ip: 'ip'
-};
+// const pay_config = {
+//     appid: config.APP_ID,
+//     mchid: config.MCH_ID,
+//     partnerKey: config.API_KEY,
+//     pfx: require('fs').readFileSync(config.CERT_PATH+"apiclient_cert.p12"),
+//     notify_url: config.SERVER.URL_PREFIX + '/wechat/notify',
+//     // spbill_create_ip: 'ip'
+// };
 // const pay_config = {
 //     appid: "wxeedf8d0cba505192",
 //     mchid: "1491171192",
@@ -31,6 +31,16 @@ const pay_config = {
 //     notify_url: 'notify',
 //     // spbill_create_ip: 'ip'
 // };
+
+const pay_config = {
+    appid: "wxeedf8d0cba505192",
+    mchid: "1491171192",
+    partnerKey: "OinKiHAr51RyvfCdjSECVCQ91OIC1SJM",
+    pfx: '',
+    notify_url: 'notify',
+    // spbill_create_ip: 'ip'
+};
+// const api =  new tenpay(pay_config);
 const api =  new tenpay(pay_config);
 const ERR_CODE = 985;
 
