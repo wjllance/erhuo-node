@@ -1,12 +1,20 @@
 const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
+
 const {Transaction, Order, Goods} = require('./models');
 const srv_transaction = require('./services/transaction')
-const srv_order = require('./services/order')
+const srv_order = require('./services/order');
+let path = require('path');
+let fs = require('fs');
 
 let config = require('./config');
-
+const AV = require('leancloud-storage');
+AV.init({
+    appId: config.LEAN_APPID,
+    appKey: config.LEAN_APPKEY,
+    masterKey: config.LEAN_MASTERKEY
+});
 exports.register = function () {
     console.log("register!");
 
@@ -16,7 +24,9 @@ exports.register = function () {
 
     scheduleGoodsExamine();
 
+    scheduleOldPicsUpload();
 };
+
 let scheduleGoodsExamine = () =>{
     schedule.scheduleJob('*/10 * * * * *', async function(){
         // schedule.scheduleJob('*/5 * * * * *', async function(){
@@ -40,6 +50,40 @@ let scheduleGoodsExamine = () =>{
             })
         }
 
+    });
+};
+
+
+let scheduleOldPicsUpload = () =>{
+    schedule.scheduleJob('*/10 * * * * *', async function(){
+
+        let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics');
+        console.log("checking old pics upload...");
+        console.log(goodsall.length);
+        for (let j = 0; j < 10 && j < goodsall.length; j++) {
+            let goods = goodsall[j];
+            let npics = [];
+            for (let i = 0; i < goods.gpics.length; i++){
+                let name = goods.gpics[i]._id+".jpg";
+                let fpath = path.join(config.PUBLIC.root, goods.gpics[i].filename);
+                console.log(fpath);
+                try{
+                    let img = fs.readFileSync(fpath);
+                    let file = new AV.File(name, img);
+                    let res = await file.save();
+                    console.log(res);
+
+                    npics.push(res.url());
+                }catch (e) {
+                    console.error(goods._id, e)
+
+                }
+
+            }
+            goods.npics = npics;
+            await goods.save();
+            console.log(goods);
+        }
     });
 }
 
@@ -98,4 +142,5 @@ let scheduleOrderCountDown = ()=>{
         });
 
     }
-}
+};
+

@@ -92,7 +92,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
 };
 
 
-// 获取商品详情
+// 获取商品详情 deprecated
 let getDetailById = exports.getDetailById = async function(goods_id, userInfo) {
 
     let goods = await Goods
