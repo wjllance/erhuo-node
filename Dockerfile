@@ -1,8 +1,8 @@
 FROM node:8.3.0-alpine
 
-COPY . /home/node
+COPY . /home/erhuo
 
-WORKDIR /home/node
+WORKDIR /home/erhuo
 
 EXPOSE 3500
 
