@@ -15,25 +15,6 @@ const router = module.exports = new Router();
 
 
 
-/**
- * @api {post} 	/identity/save  上传认证资料
- * @apiName     GoodsList
- * @apiGroup    Goods
- *
- *
- * @apiParam    {String}    cardpics      	学生证图片id
- * @apiParam    {String}    withcardpics    手持身份证图片id
- * @apiParam    {String}    name    		姓名
- * @apiParam    {String}    studentID       学号
- * @apiParam    {String}    school    		学校
- *
- * @apiSuccess  {Number}    success     1success
- * @apiSuccess  {Object}    data        分页商品列表
- * @apiSuccess  {Array}     data.goods  商品列表
- * @apiSuccess  {Boolean}   data.hasMore  还有更多
- * @apiSuccess  {Number}    data.total  总数
- *
- */
 router.post('/identity/save', auth.loginRequired,async (ctx, next) => {
 		let identity= new Identity();
 		identity.userID=ctx.state.user._id;
@@ -53,11 +34,44 @@ router.post('/identity/save', auth.loginRequired,async (ctx, next) => {
 		}
 });
 
-router.get('/identity/info', auth.loginRequired,async (ctx, next) => {
-    let identity= await Identity.findOne({userID:ctx.state.user._id}).sort({created_date:-1});
-    auth.assert(identity, "没有审核资料");
+
+
+/**
+ * @api {post} 	/identity/save  上传认证资料
+ * @apiName     GoodsList
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {String}    ncard      		学生证图片id
+ * @apiParam    {String}    nwithcard    	手持身份证图片id
+ * @apiParam    {String}    name    		姓名
+ * @apiParam    {String}    studentID       学号
+ * @apiParam    {String}    school    		学校
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页商品列表
+ *
+ */
+router.post('/v2/identity/save', auth.loginRequired,async (ctx, next) => {
+	let params = ctx.request.body;
+	auth.assert(params.name && params.studentID && params.school && params.ncard && params.nwithcard, "缺少参数");
+
+    let identity= new Identity();
+    identity.userID=ctx.state.user._id;
+
+    _.assign(identity, _.pick(ctx.request.body, ['name','studentID','school', 'ncard', 'nwithcard']));
+    await identity.save();
     ctx.body={
         success:1,
-        data:identity
+        data:identity._id
+    }
+});
+
+router.get('/identity/info', auth.loginRequired,async (ctx, next) => {
+    let identity= await Identity.findOne({userID:ctx.state.user._id}).sort({created_date:-1});
+    let ret = identity || null;
+    ctx.body={
+        success:1,
+        data:ret
     }
 });

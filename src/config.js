@@ -37,6 +37,7 @@ exports.SA_TOKEN = config['SA_TOKEN'];
 // exports.IMACCOUNT_TYPE = ""+config['IMACCOUNT_TYPE'];
 
 exports.LEAN_APPID = config['LEAN_APPID'];
+exports.LEAN_APPKEY = config['LEAN_APPKEY'];
 exports.LEAN_MASTERKEY = config['LEAN_MASTERKEY'];
 
 
@@ -87,7 +88,7 @@ exports.CONSTANT = {
         "北京师范大学",   //4
         "中国人民大学",
         "北京林业大学",
-        "中国农业大学",
+        "中国农业大学",   //7
         "北京交通大学",
         "中央民族大学",
         "首都师范大学",

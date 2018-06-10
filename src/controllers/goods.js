@@ -292,12 +292,13 @@ router.get('/goods/hot_words', async (ctx, next) => {
 
 // 发布
 /**
- * @api {post} /goods/publish  发布商品
+ * @api {post} /v2/goods/publish  发布商品
  * @apiName     GoodsPublish
  * @apiGroup    Goods
  *
  *
- * @apiParam    {Array}     gpics    图片id列表
+ * @apiParam    {Array}     [gpics]    图片id列表
+ * @apiParam    {Array}     npics    图片id列表
  * @apiParam    {String}    gname
  * @apiParam    {String}    gsummary
  * @apiParam    {String}    glabel
@@ -333,6 +334,32 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     ctx.body = {
         success: 1,
         data: goods._id.toString()
+    };
+});
+
+
+router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
+
+    let params = ctx.request.body;
+    auth.assert(params.gname && params.gsummary && params.gprice && params.gcost, "缺少参数");
+    auth.assert(params.npics && params.npics.length > 0, "没图");
+
+    let goods = new Goods();
+    goods.userID = ctx.state.user._id;
+    // goods.gpics = images.map(x => x._id);
+
+
+    _.assign(goods, _.pick(params, ['gname', 'gsummary', 'glabel', 'gprice', 'npics', 'gstype', 'glocation', 'gcost', 'gcity', 'remark']));
+
+    goods.category = params.category || "其他";
+    if(!goods.glocation){
+        goods.glocation = ctx.state.user.location || 0;
+    }
+    await goods.save();
+
+    ctx.body = {
+        success: 1,
+        data: goods._id
     };
 });
 
@@ -449,7 +476,8 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
 
     ctx.body = {
         success: 1,
-        data: await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user)
+        // data: await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user)
+        data: await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user)
     };
 });
 
@@ -474,6 +502,7 @@ router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     };
 });
 
+//deprecated
 router.get('/goods/detail/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
     // auth.assert(!isRemoved, '商品已下架');

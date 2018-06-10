@@ -167,7 +167,7 @@ exports.collectionList = async function(user, pageNo, pageSize)
     let total = await Goods.find({_id: user.collections}).count();//用户总收藏数
 
     let collections = await Goods.find({_id: user.collections}).limit(pageSize).skip((pageNo-1)*pageSize).populate('gpics');
-    let ugoods = collections.map(x => x.baseInfo());
+    let ugoods = collections.map(x => x.baseInfoV2());
     let hasMore=total-pageNo*pageSize>0;
     return {
         collections: ugoods,
