@@ -55,12 +55,12 @@ let scheduleGoodsExamine = () =>{
 
 
 let scheduleOldPicsUpload = () =>{
-    schedule.scheduleJob('*/20 * * * * *', async function(){
+    schedule.scheduleJob('*/30 * * * * *', async function(){
 
         let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics');
         console.log("checking old pics upload...");
         console.log(goodsall.length);
-        for (let j = 0; j < 4 && j < goodsall.length; j++) {
+        for (let j = 0; j < 3 && j < goodsall.length; j++) {
             let goods = goodsall[j];
             let npics = [];
             for (let i = 0; i < goods.gpics.length; i++){
