@@ -254,3 +254,53 @@ exports.refundConfirm = async(order) =>{
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
 };
 
+exports.commentNotify = async (comment_id)=>{
+
+    let comment = await Comment.findOne({_id:comment_id}).populate('fromId').populate('goodsId');
+    let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
+    let tid = String(touser._id);
+    let fid = String(comment.fromId._id);
+    logger.info(comment.fromId._id)
+    logger.info(touser)
+    if(fid == tid){
+        logger.info("not sending notify");
+        return ;
+    }
+
+    let formid = await getFormid(touser._id);
+    let template_id = "JLDhk92YgwbcLrvXmGEvK7_mjXfSv0x8RtyZ";
+    let page = "pages/message/message";
+    let data = {
+        //评论人
+        keyword1:{
+            value: comment.fromId.nickName
+        },
+        //评论主题
+        keyword2:{
+            value: comment.goodsId.gname
+        },
+        //评论内容
+        keyword3: {
+            value: comment.content
+        },
+        //留言时间
+        keyword4:{
+            value: moment(comment.created_date).format('lll')
+        },
+        //温馨提醒
+        keyword5:{
+            value: "点击即可回复"
+        },
+    };
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+};
+
+
+exports.oldGoodsNotify = async (goods)=>{
+
+}
+
+
+
