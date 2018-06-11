@@ -38,6 +38,7 @@
     "mongoose": "^5.0.12",
     "mz": "^2.7.0",
     "node-schedule": "^1.3.0",
+    "npm-git-install": "^0.3.0",
     "should": "^13.2.1",
     "superagent": "^3.8.2",
     "tenpay": "^2.1.4",

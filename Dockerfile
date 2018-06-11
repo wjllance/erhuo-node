@@ -1,8 +1,12 @@
 FROM node:8.3.0-alpine
 
-COPY . /home/node
+RUN apk update && apk upgrade && \
+    apk add --no-cache git
 
-WORKDIR /home/node
+COPY . /home/erhuo
+
+WORKDIR /home/erhuo
+RUN npm install
 
 EXPOSE 3500
 
