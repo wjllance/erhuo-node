@@ -58,12 +58,6 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
 
     let g = goods.baseInfoV2(1); //fullpic
 
-    g.user = {
-        _id: goods.userID._id,
-        name: goods.userID.nickName,
-        avatar: goods.userID.avatarUrl
-    };
-
     let userid = userInfo ? userInfo._id : null;
 
     let condi = {goodsId:goods_id};

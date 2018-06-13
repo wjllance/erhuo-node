@@ -34,6 +34,10 @@ const pay_config = {
 const api =  new tenpay(pay_config);
 const ERR_CODE = 985;
 
+
+
+
+
 const TYPE_SA = exports.TYPE_SA = 0;
 const TYPE_MINA = exports.TYPE_MINA = 1;
 

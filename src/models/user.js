@@ -61,8 +61,26 @@ userSchema.methods.baseInfo = function(){
 	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", 'phoneNumber']);
 	output.location = school_map[this.location];
     output.stu_verified = this.stu_verified ? "已认证" : "未认证";
+    if(this.stu_verified){
+        output.verify = "学生认证";
+    }
 	return output;
 };
+
+userSchema.methods.cardInfo = function(){
+
+	let verify = "";
+	if(this.stu_verified){
+		verify = "学生认证";
+	}
+	return {
+        _id: this._id,
+        name: this.nickName,
+        avatar: this.avatarUrl,
+		verify: verify
+	};
+};
+
 
 userSchema.methods.tls_id = function(){
     if(config.ENV === "production"){

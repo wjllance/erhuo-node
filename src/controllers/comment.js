@@ -12,6 +12,7 @@ let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_wechat = require('../services/wechat');
 let { User, Image, Goods, Like } = require('../models');
+let srv_wxtemplate = require('../services/wechat_template');
 
 const router = module.exports = new Router();
 
@@ -45,7 +46,8 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
 
     // goods = await srv_goods.getDetailById(goods._id, ctx.state.user);
     goods = await srv_goods.getDetailByIdV2(goods._id, ctx.state.user);
-    await srv_wechat.sendReplyNotice(res._id);
+    // await srv_wechat.sendReplyNotice(res._id);
+    await srv_wxtemplate.commentNotify(res._id);
     ctx.body = {
         success: 1,
         data: goods
