@@ -73,12 +73,9 @@ userSchema.methods.cardInfo = function(){
 	if(this.stu_verified){
 		verify = "学生认证";
 	}
-	return {
-        _id: this._id,
-        name: this.nickName,
-        avatar: this.avatarUrl,
-		verify: verify
-	};
+	let ret = _.pick(this, ['_id', 'nickName', 'avatarUrl']);
+	ret.verify = verify;
+	return ret;
 };
 
 
