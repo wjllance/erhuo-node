@@ -58,6 +58,12 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
 
     let g = goods.baseInfoV2(1); //fullpic
 
+    let jianrong = {
+        name: goods.userID.nickName,
+        avatar: goods.userID.avatarUrl
+    };
+    _.assign(g.user, jianrong);
+
     let userid = userInfo ? userInfo._id : null;
 
     let condi = {goodsId:goods_id};
