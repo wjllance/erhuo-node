@@ -69,6 +69,9 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
             g.gpics[0] = this.gpics[0].thumb();
         }
     }
+    if(this.userID._id){
+        g.user = this.userID.cardInfo();
+    }
 
     // g.state = this.removed_date ? "已下架" : "在售";
     g.created_date = tools.dateStr(this.created_date);
@@ -111,7 +114,7 @@ goodsSchema.methods.cardInfo = function() {
     g.created_date = tools.dateStr(this.created_date);
     g.glocation = school_map[this.glocation];
     if(this.userID._id){
-        g.user = _.pick(this.userID, ['_id', 'nickName', 'avatarUrl']);
+        g.user = this.userID.cardInfo();
     }
 
     g.state = getGoodsState(this);

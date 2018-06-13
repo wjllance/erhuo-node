@@ -108,39 +108,3 @@ router.post('/v2/images/uploadByAdmin/:openid', body, async (ctx, next) => {
     };
 
 });
-
-
-router.get('/test/images/old_upload_to_lean_cloud', auth.loginRequired, body, async (ctx, next) => {
-
-
-    let goodsall = await Goods.find({npics:null}).populate('gpics');
-    // console.log(goodsall);
-
-    for (let j = 0; j < 10; j++) {
-        goods = goodsall[j];
-        let npics = [];
-        for (let i = 0; i < goods.gpics.length; i++){
-            let name = goods.gpics[i]._id+".jpg";
-            let fpath = path.join(config.PUBLIC.root, goods.gpics[i].filename);
-            console.log(fpath);
-            try{
-                let img = fs.readFileSync(fpath);
-                let file = new AV.File(name, img);
-                let res = await file.save();
-                console.log(res);
-
-                npics.push(res.url());
-            }catch (e) {
-                console.error(e)
-            }
-
-        }
-        goods.npics = npics;
-        await goods.save();
-        console.log(goods);
-    }
-
-
-
-
-});

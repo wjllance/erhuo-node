@@ -9,8 +9,7 @@ let tools = require("./tools");
 /*-----------------------------------------------*/
 
 let { log } = require('../config');
-let { User } = require('../models');
-let { Goods, Comment } = require('../models');
+let { User, Goods, Comment } = require('../models');
 
 
 let getListInfo = exports.getListInfo = function(cmt){

@@ -22,7 +22,6 @@ let likeSchema = new mongoose.Schema({
     read_date: Date,
     canceled_date: Date,
     updated_date: { type: Date, default: Date.now },
-    created_date: { type: Date, default: Date.now },
 });
 
 
