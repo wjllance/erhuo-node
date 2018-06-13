@@ -9,8 +9,7 @@ let tools = require("./tools");
 /*-----------------------------------------------*/
 
 let { log } = require('../config');
-let { User } = require('../models');
-let { Goods, Comment } = require('../models');
+let { User, Goods, Comment, Like } = require('../models');
 
 
 let getListInfo = exports.getListInfo = function(cmt){
@@ -102,6 +101,22 @@ exports.unread = async function(user_id) {
         read_date: null
     }).count();
     return total;
+};
+
+exports.toggleLike = async (user_id, goods_id)=>{
+
+
+    let liken = await Like.findOneAndUpdate({
+        userID: user_id,
+        goodsId: goods_id
+    }, {
+        read_date: null,
+        updated_date: moment(),
+        canceled_date:null
+    }, {new: true, upsert: true});
+
+    console.log(liken);
+    return liken
 };
 
 
