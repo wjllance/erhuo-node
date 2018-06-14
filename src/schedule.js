@@ -57,9 +57,10 @@ let scheduleGoodsExamine = () =>{
 let scheduleOldPicsUpload = () =>{
     schedule.scheduleJob('*/30 * * * * *', async function(){
 
-        let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics');
-        console.log("checking old pics upload...");
-        console.log(goodsall.length);
+        let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics').limit(3);
+
+        let goodscount = await Goods.find({"npics.0":{$exists:false}}).count();
+        console.log("checking old pics upload...", goodscount);
         for (let j = 0; j < 3 && j < goodsall.length; j++) {
             let goods = goodsall[j];
             let npics = [];
@@ -74,6 +75,24 @@ let scheduleOldPicsUpload = () =>{
                 }catch (e) {
                     console.error(goods._id, e)
                 }
+            }
+            goods.npics = npics;
+            await goods.save();
+            console.log(goods);
+        }
+
+
+        let regex = new RegExp('lcfile', 'i');
+        goodsall = await Goods.find({"npics.0":regex}).limit(3);
+        goodscount = await Goods.find({"npics.0":regex}).count();
+
+        console.log("updating old pics urls...", goodscount);
+        for (let j = 0; j<goodsall.length; j++){
+            let goods = goodsall[j];
+            npics = [];
+            for (let i = 0; i < goods.npics.length; i++) {
+                let fn = path.basename(goods.npics[i]);
+                npics.push("https://two.jicunbao.com/"+fn)
             }
             goods.npics = npics;
             await goods.save();
