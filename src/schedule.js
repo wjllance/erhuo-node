@@ -1,7 +1,7 @@
 const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
-
+const myUtils = require("./myUtils/myUtil");
 const {Transaction, Order, Goods} = require('./models');
 const srv_transaction = require('./services/transaction')
 const srv_order = require('./services/order');
@@ -25,6 +25,8 @@ exports.register = function () {
     scheduleGoodsExamine();
 
     scheduleOldPicsUpload();
+
+    scheduleOrderImgUpdate();
 };
 
 let scheduleGoodsExamine = () =>{
@@ -98,6 +100,34 @@ let scheduleOldPicsUpload = () =>{
             await goods.save();
             console.log(goods);
         }
+    });
+}
+
+
+
+let scheduleOrderImgUpdate = () =>{
+    schedule.scheduleJob('*/5 * * * * *', async function(){
+
+        let regex = new RegExp('tmb', 'i');
+        let orders = await Order.find({"goodsInfo.img": regex}).populate('goodsId').sort({created_date:-1}).limit(3);
+
+        let orderscount = await Order.find({"goodsInfo.img": regex}).count();
+        console.log("checking old orders img update...", orderscount);
+        for (let j = 0; j < 5 && j < orders.length; j++) {
+            let order = orders[j];
+            try {
+
+                order.goodsInfo.img = myUtils.thumbnail(order.goodsId.npics[0]);
+                order.markModified("goodsInfo");
+                await order.save();
+                console.log(order);
+            }catch (e) {
+                console.error(order.goodsId);
+                // await order.remove();
+            }
+        }
+
+
     });
 }
 
