@@ -6,6 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
+let myUtils = require("../myUtils/myUtil");
 let auth = require('./auth');
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -106,7 +107,8 @@ exports.findOrCreateV3 = async function(goods, user) {
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
-    order.goodsInfo.img = goods.gpics[0].thumbnails;
+    // order.goodsInfo.img = goods.gpics[0].thumbnails;
+    order.goodsInfo.img = myUtils.thumbnail(goods.npics[0]);
     order.markModified('goodsInfo');
     order.updated_date = moment();
     return await order.save();
