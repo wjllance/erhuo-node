@@ -106,14 +106,14 @@ let scheduleOldPicsUpload = () =>{
 
 
 let scheduleOrderImgUpdate = () =>{
-    schedule.scheduleJob('*/5 * * * * *', async function(){
+    schedule.scheduleJob('*/40 * * * * *', async function(){
 
         let regex = new RegExp('tmb', 'i');
         let orders = await Order.find({"goodsInfo.img": regex}).populate('goodsId').sort({created_date:-1}).limit(3);
 
         let orderscount = await Order.find({"goodsInfo.img": regex}).count();
         console.log("checking old orders img update...", orderscount);
-        for (let j = 0; j < 5 && j < orders.length; j++) {
+        for (let j = 0; j < 3 && j < orders.length; j++) {
             let order = orders[j];
             try {
 
