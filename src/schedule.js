@@ -59,7 +59,7 @@ let scheduleGoodsExamine = () =>{
 let scheduleOldPicsUpload = () =>{
     schedule.scheduleJob('*/30 * * * * *', async function(){
 
-        let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics').limit(3);
+        let goodsall = await Goods.find({"npics.0":{$exists:false}}).sort({created_date:-1}).populate('gpics').limit(3);
 
         let goodscount = await Goods.find({"npics.0":{$exists:false}}).count();
         console.log("checking old pics upload...", goodscount);
