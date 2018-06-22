@@ -39,7 +39,12 @@ let scheduleGoodsExamine = () =>{
         }
         // ddl = moment().subtract(30,'s');
         let condi = {
-            status:config.CONSTANT.GOODS_STATUS.PASS,
+            status: {
+                $in: [
+                    config.CONSTANT.GOODS_STATUS.PASS,
+                    config.CONSTANT.GOODS_STATUS.INIT
+                ]
+            },
             created_date: {$lt: ddl}
         };
         // console.log(condi);
