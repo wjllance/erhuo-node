@@ -128,7 +128,7 @@ let scheduleOrderImgUpdate = () =>{
                 console.log(order);
             }catch (e) {
                 console.error(order.goodsId);
-                // await order.remove();
+                await order.remove();
             }
         }
 

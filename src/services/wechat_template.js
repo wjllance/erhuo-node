@@ -40,7 +40,10 @@ let getFormid = async(userid) => {
         used: {$ne: 1}
     }).sort({expire_date:1});
     console.log(formid);
-    auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
+    if(!formid){
+        console.error("没了。。")
+    }
+    // auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
     return formid;
 };
 
@@ -51,6 +54,9 @@ exports.sendPaidTemplate = async(order) => {
     let touser = await User.findById(seller_id);
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
+    if(!formid){
+        return;
+    }
     let template_id = "YguybxI3FIF3xffJsWQX6uvMrREN-6--76LLenJ7JMI";
     let page = "pages/news/news";
     let data = {
@@ -100,6 +106,9 @@ exports.confirmReceipt = async(order) =>{
     let touser = await User.findById(seller_id);
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
+    if(!formid){
+        return;
+    }
     let template_id = "h-AKhqlnkoDY9GdfRTylKd6gF1bd8KXfoVQW1uDMk5A";
     let page = "pages/news/news";
     let data = {
@@ -147,6 +156,9 @@ exports.moneyArrive = async(order)=>{
 
     let touser = await User.findById(seller_id);
     let formid = await getFormid(touser._id);
+    if(!formid){
+        return;
+    }
     let template_id = "GUJN0AyeyDJjvN6rwSNg_b3HnuzOohBxKkDBGonZGW0";
     let page = "pages/news/news";
     let data = {
@@ -181,6 +193,9 @@ exports.refundApply = async(order) => {
     let touser = await User.findById(seller_id);
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
+    if(!formid){
+        return;
+    }
     let template_id = "8r3D3uYC9Suj-W_Ri4WdupT3t7zO5hz4oaCdBVdhp6M";
     let page = "pages/news/news";
     let data = {
@@ -224,6 +239,9 @@ exports.refundConfirm = async(order) =>{
     let buyer_id = order.buyer._id || order.buyer;
     let touser = await User.findById(buyer_id);
     let formid = await getFormid(touser._id);
+    if(!formid){
+        return;
+    }
     let template_id = "gqC4nVJRmqjL_mFAifx4h7-cg9upXxXEmfr5wNYwd3k";
     let page = "pages/news/news";
     let data = {
