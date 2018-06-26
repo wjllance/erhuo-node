@@ -54,7 +54,8 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
             g.gpics = this.npics.map(x=>{
                 return {
                     url: x,
-                    thumb: x+"?imageMogr2/thumbnail/200x",
+                    // thumb: x+"?imageMogr2/thumbnail/200x",
+                    thumb: x+"?imageMogr2/thumbnail/720x",
                 }
             });
         }else{
