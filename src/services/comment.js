@@ -6,6 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
+let myUtils = require("../myUtils/myUtil");
 /*-----------------------------------------------*/
 
 let { log } = require('../config');
@@ -30,7 +31,8 @@ let getListInfo = exports.getListInfo = function(cmt){
         // created_date: cmt.created_date
     };
     ret.created_date = tools.dateStr(cmt.created_date);
-    ret.gpic = cmt.goodsId.gpics[0].thumb();
+    // ret.gpic = cmt.goodsId.gpics[0].thumb();
+    ret.gpic = myUtils.thumbnail(cmt.goodsId.npics[0]);
     return ret;
 };
 
