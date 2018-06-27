@@ -42,7 +42,7 @@ let scheduleGoodsExamine = () =>{
             status: {
                 $in: [
                     config.CONSTANT.GOODS_STATUS.PASS,
-                    config.CONSTANT.GOODS_STATUS.INIT
+                    // config.CONSTANT.GOODS_STATUS.INIT
                 ]
             },
             created_date: {$lt: ddl}
