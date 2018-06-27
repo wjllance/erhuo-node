@@ -31,8 +31,12 @@ let getListInfo = exports.getListInfo = function(cmt){
         // created_date: cmt.created_date
     };
     ret.created_date = tools.dateStr(cmt.created_date);
-    // ret.gpic = cmt.goodsId.gpics[0].thumb();
-    ret.gpic = myUtils.thumbnail(cmt.goodsId.npics[0]);
+    if(cmt.goodsId.npics &&  cmt.goodsId.npics.length > 0){
+        ret.gpic = myUtils.thumbnail(cmt.goodsId.npics[0]);
+    }else{
+        ret.gpic = cmt.goodsId.gpics[0].thumb();
+
+    }
     return ret;
 };
 
@@ -49,7 +53,7 @@ exports.momentList = async function(user_id, pageSize, pageNo){
         fromId: {$ne: user_id}
     }).populate({
             path: 'goodsId',
-            select: 'userID gpics',
+            select: 'userID gpics npics',
             populate: {
                 path: 'gpics',
             }
