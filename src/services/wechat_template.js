@@ -295,7 +295,7 @@ exports.commentNotify = async (comment_id)=>{
     if(!formid){
         return false;
     }
-    let template_id = "JLDhk92YgwbcLrvXmGEvK7_mjXfSv0x8RtyZ";
+    let template_id = "JLDhk92YgwbcLrvXmGEvK7_mjXfSv0x8RtyZDnb0_s4";
     let page = "pages/message/message";
     let data = {
         //评论人
