@@ -65,7 +65,7 @@ let updateAccessToken = async function (access_token) {
 
     auth.assert(!res.errcode, res.errmsg);
     access_token.token = res.access_token;
-    access_token.expire_date = Date.now()+res.expires_in*1000 / 4;
+    access_token.expire_date = moment().add(5, 'm');
     return await access_token.save();
 }
 

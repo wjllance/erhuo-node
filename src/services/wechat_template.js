@@ -42,6 +42,7 @@ let getFormid = async(userid) => {
     console.log(formid);
     if(!formid){
         console.error("没了。。")
+        return null;
     }
     // auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
     return formid;
