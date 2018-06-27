@@ -56,8 +56,12 @@ router.post('/v2/identity/save', auth.loginRequired,async (ctx, next) => {
 	let params = ctx.request.body;
 	auth.assert(params.name && params.studentID && params.school && params.ncard && params.nwithcard, "缺少参数");
 
-    let identity= new Identity();
-    identity.userID=ctx.state.user._id;
+    let identity = await Identity.findOne({userID:ctx.state.user._id});
+    if(!identity){
+    	identity = new Identity({
+			userID: ctx.state.user._id
+		});
+	}
 
     _.assign(identity, _.pick(ctx.request.body, ['name','studentID','school', 'ncard', 'nwithcard']));
     await identity.save();
