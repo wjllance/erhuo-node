@@ -39,7 +39,12 @@ let scheduleGoodsExamine = () =>{
         }
         // ddl = moment().subtract(30,'s');
         let condi = {
-            status:config.CONSTANT.GOODS_STATUS.PASS,
+            status: {
+                $in: [
+                    config.CONSTANT.GOODS_STATUS.PASS,
+                    config.CONSTANT.GOODS_STATUS.INIT
+                ]
+            },
             created_date: {$lt: ddl}
         };
         // console.log(condi);
@@ -59,7 +64,7 @@ let scheduleGoodsExamine = () =>{
 let scheduleOldPicsUpload = () =>{
     schedule.scheduleJob('*/30 * * * * *', async function(){
 
-        let goodsall = await Goods.find({"npics.0":{$exists:false}}).populate('gpics').limit(3);
+        let goodsall = await Goods.find({"npics.0":{$exists:false}}).sort({created_date:-1}).populate('gpics').limit(3);
 
         let goodscount = await Goods.find({"npics.0":{$exists:false}}).count();
         console.log("checking old pics upload...", goodscount);
@@ -106,14 +111,14 @@ let scheduleOldPicsUpload = () =>{
 
 
 let scheduleOrderImgUpdate = () =>{
-    schedule.scheduleJob('*/5 * * * * *', async function(){
+    schedule.scheduleJob('*/40 * * * * *', async function(){
 
         let regex = new RegExp('tmb', 'i');
         let orders = await Order.find({"goodsInfo.img": regex}).populate('goodsId').sort({created_date:-1}).limit(3);
 
         let orderscount = await Order.find({"goodsInfo.img": regex}).count();
         console.log("checking old orders img update...", orderscount);
-        for (let j = 0; j < 5 && j < orders.length; j++) {
+        for (let j = 0; j < 3 && j < orders.length; j++) {
             let order = orders[j];
             try {
 
@@ -123,7 +128,7 @@ let scheduleOrderImgUpdate = () =>{
                 console.log(order);
             }catch (e) {
                 console.error(order.goodsId);
-                // await order.remove();
+                await order.remove();
             }
         }
 
