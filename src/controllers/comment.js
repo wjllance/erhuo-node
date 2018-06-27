@@ -11,8 +11,8 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_wechat = require('../services/wechat');
-let srv_wxtemplate = require("../services/wechat_template");
 let { User, Image, Goods } = require('../models');
+let srv_wxtemplate = require('../services/wechat_template');
 
 const router = module.exports = new Router();
 
