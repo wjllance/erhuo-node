@@ -30,6 +30,7 @@ let sendMinaTempMsg = exports.sendMinaTempMsg = async (touser, template_id, form
     });
     let res = JSON.parse(text);
     console.log(res);
+    logger.info("MINA NOTIFY", res);
     return res
 };
 
@@ -328,6 +329,36 @@ exports.commentNotify = async (comment_id)=>{
 
 exports.oldGoodsNotify = async (goods)=>{
 
+    let touser = await User.findOne({_id:goods.userID});
+
+    let formid = await getFormid(touser._id);
+    if(!formid){
+        return false;
+    }
+    let template_id = "ifQlwUFT54VLxRO0o187Qx4jxAHMeISowUTb6-h193o";
+    let page = "pages/detail/detail?scene="+goods._id;
+    let data = {
+        //温馨提醒
+        keyword1:{
+            value: "商品无人问津，快回来降降价吧"
+        },
+        //商品名称
+        keyword2:{
+            value: goods.gname
+        },
+        //时间
+        keyword3: {
+            value: moment(goods.created_date).format('lll')
+        },
+        //当前状态
+        keyword4:{
+            value: "在售中"
+        }
+    };
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    return true;
 };
 
 
