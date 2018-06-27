@@ -239,6 +239,7 @@ router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => 
 });
 
 
+
 // 取消收藏
 /**
  * @api {post}   /user/uncollect/:goods_id   取消收藏

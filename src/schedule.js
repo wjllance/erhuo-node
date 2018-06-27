@@ -3,8 +3,9 @@ let moment = require('moment');
 moment.locale('zh-cn');
 const myUtils = require("./myUtils/myUtil");
 const {Transaction, Order, Goods} = require('./models');
-const srv_transaction = require('./services/transaction')
+const srv_transaction = require('./services/transaction');
 const srv_order = require('./services/order');
+const srv_wx_template = require("./services/wechat_template");
 let path = require('path');
 let fs = require('fs');
 
@@ -27,10 +28,42 @@ exports.register = function () {
     scheduleOldPicsUpload();
 
     scheduleOrderImgUpdate();
+
+    scheduleOldGoodsNotify();
 };
 
+
+let scheduleOldGoodsNotify = () =>{
+    schedule.scheduleJob('*/30 * * * * *', async function() {
+        // schedule.scheduleJob('*/5 * * * * *', async function(){
+
+        let goodsAll = await Goods.find({
+            created_date: {
+                $gt: moment().subtract(5, 'd')
+            },
+            updated_date: {
+                $lt: moment().subtract(3, 'd'),
+                $gt: moment().subtract(4, 'd')
+            }
+        });
+        console.log('checking old goods notify...', goodsAll.length);
+
+        for (let i = 0; i < goodsAll.length; i++) {
+            let goods = goodsAll[i];
+            let res = await srv_wx_template.oldGoodsNotify(goods);
+            if(res) {
+                goods.updated_date = moment();
+                await goods.save();
+            }else{
+                console.error(goods);
+            }
+        }
+    })
+};
+
+
 let scheduleGoodsExamine = () =>{
-    schedule.scheduleJob('*/10 * * * * *', async function(){
+    schedule.scheduleJob('0 */1 * * * *', async function(){
         // schedule.scheduleJob('*/5 * * * * *', async function(){
         console.log('checking goods passed...');
         let ddl = moment({hour:20});
@@ -42,7 +75,7 @@ let scheduleGoodsExamine = () =>{
             status: {
                 $in: [
                     config.CONSTANT.GOODS_STATUS.PASS,
-                    config.CONSTANT.GOODS_STATUS.INIT
+                    // config.CONSTANT.GOODS_STATUS.INIT
                 ]
             },
             created_date: {$lt: ddl}
@@ -62,7 +95,7 @@ let scheduleGoodsExamine = () =>{
 
 
 let scheduleOldPicsUpload = () =>{
-    schedule.scheduleJob('*/30 * * * * *', async function(){
+    schedule.scheduleJob('0 */5 * * * *', async function(){
 
         let goodsall = await Goods.find({"npics.0":{$exists:false}}).sort({created_date:-1}).populate('gpics').limit(3);
 
@@ -111,7 +144,7 @@ let scheduleOldPicsUpload = () =>{
 
 
 let scheduleOrderImgUpdate = () =>{
-    schedule.scheduleJob('*/40 * * * * *', async function(){
+    schedule.scheduleJob('0 */5 * * * *', async function(){
 
         let regex = new RegExp('tmb', 'i');
         let orders = await Order.find({"goodsInfo.img": regex}).populate('goodsId').sort({created_date:-1}).limit(3);
@@ -131,7 +164,6 @@ let scheduleOrderImgUpdate = () =>{
                 await order.remove();
             }
         }
-
 
     });
 }

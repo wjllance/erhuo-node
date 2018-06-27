@@ -30,6 +30,7 @@ let sendMinaTempMsg = exports.sendMinaTempMsg = async (touser, template_id, form
     });
     let res = JSON.parse(text);
     console.log(res);
+    logger.info("MINA NOTIFY", res);
     return res
 };
 
@@ -42,6 +43,7 @@ let getFormid = async(userid) => {
     console.log(formid);
     if(!formid){
         console.error("没了。。")
+        return null;
     }
     // auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
     return formid;
@@ -55,7 +57,7 @@ exports.sendPaidTemplate = async(order) => {
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
     if(!formid){
-        return;
+        return false;
     }
     let template_id = "YguybxI3FIF3xffJsWQX6uvMrREN-6--76LLenJ7JMI";
     let page = "pages/news/news";
@@ -95,7 +97,8 @@ exports.sendPaidTemplate = async(order) => {
 
     formid.used = 1;
     await formid.save();
-    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    return true;
 };
 
 
@@ -107,7 +110,7 @@ exports.confirmReceipt = async(order) =>{
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
     if(!formid){
-        return;
+        return false;
     }
     let template_id = "h-AKhqlnkoDY9GdfRTylKd6gF1bd8KXfoVQW1uDMk5A";
     let page = "pages/news/news";
@@ -147,7 +150,8 @@ exports.confirmReceipt = async(order) =>{
 
     formid.used = 1;
     await formid.save();
-    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    return true;
 };
 
 
@@ -157,7 +161,7 @@ exports.moneyArrive = async(order)=>{
     let touser = await User.findById(seller_id);
     let formid = await getFormid(touser._id);
     if(!formid){
-        return;
+        return false;
     }
     let template_id = "GUJN0AyeyDJjvN6rwSNg_b3HnuzOohBxKkDBGonZGW0";
     let page = "pages/news/news";
@@ -182,7 +186,8 @@ exports.moneyArrive = async(order)=>{
 
     formid.used = 1;
     await formid.save();
-    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    return true;
 };
 
 
@@ -194,7 +199,7 @@ exports.refundApply = async(order) => {
     let buyer = await  User.findById(buyer_id);
     let formid = await getFormid(touser._id);
     if(!formid){
-        return;
+        return false;
     }
     let template_id = "8r3D3uYC9Suj-W_Ri4WdupT3t7zO5hz4oaCdBVdhp6M";
     let page = "pages/news/news";
@@ -231,7 +236,8 @@ exports.refundApply = async(order) => {
 
     formid.used = 1;
     await formid.save();
-    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    return true;
 };
 
 
@@ -240,7 +246,7 @@ exports.refundConfirm = async(order) =>{
     let touser = await User.findById(buyer_id);
     let formid = await getFormid(touser._id);
     if(!formid){
-        return;
+        return false;
     }
     let template_id = "gqC4nVJRmqjL_mFAifx4h7-cg9upXxXEmfr5wNYwd3k";
     let page = "pages/news/news";
@@ -269,6 +275,91 @@ exports.refundConfirm = async(order) =>{
 
     formid.used = 1;
     await formid.save();
-    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    return true;
 };
+
+exports.commentNotify = async (comment_id)=>{
+
+    let comment = await Comment.findOne({_id:comment_id}).populate('fromId').populate('goodsId');
+    let touser = await User.findOne({_id:comment.toId || comment.goodsId.userID});
+    let tid = String(touser._id);
+    let fid = String(comment.fromId._id);
+    logger.info(comment.fromId._id)
+    logger.info(touser)
+    if(fid === tid){
+        logger.info("not sending notify");
+        return false;
+    }
+
+    let formid = await getFormid(touser._id);
+    if(!formid){
+        return false;
+    }
+    let template_id = "JLDhk92YgwbcLrvXmGEvK7_mjXfSv0x8RtyZDnb0_s4";
+    let page = "pages/message/message";
+    let data = {
+        //评论人
+        keyword1:{
+            value: comment.fromId.nickName
+        },
+        //评论主题
+        keyword2:{
+            value: comment.goodsId.gname
+        },
+        //评论内容
+        keyword3: {
+            value: comment.content
+        },
+        //留言时间
+        keyword4:{
+            value: moment(comment.created_date).format('lll')
+        },
+        //温馨提醒
+        keyword5:{
+            value: "点击即可回复"
+        },
+    };
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    return true;
+};
+
+
+exports.oldGoodsNotify = async (goods)=>{
+
+    let touser = await User.findOne({_id:goods.userID});
+
+    let formid = await getFormid(touser._id);
+    if(!formid){
+        return false;
+    }
+    let template_id = "ifQlwUFT54VLxRO0o187Qx4jxAHMeISowUTb6-h193o";
+    let page = "pages/detail/detail?scene="+goods._id;
+    let data = {
+        //温馨提醒
+        keyword1:{
+            value: "商品无人问津，快回来降降价吧"
+        },
+        //商品名称
+        keyword2:{
+            value: goods.gname
+        },
+        //时间
+        keyword3: {
+            value: moment(goods.created_date).format('lll')
+        },
+        //当前状态
+        keyword4:{
+            value: "在售中"
+        }
+    };
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    return true;
+};
+
+
 
