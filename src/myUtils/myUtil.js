@@ -56,6 +56,10 @@ exports.completeImgUrl = (img_path) => {
     return img_path;
 }
 
-exports.thumbnail = (imgurl) =>{
-    return imgurl + "?imageMogr2/thumbnail/200x";
+exports.thumbnail = (imgurl, width) =>{
+    if(!width)
+    {
+        width = 200;
+    }
+    return imgurl + "?imageMogr2/thumbnail/"+width+"x";
 }

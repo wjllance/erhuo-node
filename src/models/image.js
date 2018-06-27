@@ -41,6 +41,7 @@ imageSchema.methods.urlwithid = function() {
 }
 
 imageSchema.methods.thumb = function() {
+
 	let fn = this.thumbnails || this.filename;
     return config.SERVER.URL_PREFIX + '/' + fn;
 }

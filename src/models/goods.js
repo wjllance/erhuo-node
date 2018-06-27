@@ -2,6 +2,7 @@
 let mongoose = require('mongoose');
 let _ = require('lodash');
 let tools = require('../services/tools')
+let myUtils = require("../myUtils/myUtil");
 const school_map = require('../config').CONSTANT.SCHOOL_MAP;
 const GOODS_STATUS = require('../config').CONSTANT.GOODS_STATUS;
 // 商品
@@ -54,13 +55,16 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
             g.gpics = this.npics.map(x=>{
                 return {
                     url: x,
-                    // thumb: x+"?imageMogr2/thumbnail/200x",
-                    thumb: x+"?imageMogr2/thumbnail/720x",
+                    thumb: myUtils.thumbnail(x, 720),
+                    // thumb: x+"?imageMogr2/thumbnail/720x",
+
                 }
             });
         }else{
             g.gpics = [];
-            g.gpics[0] = this.npics[0]+"?imageMogr2/thumbnail/200x";
+            // g.gpics[0] = this.npics[0]+"?imageMogr2/thumbnail/200x";
+
+            g.gpics[0] = myUtils.thumbnail(this.npics[0]);
         }
     }else if(this.gpics){
         if(fullPic){
@@ -104,11 +108,13 @@ goodsSchema.methods.cardInfo = function() {
     let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
 	if(this.npics && this.npics.length > 0){
         g.gpics = [];
-        g.gpics[0] = this.npics[0] + "?imageMogr2/thumbnail/200x";
+        // g.gpics[0] = this.npics[0] + "?imageMogr2/thumbnail/200x";
+
+        g.gpics[0] = myUtils.thumbnail(this.npics[0]);
     }
     else if(this.gpics){
         g.gpics = [];
-    	g.gpics[0] = this.gpics[0].thumb();
+        g.gpics[0] = this.gpics[0].thumb();
     // g.state = this.removed_date ? "已下架" : "在售";
     }
 
