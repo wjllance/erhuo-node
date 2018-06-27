@@ -55,7 +55,7 @@ let scheduleOldGoodsNotify = () =>{
                 goods.updated_date = moment();
                 await goods.save();
             }else{
-                console.error(goods);
+                console.error(goods._id);
             }
         }
     })
