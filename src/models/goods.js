@@ -43,7 +43,14 @@ let goodsSchema = new mongoose.Schema({
 
 	status: {type: Number, default: 0},
 
-	remark: String
+	remark: String,
+
+
+    //new
+    is_special: Boolean,
+    amount: Number
+
+
 
 },{versionKey:false});
 

@@ -62,4 +62,6 @@ exports.thumbnail = (imgurl, width) =>{
         width = 200;
     }
     return imgurl + "?imageMogr2/thumbnail/"+width+"x";
-}
+};
+
+
