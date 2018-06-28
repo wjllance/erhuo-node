@@ -86,8 +86,8 @@ exports.loginRequired = async function (ctx, next) {
     if(config.ENV == "local" && !ctx.state.user)
     {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
-        // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
-        let user_id = ctx.session.user_id ||"5ad31bfba2e0c833c23d9d56";  //wjl
+        let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
+        // let user_id = ctx.session.user_id ||"5ad31bfba2e0c833c23d9d56";  //wjl
         // let user_id = ctx.session.user_id ||"5ad8b906a2e0c833c24819cd";  //mirror
         // let user_id = ctx.session.user_id ||"5ac4367c758e552f03111fc8";  //hw
         ctx.state.user = await User.findById(user_id);
