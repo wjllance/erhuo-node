@@ -102,3 +102,15 @@ exports.getDetailById = async (bargainId)=>{
     ret.friends = friends;
     return ret;
 };
+
+exports.getPrice = async (goodsId, userId)=>{
+    let bargains = await Bargain.find({
+        goodsId: goodsId,
+        owner_id: userId
+    });
+    let now = 0;
+    for (let i = 0; i < bargains.length; i++){
+        now += bargains[i].amount;
+    }
+    return bargains[0].total_price - now;
+}

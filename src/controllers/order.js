@@ -13,6 +13,7 @@ let srv_order = require('../services/order');
 let srv_wechat = require('../services/wechat');
 let srv_wxtemplate = require('../services/wechat_template');
 let srv_transaction = require('../services/transaction');
+let srv_bargain = require('../services/bargain');
 let { User, Image, Goods, Order } = require('../models');
 
 const router = module.exports = new Router();
@@ -141,7 +142,11 @@ router.post('/v2/order/', auth.loginRequired, async(ctx, next) => {
     let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
 
-    let order = await srv_order.findOrCreateV3(goods, ctx.state.user);
+    let price = goods.gprice;
+    if(goods.is_special){
+        price = await srv_bargain.getPrice(goods._id, ctx.state.user._id);
+    }
+    let order = await srv_order.findOrCreateV3(goods, ctx.state.user, price);
     console.log(order);
     ctx.body = {
         success: 1,

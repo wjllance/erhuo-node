@@ -49,8 +49,11 @@ let orderSchema = new Schema({
     created_date: { type: Date, default: Date.now},
     updated_date: { type: Date, default: Date.now},
     completed_date: Date,   //确认收货
-    finished_date: Date   //到账时间
+    finished_date: Date,   //到账时间
 
+
+    //new
+    no_modify: {type:Boolean, default:false}
 
     // gcost: Number,
 });

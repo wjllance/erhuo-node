@@ -76,8 +76,7 @@ exports.findOrCreateV2 = async function(goods, user) {
 
 
 //goods:CardInfo
-exports.findOrCreateV3 = async function(goods, user) {
-
+exports.findOrCreateV3 = async function(goods, user, price) {
 
     let order = await Order.findOne({  //检查自己的之前订单
         goodsId: goods._id,
@@ -106,7 +105,7 @@ exports.findOrCreateV3 = async function(goods, user) {
         goodsId: goods._id,
         seller: goods.userID,
         buyer: user._id,
-        price: goods.gprice,
+        price: price,
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
@@ -114,6 +113,10 @@ exports.findOrCreateV3 = async function(goods, user) {
     order.goodsInfo.img = myUtils.thumbnail(goods.npics[0]);
     order.markModified('goodsInfo');
     order.updated_date = moment();
+
+    if(goods.is_special){
+        order.no_modify = true;
+    }
     return await order.save();
 };
 
