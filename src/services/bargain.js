@@ -64,7 +64,6 @@ exports.joinBargain = async (bargainDet, user, maxAmount)=>{
 exports.getDetailById = async (bargainId)=>{
     let bargain = await Bargain
         .findById(bargainId)
-        .populate('goodsId')
         .populate('owner_id')
         .populate('userID');
 
@@ -86,10 +85,12 @@ exports.getDetailById = async (bargainId)=>{
     }
     let rest = bargain.total_price - now - 0.01;
 
+
+    let goods = await Goods.findById(bargain.goodsId).populate('userID');
     let ret = {};
     // ret.my_bargain = bargain.baseInfo();
 
-    ret.goods = bargain.goodsId.cardInfo();
+    ret.goods = goods.baseInfoV2();
     ret.user = bargain.userID.cardInfo();
     ret.owner = bargain.owner_id.cardInfo();
 
