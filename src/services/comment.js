@@ -10,7 +10,7 @@ let myUtils = require("../myUtils/myUtil");
 /*-----------------------------------------------*/
 
 let { log } = require('../config');
-let { User, Goods, Comment, Like } = require('../models');
+let { User, Goods, Comment } = require('../models');
 
 
 let getListInfo = exports.getListInfo = function(cmt){

@@ -26,8 +26,6 @@ let UserFormid = exports.UserFormid = require('./user_formid');
 
 let Identity = exports.Identity = require('./identity');
 
-let Like = exports.Like = require('./like');
-
 let Bargain = exports.Bargain = require('./bargain');
 
 mongoose.connect(config.MONGODB_URL, {

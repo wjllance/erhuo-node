@@ -11,7 +11,7 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_wechat = require('../services/wechat');
-let { User, Image, Goods, Like } = require('../models');
+let { User, Image, Goods } = require('../models');
 let srv_wxtemplate = require('../services/wechat_template');
 
 const router = module.exports = new Router();
@@ -56,52 +56,6 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
         data: goods
     };
 });
-
-
-
-router.post('/like/:goods_id', auth.loginRequired, async (ctx, next) => {
-    let user = ctx.state.user;
-    let goods = await Goods.findById(ctx.params.goods_id);
-    auth.assert(goods, '商品不存在');
-    let liken = await Like.findOne({
-        userID: ctx.user._id,
-        goodsId: goods._id,
-        canceled_date: null
-    });
-
-    auth.assert(!liken, '已经点过赞了');
-
-
-    let res = await srv_comment.toggleLike(user._id, goods._id);
-
-
-    user.collections.push(goods._id);   //TOBE DELETE
-
-    ctx.body = {
-        success: 1,
-        data: res
-    }
-});
-
-
-router.post('/unlike/:goods_id', auth.loginRequired, async (ctx, next) => {
-    let user = ctx.state.user;
-    let goods = await Goods.findById(ctx.params.goods_id);
-    auth.assert(goods, '商品不存在');
-    auth.assert(!_.some(user.collections, x => goods._id.equals(x)), '已经点过赞了');
-
-    let res = await srv_comment.like(user._id, goods._id);
-
-
-    user.collections.push(goods._id);   //TOBE DELETE
-    await user.save();
-    ctx.body = {
-        success: 1,
-        data: res
-    }
-});
-
-
 
 
 
