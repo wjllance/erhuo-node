@@ -83,7 +83,8 @@ router.post('/bargain', auth.loginRequired, async (ctx, next) => {
 
 
 /**
- * @api {post}  /bargain/join  参与砍价
+ * deprecated
+ * @api {post}  /bargain/join  参与砍价  NO USE!!!
  * @apiName     BargainJoin
  * @apiGroup    Bargain
  *

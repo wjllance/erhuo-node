@@ -112,7 +112,7 @@ goodsSchema.methods.baseInfo = function(fullPic) {
 };
 
 goodsSchema.methods.cardInfo = function() {
-    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
+    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority', 'is_special']);
 	if(this.npics && this.npics.length > 0){
         g.gpics = [];
         // g.gpics[0] = this.npics[0] + "?imageMogr2/thumbnail/200x";
