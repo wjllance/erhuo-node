@@ -134,7 +134,7 @@ orderSchema.methods.cardInfo = function() {
 orderSchema.methods.detailInfo = function() {
 
     let o = _.pick(this, ['_id', 'goodsInfo', 'goodsId', 'sn', 'price',
-        'order_status', 'pay_status', 'refund_status']);
+        'order_status', 'pay_status', 'refund_status', 'no_modify']);
     o.created_date = moment(this.created_date).format("YY-MM-DD HH:mm:ss");
     if(this.buyer){
         o.buyer = this.buyer.baseInfo();
