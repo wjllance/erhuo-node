@@ -82,7 +82,10 @@ exports.findOrCreateV3 = async function(goods, user) {
     let order = await Order.findOne({  //检查自己的之前订单
         goodsId: goods._id,
         buyer: user._id,
-        order_status : {$ne: ORDER_STATUS.CANCEL}
+        // order_status : {$ne: ORDER_STATUS.CANCEL}
+        order_status : {
+            $in: [ORDER_STATUS.INIT, ORDER_STATUS.TOPAY, ORDER_STATUS.PAID]
+        }
     });
     if(order) return order;
 
