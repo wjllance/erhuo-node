@@ -34,8 +34,8 @@ exports.register = function () {
 
 
 let scheduleOldGoodsNotify = () =>{
-    schedule.scheduleJob('*/30 * * * * *', async function() {
-        // schedule.scheduleJob('*/5 * * * * *', async function(){
+    // schedule.scheduleJob('*/30 * * * * *', async function() {
+    schedule.scheduleJob('0 */10 * * * *', async function(){
 
         let goodsAll = await Goods.find({
             created_date: {
