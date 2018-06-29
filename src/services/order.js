@@ -105,7 +105,7 @@ exports.findOrCreateV3 = async function(goods, user, price) {
         goodsId: goods._id,
         seller: goods.userID,
         buyer: user._id,
-        price: price,
+        price: price.toFixed(2),
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
