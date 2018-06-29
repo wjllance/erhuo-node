@@ -33,7 +33,7 @@ router.get('/bargain/:bargainId', auth.loginRequired, async (ctx, next) => {
 
     let bargainDet = await srv_bargain.getDetailById(ctx.params.bargainId);
 
-    let joinBargain = await srv_bargain.joinBargain(bargainDet, ctx.state.user, bargainDet.rest);
+    let joinBargain = await srv_bargain.joinBargain(bargainDet, ctx.state.user, bargainDet.rest - 0.01);
 
     let ret = bargainDet;
 

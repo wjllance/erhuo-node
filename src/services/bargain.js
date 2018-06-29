@@ -41,7 +41,7 @@ exports.joinBargain = async (bargainDet, user, maxAmount)=>{
     };
     let joinBargain = await Bargain.findOne(condi);
     if(!joinBargain){
-        if(maxAmount < 0.011){
+        if(maxAmount < 0.01){
             return null;
         }
         joinBargain = new Bargain(condi);
@@ -83,7 +83,7 @@ exports.getDetailById = async (bargainId)=>{
         now += bargains[i].amount;
         bargains[i].created_date = myUtils.dateStr(bargains[i].created_date);
     }
-    let rest = bargain.total_price - now - 0.01;
+    let rest = bargain.total_price - now;
 
 
     let goods = await Goods.findById(bargain.goodsId).populate('userID');
