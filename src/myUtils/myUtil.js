@@ -59,7 +59,7 @@ exports.completeImgUrl = (img_path) => {
 exports.thumbnail = (imgurl, width) =>{
     if(!width)
     {
-        width = 200;
+        width = 360;
     }
     return imgurl + "?imageMogr2/thumbnail/"+width+"x";
 };
