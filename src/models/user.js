@@ -52,7 +52,9 @@ let userSchema = new mongoose.Schema({
 
 	stu_verified: Date,
 	realname: String,
-	school: String
+	school: String,
+
+	active_date: { type: Date, default: Date.now }
 }
 , {versionKey:false}
 );
