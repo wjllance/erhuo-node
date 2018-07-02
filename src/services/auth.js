@@ -97,10 +97,9 @@ exports.loginRequired = async function (ctx, next) {
             console.log(user_id+"not exist")
         }
     }
+    assert(ctx.state.user, '尚未登录');
     if(ctx.state.user.active_date){
         assert(moment().isAfter(ctx.state.user.active_date), "账号封禁，将于"+moment(ctx.state.user.active_date).format('lll')+"解禁");
     }
-    assert(ctx.state.user, '尚未登录');
-
 	await next();
 }
