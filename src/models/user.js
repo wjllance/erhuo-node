@@ -67,6 +67,7 @@ userSchema.methods.baseInfo = function(){
     if(this.stu_verified){
         output.verify = "学生认证";
     }
+    output.app_verison = config.ONLINE_VERSION;
 	return output;
 };
 
