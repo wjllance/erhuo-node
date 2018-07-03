@@ -111,3 +111,10 @@ router.get('/center/test_update_service_account_user', async (ctx, next) => {
         data: res
     }
 });
+
+router.get('/center/version', async (ctx, next) => {
+    ctx.body = {
+        success: 1,
+        data: config.ONLINE_VERSION
+    }
+});
