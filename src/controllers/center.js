@@ -103,7 +103,6 @@ router.get('/center/banners', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-
 router.get('/center/test_update_service_account_user', async (ctx, next) => {
     let next_openid = ctx.query.next_openid;
     let res = await srv_wechat.update_service_account_userid(next_openid)
@@ -111,4 +110,4 @@ router.get('/center/test_update_service_account_user', async (ctx, next) => {
         success: 1,
         data: res
     }
-})
+});
