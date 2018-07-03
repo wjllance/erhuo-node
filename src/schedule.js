@@ -1,7 +1,7 @@
 const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
-const myUtils = require("./myUtils/myUtil");
+const myUtils = require("./myUtils/mUtils");
 const {Transaction, Order, Goods} = require('./models');
 const srv_transaction = require('./services/transaction');
 const srv_order = require('./services/order');

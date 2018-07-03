@@ -5,8 +5,7 @@ let superagent = require('superagent');
 let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
-let tools = require("./tools");
-let myUtils = require("../myUtils/myUtil");
+let myUtils = require("../myUtils/mUtils");
 /*-----------------------------------------------*/
 
 let { log } = require('../config');
@@ -30,7 +29,7 @@ let getListInfo = exports.getListInfo = function(cmt){
         fromAvatar: cmt.fromId.avatarUrl,
         // created_date: cmt.created_date
     };
-    ret.created_date = tools.dateStr(cmt.created_date);
+    ret.created_date = myUtils.dateStr(cmt.created_date);
     if(cmt.goodsId.npics &&  cmt.goodsId.npics.length > 0){
         ret.gpic = myUtils.thumbnail(cmt.goodsId.npics[0]);
     }else{

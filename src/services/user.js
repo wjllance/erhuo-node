@@ -5,7 +5,7 @@ let utils = require('utility');
 let superagent = require('superagent');
 let config = require('../config');
 let auth = require('../services/auth');
-let myUtil = require('../myUtils/myUtil');
+let myUtil = require('../myUtils/mUtils');
 
 let { log } = require('../config');
 let { User, Account, Order, UserFormid, Transaction } = require('../models');

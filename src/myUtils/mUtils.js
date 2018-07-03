@@ -1,4 +1,10 @@
 
+let _ = require('lodash');
+require('should');
+let moment = require('moment')
+let config = require('../config');
+moment.locale('zh-cn');
+
 /*
 var Sig = require('../libs/tlssdk/lib/TimGenerateSig.js');
 let im_config = require('../libs/tlssdk/config/config');

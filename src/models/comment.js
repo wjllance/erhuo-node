@@ -1,7 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
-let tools = require('../services/tools')
+let myUtils = require("../myUtils/mUtils");
 
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
@@ -46,7 +46,7 @@ commentSchema.methods.getFullInfo = function() {
         fromId: this.fromId._id,
         fromName: this.fromId.nickName,
         fromAvatar: this.fromId.avatarUrl,
-        created_date: tools.dateStr(this.created_date)
+        created_date: myUtils.dateStr(this.created_date)
     };
     if(this.toId != null)
     {
