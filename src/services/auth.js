@@ -8,6 +8,8 @@ let { log } = require('../config');
 let { User } = require('../models');
 let { Visit } = require('../models');
 let { Account } = require('../models');
+let moment = require('moment');
+let myUtils = require("../myUtils/mUtils");
 
 const ERR_CODE = 978;
 
@@ -86,8 +88,8 @@ exports.loginRequired = async function (ctx, next) {
     if(config.ENV == "local" && !ctx.state.user)
     {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
-        let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
-        // let user_id = ctx.session.user_id ||"5ad31bfba2e0c833c23d9d56";  //wjl
+        // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
+        let user_id = ctx.session.user_id ||"5ad31bfba2e0c833c23d9d56";  //wjl
         // let user_id = ctx.session.user_id ||"5ad8b906a2e0c833c24819cd";  //mirror
         // let user_id = ctx.session.user_id ||"5ac4367c758e552f03111fc8";  //hw
         ctx.state.user = await User.findById(user_id);
@@ -96,6 +98,8 @@ exports.loginRequired = async function (ctx, next) {
         }
     }
     assert(ctx.state.user, '尚未登录');
-
+    if(ctx.state.user.active_date){
+        assert(moment().isAfter(ctx.state.user.active_date), "账号封禁，将于"+moment(ctx.state.user.active_date).format('lll')+"解禁");
+    }
 	await next();
 }

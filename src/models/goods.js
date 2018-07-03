@@ -1,8 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
-let tools = require('../services/tools')
-let myUtils = require("../myUtils/myUtil");
+let myUtils = require("../myUtils/mUtils");
 const school_map = require('../config').CONSTANT.SCHOOL_MAP;
 const GOODS_STATUS = require('../config').CONSTANT.GOODS_STATUS;
 // 商品
@@ -86,7 +85,7 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
     }
 
     // g.state = this.removed_date ? "已下架" : "在售";
-    g.created_date = tools.dateStr(this.created_date);
+    g.created_date = myUtils.dateStr(this.created_date);
     g.glocation = school_map[this.glocation] ;
 
     g.state = getGoodsState(this);
@@ -104,7 +103,7 @@ goodsSchema.methods.baseInfo = function(fullPic) {
 
     }
     // g.state = this.removed_date ? "已下架" : "在售";
-    g.created_date = tools.dateStr(this.created_date);
+    g.created_date = myUtils.dateStr(this.created_date);
     g.glocation = school_map[this.glocation] ;
 
     g.state = getGoodsState(this);
@@ -125,7 +124,7 @@ goodsSchema.methods.cardInfo = function() {
     // g.state = this.removed_date ? "已下架" : "在售";
     }
 
-    g.created_date = tools.dateStr(this.created_date);
+    g.created_date = myUtils.dateStr(this.created_date);
     g.glocation = school_map[this.glocation];
     if(this.userID._id){
         g.user = this.userID.cardInfo();

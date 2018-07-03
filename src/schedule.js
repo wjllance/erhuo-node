@@ -1,7 +1,7 @@
 const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
-const myUtils = require("./myUtils/myUtil");
+const myUtils = require("./myUtils/mUtils");
 const {Transaction, Order, Goods} = require('./models');
 const srv_transaction = require('./services/transaction');
 const srv_order = require('./services/order');
@@ -34,8 +34,8 @@ exports.register = function () {
 
 
 let scheduleOldGoodsNotify = () =>{
-    schedule.scheduleJob('*/30 * * * * *', async function() {
-        // schedule.scheduleJob('*/5 * * * * *', async function(){
+    // schedule.scheduleJob('*/30 * * * * *', async function() {
+    schedule.scheduleJob('0 */10 * * * *', async function(){
 
         let goodsAll = await Goods.find({
             created_date: {

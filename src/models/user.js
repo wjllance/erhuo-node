@@ -2,7 +2,8 @@
 let mongoose = require('mongoose');
 let _ = require('lodash');
 let school_map = require('../config').CONSTANT.SCHOOL_MAP
-let config = require('../config')
+let config = require('../config');
+let moment = require('moment');
 // 用户
 let userSchema = new mongoose.Schema({
 
@@ -52,7 +53,9 @@ let userSchema = new mongoose.Schema({
 
 	stu_verified: Date,
 	realname: String,
-	school: String
+	school: String,
+
+	active_date: { type: Date, default: moment().subtract(1, 'days') }
 }
 , {versionKey:false}
 );

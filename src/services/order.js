@@ -6,7 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
-let myUtils = require("../myUtils/myUtil");
+let myUtils = require("../myUtils/mUtils");
 let auth = require('./auth');
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -105,7 +105,7 @@ exports.findOrCreateV3 = async function(goods, user, price) {
         goodsId: goods._id,
         seller: goods.userID,
         buyer: user._id,
-        price: price,
+        price: price.toFixed(2),
         // sn: generateSerialNumber()
     });
     order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
