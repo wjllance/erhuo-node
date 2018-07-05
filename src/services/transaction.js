@@ -49,6 +49,7 @@ exports.withdraw = async (user, amount) =>{
     account.balance = account.balance - amount;
     account.updated_date = moment();
     await account.save();
+    console.log("提现...", account);
     return await transaction.save();
 };
 
