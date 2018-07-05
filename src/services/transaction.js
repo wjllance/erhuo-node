@@ -47,6 +47,7 @@ exports.withdraw = async (user, amount) =>{
     });
 
     account.balance = account.balance - amount;
+    account.updated_date = moment();
     await account.save();
     return await transaction.save();
 };
