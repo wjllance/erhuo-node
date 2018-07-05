@@ -28,6 +28,10 @@ let Identity = exports.Identity = require('./identity');
 
 let Bargain = exports.Bargain = require('./bargain');
 
+let UserGroup = exports.UserGroup = require('./user_group');
+
+let wxGroup = exports.wxGroup = require('./wxgroup');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {

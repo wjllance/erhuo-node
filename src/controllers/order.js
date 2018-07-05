@@ -445,6 +445,19 @@ router.post('/order/refund/confirm_by_admin', auth.loginRequired, async(ctx, nex
 });
 
 
+router.post('/order/refund/confirm_by_admin', async(ctx, next)=>{
+    let order = await Order.findById(ctx.request.body.orderId);
+    auth.assert(order, "订单不存在");
+    //TODO:: AUTH!!!
+    let res = await srv_order.refund_confirm(order);
+    let transaction = await srv_transaction.refundConfirm(order);
+    await srv_wxtemplate.refundConfirm(order);
+    console.log("confirm refund transaction ", transaction);
+    ctx.body = {
+        success:1,
+        data: res
+    }
+});
 
 
 

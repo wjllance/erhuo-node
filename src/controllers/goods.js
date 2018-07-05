@@ -341,17 +341,17 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
 
     let params = ctx.request.body;
-    auth.assert(params.gname && params.gsummary && params.gprice && params.gcost, "缺少参数");
+    auth.assert(params.gsummary && params.gprice, "缺少参数");
     auth.assert(params.npics && params.npics.length > 0, "没图");
 
     let goods = new Goods();
     goods.userID = ctx.state.user._id;
     // goods.gpics = images.map(x => x._id);
 
-
     _.assign(goods, _.pick(params, ['gname', 'gsummary', 'glabel', 'gprice', 'npics', 'gstype', 'glocation', 'gcost', 'gcity', 'remark']));
 
     goods.category = params.category || "其他";
+    goods.gname = params.gname || params.gsummary.substr(0, 20);
     if(!goods.glocation){
         goods.glocation = ctx.state.user.location || 0;
     }

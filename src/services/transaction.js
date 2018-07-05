@@ -47,7 +47,9 @@ exports.withdraw = async (user, amount) =>{
     });
 
     account.balance = account.balance - amount;
+    account.updated_date = moment();
     await account.save();
+    console.log("提现...", account);
     return await transaction.save();
 };
 
@@ -127,6 +129,7 @@ exports.refundConfirm = async(order)=>{
     });
     auth.assert(r_transaction && !r_transaction.finished_date, "交易不存在或已结束");
     r_transaction.finished_date = moment();
+    r_transaction.status = TRANSACTION_STATUS.SUCCEED;
     let ret = await r_transaction.save();
 
 
@@ -142,6 +145,7 @@ exports.refundConfirm = async(order)=>{
 
     let account = await Account.findById(r_transaction.accountId);
     account.balance = account.balance + r_transaction.amount;
+    account.updated_date = moment();
     await account.save();
 
     console.log("已入账...", moment(), account);
