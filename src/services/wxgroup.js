@@ -64,7 +64,8 @@ exports.getGroupList = async (user) => {
             userID:user._id,
             deleted_date: null
         })
-        .populate('group_id');
+        .populate('group_id')
+        .sort({created_date:-1});
     console.log("mygroups...", groups);
     return _.map(groups, g=>g.group_id);
 };
