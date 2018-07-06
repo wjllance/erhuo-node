@@ -26,6 +26,7 @@ let commentSchema = new mongoose.Schema({
     secret: Boolean,
     read_date: {type: Date, default: null},
     created_date: { type: Date, default: Date.now },
+    deleted_date: Date
 },{versionKey:false});
 
 

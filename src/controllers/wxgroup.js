@@ -176,22 +176,29 @@ router.post('/group/join', async (ctx, next) => {
 router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
 
     let reqParams = ctx.request.body;
+    console.log(reqParams);
+
+
     let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
-    let decryptedData = pc.decryptData(reqParams.m, reqParams.iv);
+    let decryptedData = pc.decryptData(reqParams.encryptedData, reqParams.iv);
+
+    auth.assert(decryptedData.watermark.appid === config.APP_ID, '水印错误');
 
     console.log(decryptedData);
     auth.assert(decryptedData.openGId, "没");
 
-    let data = {};
-    if(reqParams.groupName){
-        data.name = reqParams.groupName;
+    let condi = {openGId:decryptedData.openGId};
+
+    let wxgroup = await wxGroup.findOne(condi);
+    if(!wxgroup){
+        wxgroup = new wxGroup(condi);
+        wxgroup.name = reqParams.groupName || null;
+        await wxgroup.save();
     }
-    let wxgroup = await wxGroup.findOneAndUpdate({
-        openGId:decryptedData.openGId
-    }, data, {new:true, upsert:true});
+
     ctx.body = {
         success:1,
-        data: wxgroup._id
+        data: wxgroup
     }
 });
 

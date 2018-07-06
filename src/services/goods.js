@@ -1,9 +1,7 @@
 
 let _ = require('lodash');
 
-let { User  } = require('../models');
-let { Comment } = require('../models');
-let { Goods } = require('../models');
+let { User, Like,Comment,Goods  } = require('../models');
 
 let auth = require('../services/auth');
 let tools = require('./tools')
@@ -47,14 +45,35 @@ exports.postComment = async function(goods, user, cmt, toUserId){
     return await goods.save();
 };
 
+
+let updateStatus = async (goods) => {
+    let likenum = await Like.find({
+        goods_id: goods_id,
+        deleted_date:null
+    }).count();
+    let commentnum = await Comment.find({
+        goodsId: goods_id,
+        deleted_date: null
+    }).count();
+
+    goods.like_num = likenum;
+    goods.comment_num = commentnum;
+    return await goods.save();
+}
+
 // 获取商品详情
 let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInfo) {
+
+
+
 
     let goods = await Goods
         .findById(goods_id)
         .populate('gpics')
         .populate('userID');
     auth.assert(goods, '商品不存在');
+
+    goods = await updateStatus(goods);
 
     let g = goods.baseInfoV2(1); //fullpic
 
@@ -88,6 +107,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
         _.assign(g, await injectGoods(g, userInfo));
     }
     g.remark = goods.remark;
+
     return g;
 };
 

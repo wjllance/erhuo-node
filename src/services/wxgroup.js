@@ -41,6 +41,7 @@ exports.createUserGroup = async (wxgroup, user)=>{
         userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
         wxgroup.member_num += 1;
         await wxgroup.save();
+        await userGroup.save();
         console.log("creating user group...", userGroup);
 
     }else{
