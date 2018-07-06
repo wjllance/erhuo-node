@@ -17,7 +17,7 @@ let wxGroupSchema = new mongoose.Schema({
 
         member_num: {
             type: Number,
-            default: 1
+            default: 0
         },
 
         created_date: { type: Date, default: Date.now },

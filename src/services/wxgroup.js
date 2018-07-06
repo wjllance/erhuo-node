@@ -28,32 +28,42 @@ let {Order, Goods, UserGroup, wxGroup} = require('../models');
 exports.createUserGroup = async (wxgroup, user)=>{
 
     let condi = {
-        group_id:groupId,
-        userID: ctx.state.user._id
+        group_id:wxgroup._id,
+        userID: user._id
     };
     let data = {
-        openGId: wxgroup.openGId,
+        // openGId: wxgroup.openGId,
         deleted_date: null
+    };
+    let userGroup = await UserGroup.findOne(condi);
+
+    if(!userGroup || userGroup.deleted_date){
+        userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
+        wxgroup.member_num += 1;
+        await wxgroup.save();
+        console.log("creating user group...", userGroup);
+
+    }else{
+        console.log("created before...", userGroup);
     }
-    let userGroup = await UserGroup.find(condi);
-
-    if(userGroup && !userGroup.deleted_date){
-        return userGroup;
-    }
-
-    wxgroup.member_num += 1;
-    await wxgroup.save();
-
-    userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
-
-    console.log("creating user group...", userGroup);
-    return userGroup;
+    return wxgroup;
 };
 
 exports.getMembers = async (groupId) => {
     let users = await UserGroup.find({
-        group_id:groupId,
-        deleted_date:null
-    }).populate('user');
-    return _.map(users, u=>u.userID);
-}
+        group_id: groupId,
+        deleted_date: null
+    }).populate('userID');
+    return _.map(users, u => u.userID.cardInfo());
+};
+
+exports.getGroupList = async (user) => {
+    let groups = await UserGroup
+        .find({
+            userID:user._id,
+            deleted_date: null
+        })
+        .populate('group_id');
+    console.log("mygroups...", groups);
+    return _.map(groups, g=>g.group_id);
+};

@@ -1,7 +1,7 @@
 
 require('should');
 let Router = require('koa-router');
-
+const moment = require('moment');
 let _ = require('lodash');
 
 let utils = require('utility');
@@ -34,16 +34,16 @@ const router = module.exports = new Router();
  */
 router.get('/group/my', auth.loginRequired, async (ctx, next) => {
 
-    let mygroup = await wxGroup.find({userID:ctx.state.user._id});
+    let mygroups = await srv_wxgroup.getGroupList(ctx.state.user);
 
     ctx.body = {
         success:1,
-        data: mygroup
+        data: mygroups
     }
 });
 
 
-router.del('/group/:openGId', auth.loginRequired, async (ctx, next)=>{
+router.del('/group/:groupId', auth.loginRequired, async (ctx, next)=>{
 
 });
 
@@ -98,20 +98,20 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     let gusers = await srv_wxgroup.getMembers(group._id);
 
-    console.log("group users...", guserids);
+    console.log("group users...", gusers);
 
     condi.userID = {
         $in: _.map(gusers, u=>u._id)
     };
 
     let user = ctx.state.user;
-    if(user){ //not other
-        condi.$or=[{
-            glocation:user.location
-        },{
-            glocation:0
-        }]
-    }
+    // if(user){ //not other
+    //     condi.$or=[{
+    //         glocation:user.location
+    //     },{
+    //         glocation:0
+    //     }]
+    // }
     let ret = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
 
     ctx.body = {
@@ -122,7 +122,7 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
 
 /**
- * @api {post}  /group/:groupId/join    加入群
+ * @api {post}  /group/join    加入群
  * @apiName     GroupJoin
  * @apiGroup    Group
  *
@@ -142,16 +142,20 @@ router.post('/group/join', async (ctx, next) => {
 
     let wxgroup = await wxGroup.findById(groupId);
     auth.assert(wxgroup, "群不在");
-    let user = ctx.state.user;
+
+    let user = null;
     if (ctx.request.body.GOD){
         user = await User.findById(ctx.request.body.userId);
     }
-    auth.assert(user, "没有人");
-    await srv_wxgroup.createUserGroup(wxgroup, user);
+    else {
+        await auth.loginRequired(ctx, next);
+        user = ctx.state.user;
+    }
+    wxgroup = await srv_wxgroup.createUserGroup(wxgroup, user);
 
     ctx.body = {
         success:1,
-        data: wxgroup._id
+        data: wxgroup
     }
 });
 
