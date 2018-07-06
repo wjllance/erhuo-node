@@ -32,6 +32,9 @@ let UserGroup = exports.UserGroup = require('./user_group');
 
 let wxGroup = exports.wxGroup = require('./wxgroup');
 
+
+let Like = exports.Like = require('./like');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {

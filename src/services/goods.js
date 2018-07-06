@@ -1,7 +1,7 @@
 
 let _ = require('lodash');
 
-let { User, Like,Comment,Goods  } = require('../models');
+let { User,Comment,Goods,Like  } = require('../models');
 
 let auth = require('../services/auth');
 let tools = require('./tools')
@@ -48,11 +48,11 @@ exports.postComment = async function(goods, user, cmt, toUserId){
 
 let updateStatus = async (goods) => {
     let likenum = await Like.find({
-        goods_id: goods_id,
+        goods_id: goods._id,
         deleted_date:null
     }).count();
     let commentnum = await Comment.find({
-        goodsId: goods_id,
+        goodsId: goods._id,
         deleted_date: null
     }).count();
 
