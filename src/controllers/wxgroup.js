@@ -159,6 +159,35 @@ router.post('/group/join', async (ctx, next) => {
     }
 });
 
+
+/**
+ * @api {get}  /group/:groupId/info    群信息
+ * @apiName     GroupInfo
+ * @apiGroup    Group
+ *
+ * @apiParam    {Boolean}   [withMembers]
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.get('/group/:groupId/info', async (ctx, next) => {
+
+    let wxgroup = await wxGroup.findById(ctx.params.groupId);
+    auth.assert(wxgroup, "群不在");
+
+    let ret = {
+        group : wxgroup
+    };
+    if(ctx.query.withMembers){
+        ret.members = await srv_wxgroup.getMembers(ctx.params.groupId);
+    }
+    ctx.body = {
+        success:1,
+        data: ret
+    }
+});
+
 /**
  * @api {post}  /group/update    群信息更新
  * @apiName     GroupUpdate
@@ -167,7 +196,7 @@ router.post('/group/join', async (ctx, next) => {
  * @apiParam    {String}    encryptedData       加密信息
  * @apiParam    {String}    iv
  *
- * @apiParam    {String}    [groupName]   群名
+ * @apiParam    {String}    [join]   是否入群
  *
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
@@ -192,8 +221,11 @@ router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
     let wxgroup = await wxGroup.findOne(condi);
     if(!wxgroup){
         wxgroup = new wxGroup(condi);
-        wxgroup.name = reqParams.groupName || null;
         await wxgroup.save();
+    }
+
+    if(reqParams.join){
+        wxgroup = await srv_wxgroup.createUserGroup(wxgroup, user);
     }
 
     ctx.body = {
