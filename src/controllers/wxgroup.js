@@ -225,7 +225,7 @@ router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
     }
 
     if(reqParams.join){
-        wxgroup = await srv_wxgroup.createUserGroup(wxgroup, user);
+        wxgroup = await srv_wxgroup.createUserGroup(wxgroup, ctx.state.user);
     }
 
     ctx.body = {
