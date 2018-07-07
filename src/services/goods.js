@@ -12,15 +12,15 @@ const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包"
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
 
-    // let res = await Like.findOne({
-    //     goods_id:goods._id,
-    //     userID: user._id,
-    //     deleted_date: null
-    // });
-    //
-    // let has_collected = !(!res);
+    let res = await Like.findOne({
+        goods_id:goods._id,
+        userID: user._id,
+        deleted_date: null
+    });
 
-    let has_collected = false;
+    let has_collected = !(!res);
+
+    // let has_collected = false;
     if(!has_collected){
         has_collected = _.some(user.collections, x => goods._id.equals(x));
     }
