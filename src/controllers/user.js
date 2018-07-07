@@ -364,7 +364,7 @@ router.post('/user/save_formids', auth.loginRequired, async(ctx, next)=>{
 /**
  * @api {get}   /user/collections   我的收藏
  * @apiName     Collections
- * @apiGroup    Center
+ * @apiGroup    User
  *
  *
  * @apiParam    {Number}    pageNo      当前页码，默认1
@@ -389,5 +389,40 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+
+/**
+ * @api {get}   /user/mylikes   我的点赞
+ * @apiName     MyLikes
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+router.get('/user/mylikes', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+    console.log(pageNo);
+    console.log(pageSize);
+
+    let collections = await Like.find({
+        userID: ctx.state.user._id,
+        deleted_date:null
+    });
+    let user = ctx.state.user;
+    let condi = {_id: _.map(collections, col=>col.goods_id)};
+
+    console.log(condi);
+    let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
+
+    ctx.body = {
+        success: 1,
+        data: goods
+    };
+});
 
 

@@ -11,14 +11,28 @@ const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包"
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
-    let has_collected = _.some(user.collections, x => goods._id.equals(x));
+
+    let res = await Like.findOne({
+        goods_id:goods._id,
+        userID: user._id,
+        deleted_date: null
+    });
+
+    let has_collected = !(!res);
+
     return {
         has_collected
     };
+
+    // let has_collected = _.some(user.collections, x => goods._id.equals(x));
+    // return {
+    //     has_collected
+    // };
 };
 
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
+
     if (!_.isArray(goods)) {
         return _.assign(goods.cardInfo(), await injectGoods(goods, user));
     } else {
@@ -30,6 +44,8 @@ let outputify = exports.outputify = async function(goods, user) {
         return ugoods;
     }
 };
+
+
 
 exports.postComment = async function(goods, user, cmt, toUserId){
     let new_comment = await Comment.create({
