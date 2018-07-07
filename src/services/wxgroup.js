@@ -50,11 +50,16 @@ exports.createUserGroup = async (wxgroup, user)=>{
     return wxgroup;
 };
 
-exports.getMembers = async (groupId) => {
+let getMembers = exports.getMembers = async (groupId, count) => {
+
     let users = await UserGroup.find({
         group_id: groupId,
         deleted_date: null
-    }).populate('userID');
+    }).populate('userID')
+        .sort({
+            created_date:1
+        })
+        .limit(count);
     return _.map(users, u => u.userID.cardInfo());
 };
 
@@ -67,5 +72,15 @@ exports.getGroupList = async (user) => {
         .populate('group_id')
         .sort({created_date:-1});
     console.log("mygroups...", groups);
-    return _.map(groups, g=>g.group_id);
+
+    let ret = [];
+    for (let i = 0; i < groups.length; i++){
+        let res = {
+            group : groups[i].group_id,
+            members: await this.getMembers(groups[i].group_id._id, 5)
+        };
+        ret.push(res);
+    }
+
+    return ret;
 };
