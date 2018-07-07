@@ -12,22 +12,22 @@ const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包"
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
 
-    let res = await Like.findOne({
-        goods_id:goods._id,
-        userID: user._id,
-        deleted_date: null
-    });
+    // let res = await Like.findOne({
+    //     goods_id:goods._id,
+    //     userID: user._id,
+    //     deleted_date: null
+    // });
+    //
+    // let has_collected = !(!res);
 
-    let has_collected = !(!res);
-
+    let has_collected = false;
+    if(!has_collected){
+        has_collected = _.some(user.collections, x => goods._id.equals(x));
+    }
     return {
         has_collected
     };
 
-    // let has_collected = _.some(user.collections, x => goods._id.equals(x));
-    // return {
-    //     has_collected
-    // };
 };
 
 // 获取可以输出的数据
