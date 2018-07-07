@@ -2,7 +2,7 @@ const schedule = require('node-schedule');
 let moment = require('moment');
 moment.locale('zh-cn');
 const myUtils = require("./myUtils/mUtils");
-const {Transaction, Order, Goods} = require('./models');
+const {Transaction, Order, Goods, User, Like} = require('./models');
 const srv_transaction = require('./services/transaction');
 const srv_order = require('./services/order');
 const srv_wx_template = require("./services/wechat_template");
@@ -25,11 +25,41 @@ exports.register = function () {
 
     scheduleGoodsExamine();
 
-    scheduleOldPicsUpload();
+    // scheduleOldPicsUpload();
 
-    scheduleOrderImgUpdate();
+    // scheduleOrderImgUpdate();
 
     scheduleOldGoodsNotify();
+
+    scheduleUpdateCollection();
+};
+
+let scheduleUpdateCollection = ()=>{
+    schedule.scheduleJob('*/10 * * * * *', async function(){
+        let user = await User.findOne({
+            "collections.0": {$exists:true}
+        });
+        if(!user){
+            return;
+        }
+        console.log("moving like for ...", user);
+        let collections = user.collections;
+        for (let i = 0; i < 5 && i < user.collections.length; i++){
+            let goodsId = user.collections[i];
+
+            let res = await Like.findOneAndUpdate({
+                userID: user._id,
+                goods_id: goodsId
+            }, {
+                deleted_date: null,
+                updated_date: moment()
+            }, {new:true, upsert:true});
+            console.log("move likes...", res);
+            collections = collections.slice(1);
+        }
+        user.collections = collections;
+        await user.save();
+    })
 };
 
 
