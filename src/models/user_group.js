@@ -14,16 +14,16 @@ let userGroupSchema = new mongoose.Schema({
     // 微信群id
     group_id: {
         type:  mongoose.Schema.ObjectId,
-        ref: 'User',
+        ref: 'wxGroup',
         required: true,
         index: true
     },
 
-    openGId: {
-        type: String,
-        require: true,
-        index: true
-    },
+    // openGId: {
+    //     type: String,
+    //     require: true,
+    //     index: true
+    // },
 
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },

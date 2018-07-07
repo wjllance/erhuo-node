@@ -12,8 +12,7 @@ let tools = require('../services/tools');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_user = require('../services/user');
-let { User } = require('../models');
-let { Goods } = require('../models');
+let { Like, Goods, User } = require('../models');
 // const schools = config.CONSTANT.SCHOOL;
 const school_map = config.CONSTANT.SCHOOL_MAP;
 let moment = require('moment');
@@ -238,6 +237,78 @@ router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => 
     }
 });
 
+/**
+ * @api {post}  /user/like   点赞
+ * @apiName     Like
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {String}    goodsId
+ *
+ *
+ */
+router.post('/user/like', auth.loginRequired, async (ctx, next) => {
+    let goodsId = ctx.request.body.goodsId;
+    let goods = await Goods.findById(goodsId);
+    auth.assert(goods, '商品不存在');
+    let res = await Like.findOne({
+        userID: ctx.state.user._id,
+        goods_id: goodsId
+    });
+
+    auth.assert(!res || res.deleted_date, "点过了");
+
+    res = await Like.findOneAndUpdate({
+        userID: ctx.state.user._id,
+        goods_id: goodsId
+    }, {
+        deleted_date: null,
+        updated_date: moment()
+    }, {new:true, upsert:true});
+
+    goods.like_num --;
+    await goods.save();
+
+
+    ctx.body = {
+        success: 1,
+        data: res
+    }
+});
+
+/**
+ * @api {post}  /user/unlike   取消点赞
+ * @apiName     Unlike
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {String}    goodsId
+ *
+ *
+ */
+router.post('/user/unlike', auth.loginRequired, async (ctx, next) => {
+    let goodsId = ctx.request.body.goodsId;
+    let goods = await Goods.findById(goodsId);
+    auth.assert(goods, '商品不存在');
+
+    let res = await Like.findOne({
+        userID: ctx.state.user._id,
+        goods_id: goodsId
+    });
+
+    auth.assert(res && !res.deleted_date, "没赞过");
+
+    res.deleted_date = moment();
+    res.updated_date = moment();
+    goods.like_num --;
+    await res.save();
+    await goods.save();
+
+    ctx.body = {
+        success: 1,
+        data: res
+    }
+});
 
 
 // 取消收藏
@@ -293,7 +364,7 @@ router.post('/user/save_formids', auth.loginRequired, async(ctx, next)=>{
 /**
  * @api {get}   /user/collections   我的收藏
  * @apiName     Collections
- * @apiGroup    Center
+ * @apiGroup    User
  *
  *
  * @apiParam    {Number}    pageNo      当前页码，默认1
@@ -318,5 +389,40 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
     };
 });
 
+
+/**
+ * @api {get}   /user/mylikes   我的点赞
+ * @apiName     MyLikes
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+router.get('/user/mylikes', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+    console.log(pageNo);
+    console.log(pageSize);
+
+    let collections = await Like.find({
+        userID: ctx.state.user._id,
+        deleted_date:null
+    });
+    let user = ctx.state.user;
+    let condi = {_id: _.map(collections, col=>col.goods_id)};
+
+    console.log(condi);
+    let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
+
+    ctx.body = {
+        success: 1,
+        data: goods
+    };
+});
 
 

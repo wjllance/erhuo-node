@@ -45,17 +45,28 @@ let goodsSchema = new mongoose.Schema({
 	remark: String,
 
 
-    //new
     is_special: Boolean,
-    amount: Number
+    amount: Number,
 
+
+    //new
+
+    like_num :{
+	    type: Number,
+        default: 0
+    },
+
+    comment_num :{
+        type: Number,
+        default: 0
+    },
 
 
 },{versionKey:false});
 
 
 goodsSchema.methods.baseInfoV2 = function(fullPic) {
-	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
+	let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority', 'like_num', 'comment_num']);
     if(this.npics && this.npics.length > 0){
 	    if(fullPic){
             g.gpics = this.npics.map(x=>{
@@ -94,7 +105,7 @@ goodsSchema.methods.baseInfoV2 = function(fullPic) {
 
 //deprecated
 goodsSchema.methods.baseInfo = function(fullPic) {
-    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
+    let g = _.pick(this, ['_id', 'like_num', 'comment_num', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority']);
     if(fullPic){
         g.gpics = this.gpics.map(y => y.url());
     }else{
@@ -111,7 +122,7 @@ goodsSchema.methods.baseInfo = function(fullPic) {
 };
 
 goodsSchema.methods.cardInfo = function() {
-    let g = _.pick(this, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority', 'is_special']);
+    let g = _.pick(this, ['_id', 'like_num', 'comment_num', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'gcost', 'category', 'updated_date', 'gpriority', 'is_special']);
 	if(this.npics && this.npics.length > 0){
         g.gpics = [];
         // g.gpics[0] = this.npics[0] + "?imageMogr2/thumbnail/200x";

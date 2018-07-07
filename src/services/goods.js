@@ -1,9 +1,7 @@
 
 let _ = require('lodash');
 
-let { User  } = require('../models');
-let { Comment } = require('../models');
-let { Goods } = require('../models');
+let { User,Comment,Goods,Like  } = require('../models');
 
 let auth = require('../services/auth');
 let tools = require('./tools')
@@ -13,7 +11,19 @@ const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包"
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
-    let has_collected = _.some(user.collections, x => goods._id.equals(x));
+
+    // let res = await Like.findOne({
+    //     goods_id:goods._id,
+    //     userID: user._id,
+    //     deleted_date: null
+    // });
+    //
+    // let has_collected = !(!res);
+
+    let has_collected = false;
+    if(!has_collected){
+        has_collected = _.some(user.collections, x => goods._id.equals(x));
+    }
     return {
         has_collected
     };
@@ -21,6 +31,7 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
 
 // 获取可以输出的数据
 let outputify = exports.outputify = async function(goods, user) {
+
     if (!_.isArray(goods)) {
         return _.assign(goods.cardInfo(), await injectGoods(goods, user));
     } else {
@@ -32,6 +43,8 @@ let outputify = exports.outputify = async function(goods, user) {
         return ugoods;
     }
 };
+
+
 
 exports.postComment = async function(goods, user, cmt, toUserId){
     let new_comment = await Comment.create({
@@ -47,14 +60,35 @@ exports.postComment = async function(goods, user, cmt, toUserId){
     return await goods.save();
 };
 
+
+let updateStatus = async (goods) => {
+    let likenum = await Like.find({
+        goods_id: goods._id,
+        deleted_date:null
+    }).count();
+    let commentnum = await Comment.find({
+        goodsId: goods._id,
+        deleted_date: null
+    }).count();
+
+    goods.like_num = likenum;
+    goods.comment_num = commentnum;
+    return await goods.save();
+}
+
 // 获取商品详情
 let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInfo) {
+
+
+
 
     let goods = await Goods
         .findById(goods_id)
         .populate('gpics')
         .populate('userID');
     auth.assert(goods, '商品不存在');
+
+    goods = await updateStatus(goods);
 
     let g = goods.baseInfoV2(1); //fullpic
 
@@ -88,6 +122,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function(goods_id, userInf
         _.assign(g, await injectGoods(g, userInfo));
     }
     g.remark = goods.remark;
+
     return g;
 };
 

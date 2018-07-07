@@ -14,13 +14,13 @@ let likeSchema = new mongoose.Schema({
         ref: 'User',
         require: true
     },
-    goodsId: {
+    goods_id: {
         type:  mongoose.Schema.ObjectId,
         ref: 'Goods',
         require:true
     },
     read_date: Date,
-    canceled_date: Date,
+    deleted_date: Date,
     updated_date: { type: Date, default: Date.now },
 });
 
