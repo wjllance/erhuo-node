@@ -88,21 +88,6 @@ router.get('/center/unread', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-router.get('/center/banners', auth.loginRequired, async (ctx, next) => {
-
-    // let unread = await srv_comment.unread(ctx.state.user._id);
-    let bids = [
-        "5ac86b6f76a65223294eb319",
-        "5ad336e84f20d6431257e5b0"
-    ];
-    // let banner =
-
-    ctx.body = {
-        success: 1,
-        data: data
-    };
-});
-
 router.get('/center/test_update_service_account_user', async (ctx, next) => {
     let next_openid = ctx.query.next_openid;
     let res = await srv_wechat.update_service_account_userid(next_openid)
@@ -116,5 +101,20 @@ router.get('/center/version', async (ctx, next) => {
     ctx.body = {
         success: 1,
         data: config.ONLINE_VERSION
+    }
+});
+
+
+router.get('/center/banners', async(ctx, next) =>{
+    let banners = [{
+        picUrl: 'https://two.jicunbao.com/44f1e0fbaab11b7aa0f2.jpg',
+        // redirectTo : "/pages/message/message"
+    },{
+        picUrl: 'https://two.jicunbao.com/6814582c82a135db79c7.jpg'
+    }
+    ];
+    ctx.body = {
+        success:1,
+        data:banners
     }
 });
