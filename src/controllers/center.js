@@ -106,9 +106,12 @@ router.get('/center/version', async (ctx, next) => {
 
 
 router.get('/center/banners', async(ctx, next) =>{
-    let banners = [
-        'https://two.jicunbao.com/44f1e0fbaab11b7aa0f2.jpg',
-        'https://two.jicunbao.com/6814582c82a135db79c7.jpg'
+    let banners = [{
+        picUrl: 'https://two.jicunbao.com/44f1e0fbaab11b7aa0f2.jpg',
+        // redirectTo : "/pages/message/message"
+    },{
+        picUrl: 'https://two.jicunbao.com/6814582c82a135db79c7.jpg'
+    }
     ];
     ctx.body = {
         success:1,
