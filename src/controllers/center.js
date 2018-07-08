@@ -88,21 +88,6 @@ router.get('/center/unread', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-router.get('/center/banners', auth.loginRequired, async (ctx, next) => {
-
-    // let unread = await srv_comment.unread(ctx.state.user._id);
-    let bids = [
-        "5ac86b6f76a65223294eb319",
-        "5ad336e84f20d6431257e5b0"
-    ];
-    // let banner =
-
-    ctx.body = {
-        success: 1,
-        data: data
-    };
-});
-
 router.get('/center/test_update_service_account_user', async (ctx, next) => {
     let next_openid = ctx.query.next_openid;
     let res = await srv_wechat.update_service_account_userid(next_openid)
