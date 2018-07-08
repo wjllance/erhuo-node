@@ -9,6 +9,8 @@ let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let auth = require('../services/auth');
+
+
 let wechat = require('../services/wechat');
 let srv_wxtemplate = require('../services/wechat_template');
 let srv_bargain = require('../services/bargain');
