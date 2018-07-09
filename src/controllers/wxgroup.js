@@ -86,10 +86,12 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
             $gt: ddl
         };
         sorti = {
+            removed_date: 1,
             created_date:-1
         };
     }else{
         sorti = {
+            removed_date: 1,
             updated_date:-1
         };
     }
