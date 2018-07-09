@@ -100,7 +100,7 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     let gusers = await srv_wxgroup.getMembers(group._id);
 
-    console.log("group users...", gusers);
+    // console.log("group users...", gusers);
 
     condi.userID = {
         $in: _.map(gusers, u=>u._id)

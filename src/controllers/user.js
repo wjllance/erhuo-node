@@ -257,6 +257,7 @@ router.post('/user/collect/:goodsId', auth.loginRequired, async (ctx, next) => {
     }, {new:true, upsert:true});
 
     goods.like_num ++;
+    goods.updated_date = moment();
     await goods.save();
 
 
