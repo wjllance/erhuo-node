@@ -8,6 +8,8 @@ let utils = require('utility');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
+let mUtils = require('../myUtils/mUtils');
+
 let auth = require('../services/auth');
 
 
@@ -16,7 +18,7 @@ let srv_wxtemplate = require('../services/wechat_template');
 let srv_bargain = require('../services/bargain');
 let srv_wxgroup = require('../services/wxgroup');
 let srv_goods = require('../services/goods');
-let {Order,User, Goods, Bargain, wxGroup} = require('../models');
+let {User, Goods, UserGroup, wxGroup, GroupCheckIn, TodayBonusSchema} = require('../models');
 
 let WXBizDataCrypt = require('../services/WXBizDataCrypt');
 
@@ -88,10 +90,12 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
             $gt: ddl
         };
         sorti = {
+            removed_date: 1,
             created_date:-1
         };
     }else{
         sorti = {
+            removed_date: 1,
             updated_date:-1
         };
     }
@@ -100,7 +104,7 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     let gusers = await srv_wxgroup.getMembers(group._id);
 
-    console.log("group users...", gusers);
+    // console.log("group users...", gusers);
 
     condi.userID = {
         $in: _.map(gusers, u=>u._id)
@@ -247,7 +251,6 @@ router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
  *
  */
 router.get('/group/:groupId/members', auth.loginRequired, async (ctx, next) => {
-
     let ret = await srv_wxgroup.getMembers(ctx.params.groupId);
     ctx.body = {
         success:1,
@@ -256,3 +259,123 @@ router.get('/group/:groupId/members', auth.loginRequired, async (ctx, next) => {
 });
 
 
+/**
+ * @api {post}  /group/check_in   签到
+ * @apiName     GroupCheckIn
+ * @apiGroup    Group
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.post('/group/check_in', auth.loginRequired, async (ctx, next) => {
+    let groupId = ctx.request.body.groupId;
+    let condi = {
+        group_id: groupId,
+        userID: ctx.state.user._id,
+        deleted_date:null
+    };
+   let userGroup = await UserGroup.findOne(condi);
+   console.log(condi);
+
+   auth.assert(userGroup, "不在这个群");
+   let checkIn = await GroupCheckIn.findOne({
+       userID: ctx.state.user._id,
+       group_id: groupId,
+       created_date: {
+           $gt: moment({hour: 0})
+       }
+   });
+    if(!checkIn){
+       checkIn = await GroupCheckIn.create({
+           userID: ctx.state.user._id,
+           group_id: groupId,
+           created_date: moment()
+       });
+       userGroup.check_in_times ++;
+       await userGroup.save();
+       console.log("updating check in times...", userGroup);
+    }else{
+        console.log("签过了");
+    }
+    ctx.body = {
+       success:1,
+        data: checkIn
+    }
+
+});
+
+/**
+ * @api {get}  /group/:groupId/check_in_members   今日签到
+ * @apiName     GroupTodayCheckIn
+ * @apiGroup    Group
+ *
+ * @apiParam    {Number}    [limitCount]   前多少个
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.get('/group/:groupId/check_in_members', auth.loginRequired, async (ctx, next) => {
+    let res = await srv_wxgroup.getCheckInMembers(ctx.params.groupId, ctx.query.limitCount);
+    ctx.body = {
+        success:1,
+        data: {
+            count: res.length,
+            members: res
+        }
+    }
+});
+
+
+/**
+ * @api {get}  /group/:groupId/my_check_ins   我的签到
+ * @apiName     GroupMyCheckIn
+ * @apiGroup    Group
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next) => {
+    let res = await GroupCheckIn.find({
+        userID:ctx.state.user._id
+    });
+    res = _.map(res, x=>moment(x.created_date).format('lll'));
+    ctx.body = {
+        success:1,
+        data: {
+            count: res.length,
+            list: res
+        }
+    }
+});
+
+
+/**
+ * @api {get}  /group/:groupId/bonus   今日福利
+ * @apiName     GroupTodayBonus
+ * @apiGroup    Group
+ *
+ * @apiParam    {Number}    [limitCount]   前多少个
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
+    let res = await srv_wxgroup.getCheckInMembers(ctx.params.groupId);
+    auth.assert(ctx.query.god_bless_you || res.length > 9, "未满");
+    res = await TodayBonusSchema.findOne().sort({created_date:-1});
+    if(!res){
+        res = await TodayBonusSchema.create({
+            content:"empty"
+        })
+    }
+    let ret = {
+        content: res.content,
+        date: moment(res.created_date).format('L')
+    }
+    ctx.body = {
+        success:1,
+        data:ret
+    }
+});
