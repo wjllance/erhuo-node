@@ -35,6 +35,10 @@ let wxGroup = exports.wxGroup = require('./wxgroup');
 
 let Like = exports.Like = require('./like');
 
+let GroupCheckIn = exports.GroupCheckIn = require('./group_check_in');
+
+let TodayBonusSchema = exports.TodayBonusSchema = require('./today_bonus');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {

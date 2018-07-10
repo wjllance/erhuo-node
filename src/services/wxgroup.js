@@ -6,12 +6,15 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
+let mUtils = require("../myUtils/mUtils");
+
+
 let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
 
-let {Order, Goods, UserGroup, wxGroup} = require('../models');
+let {Order, Goods, UserGroup, GroupCheckIn, wxGroup} = require('../models');
 
 // exports.findOrCreate = async (openGId, user) =>{
 //
@@ -61,6 +64,26 @@ let getMembers = exports.getMembers = async (groupId, count) => {
         })
         .limit(count);
     return _.map(users, u => u.userID.cardInfo());
+};
+
+let getCheckInMembers = exports.getCheckInMembers = async (groupId, count) => {
+
+    let users = await GroupCheckIn.find({
+        group_id: groupId,
+
+        created_date: {
+            $gt: moment({h:0})
+        }
+    }).populate('userID')
+        .sort({
+            created_date:1
+        })
+        .limit(count);
+    return _.map(users, u => {
+        let res = u.userID.cardInfo();
+        res.check_in_time = moment(u.created_date).format('LTS');
+        return res;
+    });
 };
 
 exports.getGroupList = async (user) => {
