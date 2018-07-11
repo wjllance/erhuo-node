@@ -356,7 +356,6 @@ router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next)
  * @apiName     GroupTodayBonus
  * @apiGroup    Group
  *
- * @apiParam    {Number}    [limitCount]   前多少个
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
  *
