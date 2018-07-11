@@ -362,7 +362,7 @@ router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next)
  */
 router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
     let res = await srv_wxgroup.getCheckInMembers(ctx.params.groupId);
-    auth.assert(ctx.query.god_bless_you || res.length > 9, "未满");
+    auth.assert(ctx.query.god_bless_you || res.length > 0, "未满");
     res = await TodayBonusSchema.findOne().sort({created_date:-1});
     if(!res){
         res = await TodayBonusSchema.create({
