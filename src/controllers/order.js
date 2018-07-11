@@ -430,7 +430,7 @@ router.post('/order/refund/confirm', auth.loginRequired, async(ctx, next)=>{
 });
 
 
-router.post('/order/refund/confirm_by_admin', auth.loginRequired, async(ctx, next)=>{
+router.post('/order/refund/confirm_by_admin', async(ctx, next)=>{
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
     //TODO:: AUTH!!!
