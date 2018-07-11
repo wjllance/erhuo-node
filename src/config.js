@@ -113,7 +113,8 @@ exports.CONSTANT = {
         REJECT:2,           //审核失败
         RELEASED:3,         //已发布
         UNDERCARRIAGE:4     //下架
-    }
+    },
+    required_population: 1,
 };
 
 
