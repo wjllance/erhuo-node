@@ -320,6 +320,7 @@ router.get('/group/:groupId/check_in_members', auth.loginRequired, async (ctx, n
     ctx.body = {
         success:1,
         data: {
+            require: config.CONSTANT.required_population,
             count: res.length,
             members: res
         }
@@ -362,7 +363,7 @@ router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next)
  */
 router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
     let res = await srv_wxgroup.getCheckInMembers(ctx.params.groupId);
-    auth.assert(ctx.query.god_bless_you || res.length > 0, "未满");
+    auth.assert(ctx.query.god_bless_you || res.length >= config.CONSTANT.required_population, "未满");
     res = await TodayBonusSchema.findOne().sort({created_date:-1});
     if(!res){
         res = await TodayBonusSchema.create({
