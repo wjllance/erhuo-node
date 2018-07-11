@@ -47,7 +47,7 @@ router.post('/user/login', async (ctx, next) => {
 
 router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 
-    console.log("here is update")
+    console.log("here is update");
 
     auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
 
