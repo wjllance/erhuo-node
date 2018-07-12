@@ -35,7 +35,7 @@ exports.register = function () {
 };
 
 let scheduleUpdateCollection = ()=>{
-    schedule.scheduleJob('*/10 * * * * *', async function(){
+    schedule.scheduleJob('*/30 * * * * *', async function(){
         let user = await User.findOne({
             "collections.0": {$exists:true}
         });
