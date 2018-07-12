@@ -74,7 +74,8 @@ let scheduleOldGoodsNotify = () =>{
             updated_date: {
                 $lt: moment().subtract(3, 'd'),
                 $gt: moment().subtract(4, 'd')
-            }
+            },
+            status: config.CONSTANT.GOODS_STATUS.RELEASED
         });
         console.log('checking old goods notify...', goodsAll.length);
 

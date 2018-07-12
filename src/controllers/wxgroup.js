@@ -1,7 +1,6 @@
 
 require('should');
 let Router = require('koa-router');
-const moment = require('moment');
 let _ = require('lodash');
 
 let utils = require('utility');
@@ -9,6 +8,10 @@ let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let mUtils = require('../myUtils/mUtils');
+
+let moment = require('moment');
+moment.locale('zh-cn');
+
 
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
