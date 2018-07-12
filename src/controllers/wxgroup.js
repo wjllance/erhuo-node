@@ -1,7 +1,6 @@
 
 require('should');
 let Router = require('koa-router');
-const moment = require('moment');
 let _ = require('lodash');
 
 let utils = require('utility');
@@ -9,6 +8,10 @@ let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let mUtils = require('../myUtils/mUtils');
+
+let moment = require('moment');
+moment.locale('zh-cn');
+
 
 let auth = require('../services/auth');
 
@@ -82,9 +85,10 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     console.log(cate);
 
+
+    let org = false;
     if(cate === "今日"){
         let ddl = moment().subtract(1,'d');
-
         condi.created_date = {
             // $gt: moment().subtract(1, 'd')
             $gt: ddl
@@ -93,16 +97,18 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
             removed_date: 1,
             created_date:-1
         };
-    }else{
+    }else {
         sorti = {
             removed_date: 1,
             updated_date:-1
         };
+        if(cate === '原住民'){
+            org = true;
+        }
     }
     console.log(condi, sorti);
 
-
-    let gusers = await srv_wxgroup.getMembers(group._id);
+    let gusers = await srv_wxgroup.getMembers(group._id, org);
 
     // console.log("group users...", gusers);
 
@@ -134,6 +140,7 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
  *
  *
  * @apiParam    {String}    groupId
+ * @apiParam    {String}    invited_by
  * @apiParam    {String}    [userId]
  * @apiParam    {Boolean}   [GOD]
  *
@@ -157,7 +164,8 @@ router.post('/group/join', async (ctx, next) => {
         await auth.loginRequired(ctx, next);
         user = ctx.state.user;
     }
-    wxgroup = await srv_wxgroup.createUserGroup(wxgroup, user);
+
+    wxgroup = await srv_wxgroup.createUserGroup(wxgroup, user, ctx.request.body.invited_by);
 
     ctx.body = {
         success:1,
@@ -379,3 +387,4 @@ router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
         data:ret
     }
 });
+

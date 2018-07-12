@@ -35,7 +35,7 @@ exports.register = function () {
 };
 
 let scheduleUpdateCollection = ()=>{
-    schedule.scheduleJob('*/10 * * * * *', async function(){
+    schedule.scheduleJob('*/30 * * * * *', async function(){
         let user = await User.findOne({
             "collections.0": {$exists:true}
         });
@@ -74,7 +74,8 @@ let scheduleOldGoodsNotify = () =>{
             updated_date: {
                 $lt: moment().subtract(3, 'd'),
                 $gt: moment().subtract(4, 'd')
-            }
+            },
+            status: config.CONSTANT.GOODS_STATUS.RELEASED
         });
         console.log('checking old goods notify...', goodsAll.length);
 

@@ -28,7 +28,7 @@ let {Order, Goods, UserGroup, GroupCheckIn, wxGroup} = require('../models');
 // };
 
 
-exports.createUserGroup = async (wxgroup, user)=>{
+exports.createUserGroup = async (wxgroup, user, invited_by)=>{
 
     let condi = {
         group_id:wxgroup._id,
@@ -36,15 +36,26 @@ exports.createUserGroup = async (wxgroup, user)=>{
     };
     let data = {
         // openGId: wxgroup.openGId,
-        deleted_date: null
+        deleted_date: null,
+        invited_by: invited_by
     };
     let userGroup = await UserGroup.findOne(condi);
 
     if(!userGroup || userGroup.deleted_date){
         userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
         wxgroup.member_num += 1;
+        if(invited_by){
+            let inviter = await UserGroup.findOne({
+                group_id: wxgroup._id,
+                userID: invited_by
+            });
+            inviter.invite_times ++;
+            await inviter.save();
+            console.log("inviter info...", inviter);
+        }
         await wxgroup.save();
         await userGroup.save();
+
         console.log("creating user group...", userGroup);
 
     }else{
@@ -53,18 +64,22 @@ exports.createUserGroup = async (wxgroup, user)=>{
     return wxgroup;
 };
 
-let getMembers = exports.getMembers = async (groupId, count) => {
-
-    let users = await UserGroup.find({
+let getMembers = exports.getMembers = async (groupId, count, org) => {
+    let condi = {
         group_id: groupId,
-        deleted_date: null
-    }).populate('userID')
+        deleted_date: null,
+    };
+    if (org){ //原始成员
+        condi.invited_by = null;
+    }
+    let users = await UserGroup.find(condi).populate('userID')
         .sort({
             created_date:1
         })
         .limit(count);
     return _.map(users, u => u.userID.cardInfo());
 };
+
 
 let getCheckInMembers = exports.getCheckInMembers = async (groupId, count) => {
 
