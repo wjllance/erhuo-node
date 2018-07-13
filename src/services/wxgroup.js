@@ -44,6 +44,7 @@ exports.createUserGroup = async (wxgroup, user, invited_by)=>{
     if(!userGroup || userGroup.deleted_date){
         userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
         wxgroup.member_num += 1;
+        wxgroup.updated_date = moment();
         if(invited_by){
             let inviter = await UserGroup.findOne({
                 group_id: wxgroup._id,
@@ -54,6 +55,9 @@ exports.createUserGroup = async (wxgroup, user, invited_by)=>{
             console.log("inviter info...", inviter);
         }
         await wxgroup.save();
+        if(wxgroup.member_num === 1){
+            userGroup.is_admin = moment();
+        }
         await userGroup.save();
 
         console.log("creating user group...", userGroup);
@@ -108,7 +112,7 @@ exports.getGroupList = async (user) => {
             deleted_date: null
         })
         .populate('group_id')
-        .sort({created_date:-1});
+        .sort({updated_date:-1});
     console.log("mygroups...", groups);
 
     let ret = [];
