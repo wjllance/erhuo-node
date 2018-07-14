@@ -37,7 +37,9 @@ let Like = exports.Like = require('./like');
 
 let GroupCheckIn = exports.GroupCheckIn = require('./group_check_in');
 
-let TodayBonusSchema = exports.TodayBonusSchema = require('./today_bonus');
+let TodayBonus = exports.TodayBonusSchema = require('./today_bonus');
+
+let Version = exports.Version = require('./version');
 
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {

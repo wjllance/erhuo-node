@@ -40,8 +40,6 @@ exports.LEAN_APPID = config['LEAN_APPID'];
 exports.LEAN_APPKEY = config['LEAN_APPKEY'];
 exports.LEAN_MASTERKEY = config['LEAN_MASTERKEY'];
 
-exports.ONLINE_VERSION = config['ONLINE_VERSION'];
-
 
 exports.CONSTANT = {
     SCHOOL:{
