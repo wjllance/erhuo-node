@@ -10,8 +10,7 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_wechat = require('../services/wechat')
-let { User } = require('../models');
-let { Goods } = require('../models');
+let { User, Goods, Version } = require('../models');
 
 const router = module.exports = new Router();
 
@@ -98,9 +97,18 @@ router.get('/center/test_update_service_account_user', async (ctx, next) => {
 });
 
 router.get('/center/version', async (ctx, next) => {
+
+    let version = await Version.findOne().sort({created_date: -1});
+    if(!version){
+        version = new Version({
+            name: '0.7.7',
+            desc: "this is a description"
+        });
+        await version.save();
+    }
     ctx.body = {
         success: 1,
-        data: config.ONLINE_VERSION
+        data: version.name
     }
 });
 
@@ -118,3 +126,4 @@ router.get('/center/banners', async(ctx, next) =>{
         data:banners
     }
 });
+
