@@ -28,7 +28,7 @@ let {Order, Goods, UserGroup, GroupCheckIn, wxGroup} = require('../models');
 // };
 
 
-exports.createUserGroup = async (wxgroup, user, invited_by)=>{
+exports.createUserGroup = async (wxgroup, user, inviter)=>{
 
     let condi = {
         group_id:wxgroup._id,
@@ -37,30 +37,32 @@ exports.createUserGroup = async (wxgroup, user, invited_by)=>{
     let data = {
         // openGId: wxgroup.openGId,
         deleted_date: null,
-        invited_by: invited_by
     };
+    if (inviter){
+        data.invited_by = inviter.userID;
+    }
     let userGroup = await UserGroup.findOne(condi);
 
     if(!userGroup || userGroup.deleted_date){
         userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
-        wxgroup.member_num += 1;
+
         wxgroup.updated_date = moment();
-        if(invited_by){
-            let inviter = await UserGroup.findOne({
-                group_id: wxgroup._id,
-                userID: invited_by
-            });
+        if(inviter){
             inviter.invite_times ++;
             await inviter.save();
             console.log("inviter info...", inviter);
         }
-        await wxgroup.save();
-        if(wxgroup.member_num === 1){
+        if(wxgroup.member_num === 0){
             userGroup.is_admin = moment();
         }
         await userGroup.save();
 
         console.log("creating user group...", userGroup);
+        wxgroup.member_num = await UserGroup.find({
+            group_id: wxgroup._id,
+            deleted_date: null
+        }).count();
+        await wxgroup.save();
 
     }else{
         console.log("created before...", userGroup);
@@ -76,12 +78,25 @@ let getMembers = exports.getMembers = async (groupId, count, org) => {
     if (org){ //原始成员
         condi.invited_by = null;
     }
-    let users = await UserGroup.find(condi).populate('userID')
+    let users = await UserGroup.find(condi)
+        .populate('userID')
+        .populate('invited_by')
         .sort({
+            is_admin: -1,
             created_date:1
         })
         .limit(count);
-    return _.map(users, u => u.userID.cardInfo());
+    return _.map(users, u => {
+        let assign = {
+            is_admin: !!u.is_admin,
+            invite_times: u.invite_times,
+            check_in_times: u.check_in_times
+        };
+        if (u.invited_by){
+            assign.invited_by = u.invited_by.cardInfo();
+        }
+        return _.assign(u.userID.cardInfo(), assign)
+    });
 };
 
 
