@@ -37,6 +37,7 @@ exports.createUserGroup = async (wxgroup, user, inviter)=>{
     let data = {
         // openGId: wxgroup.openGId,
         deleted_date: null,
+        updated_date: moment()
     };
     if (inviter){
         data.invited_by = inviter.userID;
@@ -132,8 +133,12 @@ exports.getGroupList = async (user) => {
 
     let ret = [];
     for (let i = 0; i < groups.length; i++){
+        let ginfo = groups[i].group_id;
+        if(groups[i].invited_by && !ginfo.name){
+            ginfo.name = "二货兔-别人的群集市";
+        }
         let res = {
-            group : groups[i].group_id,
+            group : ginfo,
             members: await this.getMembers(groups[i].group_id._id, 5)
         };
         ret.push(res);
