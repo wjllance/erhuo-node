@@ -149,6 +149,9 @@ router.get('/group/:groupId/info', async (ctx, next) => {
     let wxgroup = await wxGroup.findById(ctx.params.groupId);
     auth.assert(wxgroup, "群不在");
 
+    if(!wxgroup.name){
+        wxgroup.name = "二货兔-人家的群集市";
+    }
     let ret = {
         group : wxgroup
     };

@@ -135,7 +135,7 @@ exports.getGroupList = async (user) => {
     for (let i = 0; i < groups.length; i++){
         let ginfo = groups[i].group_id;
         if(groups[i].invited_by && !ginfo.name){
-            ginfo.name = "二货兔-别人的群集市";
+            ginfo.name = "二货兔-人家的群集市";
         }
         let res = {
             group : ginfo,
