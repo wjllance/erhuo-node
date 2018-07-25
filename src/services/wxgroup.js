@@ -28,7 +28,7 @@ let {Order, Goods, UserGroup, GroupCheckIn, wxGroup} = require('../models');
 // };
 
 
-exports.createUserGroup = async (wxgroup, user)=>{
+exports.createUserGroup = async (wxgroup, user, inviter)=>{
 
     let condi = {
         group_id:wxgroup._id,
@@ -36,16 +36,34 @@ exports.createUserGroup = async (wxgroup, user)=>{
     };
     let data = {
         // openGId: wxgroup.openGId,
-        deleted_date: null
+        deleted_date: null,
+        updated_date: moment()
     };
+    if (inviter){
+        data.invited_by = inviter.userID;
+    }
     let userGroup = await UserGroup.findOne(condi);
 
     if(!userGroup || userGroup.deleted_date){
         userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
-        wxgroup.member_num += 1;
-        await wxgroup.save();
+
+        wxgroup.updated_date = moment();
+        if(inviter){
+            inviter.invite_times ++;
+            await inviter.save();
+            console.log("inviter info...", inviter);
+        }
+        if(wxgroup.member_num === 0){
+            userGroup.is_admin = moment();
+        }
         await userGroup.save();
+
         console.log("creating user group...", userGroup);
+        wxgroup.member_num = await UserGroup.find({
+            group_id: wxgroup._id,
+            deleted_date: null
+        }).count();
+        await wxgroup.save();
 
     }else{
         console.log("created before...", userGroup);
@@ -53,18 +71,35 @@ exports.createUserGroup = async (wxgroup, user)=>{
     return wxgroup;
 };
 
-let getMembers = exports.getMembers = async (groupId, count) => {
-
-    let users = await UserGroup.find({
+let getMembers = exports.getMembers = async (groupId, count, org) => {
+    let condi = {
         group_id: groupId,
-        deleted_date: null
-    }).populate('userID')
+        deleted_date: null,
+    };
+    if (org){ //原始成员
+        condi.invited_by = null;
+    }
+    let users = await UserGroup.find(condi)
+        .populate('userID')
+        .populate('invited_by')
         .sort({
+            is_admin: -1,
             created_date:1
         })
         .limit(count);
-    return _.map(users, u => u.userID.cardInfo());
+    return _.map(users, u => {
+        let assign = {
+            is_admin: !!u.is_admin,
+            invite_times: u.invite_times,
+            check_in_times: u.check_in_times
+        };
+        if (u.invited_by){
+            assign.invited_by = u.invited_by.cardInfo();
+        }
+        return _.assign(u.userID.cardInfo(), assign)
+    });
 };
+
 
 let getCheckInMembers = exports.getCheckInMembers = async (groupId, count) => {
 
@@ -93,13 +128,18 @@ exports.getGroupList = async (user) => {
             deleted_date: null
         })
         .populate('group_id')
-        .sort({created_date:-1});
+        .sort({updated_date:-1});
     console.log("mygroups...", groups);
 
     let ret = [];
     for (let i = 0; i < groups.length; i++){
+        let ginfo = groups[i].group_id;
+        if(groups[i].invited_by && !ginfo.name){
+            ginfo.name = "二货兔-人家的群集市";
+            ginfo.invited_by = groups[i].invited_by;
+        }
         let res = {
-            group : groups[i].group_id,
+            group : ginfo,
             members: await this.getMembers(groups[i].group_id._id, 5)
         };
         ret.push(res);

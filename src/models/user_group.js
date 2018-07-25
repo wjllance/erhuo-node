@@ -29,6 +29,20 @@ let userGroupSchema = new mongoose.Schema({
         default: 0
     },
 
+    invited_by: {
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+    },
+
+    invite_times: {
+        type: Number,
+        default: 0
+    },
+
+    is_admin : Date,
+
+    extra: mongoose.Schema.Types.Mixed,
+
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },
     deleted_date: Date

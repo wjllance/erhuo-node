@@ -14,6 +14,8 @@ moment.locale('zh-cn');
 
 
 let auth = require('../services/auth');
+
+
 let wechat = require('../services/wechat');
 let srv_wxtemplate = require('../services/wechat_template');
 let srv_bargain = require('../services/bargain');
@@ -48,9 +50,6 @@ router.get('/group/my', auth.loginRequired, async (ctx, next) => {
 });
 
 
-router.del('/group/:groupId', auth.loginRequired, async (ctx, next)=>{
-
-});
 
 
 /**
@@ -83,9 +82,10 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     console.log(cate);
 
+
+    let org = false;
     if(cate === "今日"){
         let ddl = moment().subtract(1,'d');
-
         condi.created_date = {
             // $gt: moment().subtract(1, 'd')
             $gt: ddl
@@ -94,16 +94,18 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
             removed_date: 1,
             created_date:-1
         };
-    }else{
+    }else {
         sorti = {
             removed_date: 1,
             updated_date:-1
         };
+        if(cate === '原住民'){
+            org = true;
+        }
     }
     console.log(condi, sorti);
 
-
-    let gusers = await srv_wxgroup.getMembers(group._id);
+    let gusers = await srv_wxgroup.getMembers(group._id, org);
 
     // console.log("group users...", gusers);
 
@@ -128,43 +130,7 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 });
 
 
-/**
- * @api {post}  /group/join    加入群
- * @apiName     GroupJoin
- * @apiGroup    Group
- *
- *
- * @apiParam    {String}    groupId
- * @apiParam    {String}    [userId]
- * @apiParam    {Boolean}   [GOD]
- *
- *
- * @apiSuccess  {Number}    success
- * @apiSuccess  {Object}    data
- *
- */
-router.post('/group/join', async (ctx, next) => {
 
-    let groupId = ctx.request.body.groupId;
-
-    let wxgroup = await wxGroup.findById(groupId);
-    auth.assert(wxgroup, "群不在");
-
-    let user = null;
-    if (ctx.request.body.GOD){
-        user = await User.findById(ctx.request.body.userId);
-    }
-    else {
-        await auth.loginRequired(ctx, next);
-        user = ctx.state.user;
-    }
-    wxgroup = await srv_wxgroup.createUserGroup(wxgroup, user);
-
-    ctx.body = {
-        success:1,
-        data: wxgroup
-    }
-});
 
 
 /**
@@ -178,11 +144,19 @@ router.post('/group/join', async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/info', async (ctx, next) => {
+router.get('/group/:groupId/info', auth.loginRequired, async (ctx, next) => {
 
     let wxgroup = await wxGroup.findById(ctx.params.groupId);
     auth.assert(wxgroup, "群不在");
 
+    let userGroup = await UserGroup.findOne({
+        'userID': ctx.state.user._id,
+        'group_id' : wxgroup._id,
+        'delete_date' : null
+    });
+    if(userGroup.invited_by && !wxgroup.name){
+        wxgroup.name = "二货兔-人家的群集市";
+    }
     let ret = {
         group : wxgroup
     };
@@ -271,6 +245,8 @@ router.get('/group/:groupId/members', auth.loginRequired, async (ctx, next) => {
  */
 router.post('/group/check_in', auth.loginRequired, async (ctx, next) => {
     let groupId = ctx.request.body.groupId;
+    let wxgroup = await wxGroup.findById(groupId);
+    auth.assert(wxgroup, "群不在");
     let condi = {
         group_id: groupId,
         userID: ctx.state.user._id,
@@ -296,6 +272,10 @@ router.post('/group/check_in', auth.loginRequired, async (ctx, next) => {
        userGroup.check_in_times ++;
        await userGroup.save();
        console.log("updating check in times...", userGroup);
+       wxgroup.updated_date = moment();
+       await wxgroup.save();
+       console.log("updating wx group....", wxgroup);
+
     }else{
         console.log("签过了");
     }
@@ -358,7 +338,6 @@ router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next)
  * @apiName     GroupTodayBonus
  * @apiGroup    Group
  *
- * @apiParam    {Number}    [limitCount]   前多少个
  * @apiSuccess  {Number}    success
  * @apiSuccess  {Object}    data
  *
@@ -379,5 +358,183 @@ router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
     ctx.body = {
         success:1,
         data:ret
+    }
+});
+
+
+
+/**
+ * @api {post}  /group/join    加入群
+ * @apiName     GroupJoin
+ * @apiGroup    Group
+ *
+ *
+ * @apiParam    {String}    groupId
+ * @apiParam    {String}    invited_by
+ * @apiParam    {String}    [userId]
+ * @apiParam    {Boolean}   [GOD]
+ *
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.post('/group/join', auth.loginRequired, async (ctx, next) => {
+
+    let groupId = ctx.request.body.groupId;
+
+    let wxgroup = await wxGroup.findById(groupId);
+    auth.assert(wxgroup, "群不在");
+
+    wxgroup = await srv_wxgroup.createUserGroup(wxgroup, ctx.state.user, ctx.request.body.invited_by);
+
+    ctx.body = {
+        success:1,
+        data: wxgroup
+    }
+});
+
+
+/**
+ * @api {post}  /group/:groupId/join    加入群
+ * @apiName     GroupJoin
+ * @apiGroup    Group
+ *
+ *
+ * @apiParam    {String}    invited_by
+ *
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.post('/v2/group/:groupId/join', auth.loginRequired, async (ctx, next) => {
+
+    let groupId = ctx.params.groupId;
+
+    let wxgroup = await wxGroup.findById(groupId);
+    auth.assert(wxgroup, "群不在");
+
+    let inviter = null;
+    if(ctx.request.body.invited_by){
+        inviter = await UserGroup.findOne({
+            userID: ctx.request.body.invited_by,
+            group_id: groupId
+        });
+        auth.assert(inviter, "没有邀请权限");
+    }
+    wxgroup = await srv_wxgroup.createUserGroup(wxgroup, ctx.state.user, inviter);
+
+    ctx.body = {
+        success:1,
+        data: wxgroup
+    }
+});
+
+/**
+ * @api {post}  /group/:groupId/quit    退出
+ * @apiName     GroupQuit
+ * @apiGroup    Group
+ *
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+router.post('/group/:groupId/quit', auth.loginRequired, async (ctx, next)=>{
+
+    let wxgroup = await wxGroup.findById(ctx.params.groupId);
+    auth.assert(wxgroup, "群不在");
+
+    let remove_user = await UserGroup.findOne({
+        group_id: wxgroup._id,
+        userID: ctx.state.user._id,
+        deleted_date: null
+    });
+    auth.assert(remove_user, "不在群里");
+
+    remove_user.deleted_date = moment();
+
+    if(remove_user.is_admin){       //换管理员
+                                    //TODO record admin history
+
+        let userGroup = await UserGroup.findOne({
+            group_id: wxgroup._id,
+            is_admin: null,
+            deleted_date: null
+        }).sort({
+            created_date: 1
+        });
+        if(userGroup){
+            userGroup.is_admin = moment();
+            await userGroup.save();
+            console.log("new admin...", userGroup);
+        }
+        remove_user.is_admin = null;
+    }
+
+    await remove_user.save();
+
+    wxgroup.member_num = await UserGroup.find({
+        group_id: wxgroup._id,
+        deleted_date: null
+    }).count();
+    console.log("removed...", remove_user);
+    await wxgroup.save();
+
+    ctx.body = {
+        success:1,
+        data: wxgroup
+    }
+});
+
+
+/**
+ * @api {post}  /group/:groupId/remove_member    移除群成员
+ * @apiName     GroupRemoveMember
+ * @apiGroup    Group
+ *
+ * @apiPermission   group_admin
+ *
+ * @apiParam    {String}    user_id     被移除的用户ID
+ *
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ *
+ */
+
+router.post('/group/:groupId/remove_member', auth.loginRequired, async (ctx, next) => {
+
+    let wxgroup = await wxGroup.findById(ctx.params.groupId);
+    auth.assert(wxgroup, "群不在");
+
+    let userGroup = await UserGroup.findOne({
+        group_id: wxgroup._id,
+        userID: ctx.state.user._id
+    });
+    auth.assert(userGroup.is_admin, "不是管理员");
+
+    let remove_user = await UserGroup.findOne({
+        group_id: wxgroup._id,
+        userID: ctx.request.body.user_id,
+        deleted_date: null
+    });
+    auth.assert(remove_user, "不在群里");
+    auth.assert(ctx.state.user._id.toString() !== ctx.request.body.user_id.toString(), "别删自己");
+
+    remove_user.deleted_date = moment();
+    await remove_user.save();
+    console.log("removed...", remove_user);
+
+    wxgroup.member_num = await UserGroup.find({
+        group_id: wxgroup._id,
+        deleted_date: null
+    }).count();
+    await wxgroup.save();
+
+    ctx.body = {
+        success:1,
+        data: wxgroup
     }
 });

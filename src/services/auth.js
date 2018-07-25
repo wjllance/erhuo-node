@@ -98,7 +98,7 @@ exports.loginRequired = async function (ctx, next) {
         }
     }
     if(ctx.query.god_bless_you){
-        ctx.state.user = await User.findById(ctx.query.user_id);
+        ctx.state.user = await User.findById(ctx.query.mock_user);
     }
 
     assert(ctx.state.user, '尚未登录');

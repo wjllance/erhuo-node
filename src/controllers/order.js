@@ -418,7 +418,6 @@ router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
 router.post('/order/refund/confirm', auth.loginRequired, async(ctx, next)=>{
     let order = await Order.findById(ctx.request.body.orderId);
     auth.assert(order, "订单不存在");
-
     auth.assert(order.seller.equals(ctx.state.user._id), "无权限");
     let res = await srv_order.refund_confirm(order);
     let transaction = await srv_transaction.refundConfirm(order);

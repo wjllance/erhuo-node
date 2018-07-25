@@ -152,6 +152,8 @@ goodsSchema.methods.myRemove = async function() {
 	await this.save();
 };
 
+
+
 let getGoodsState = (self)=>{
 
     switch (self.status){

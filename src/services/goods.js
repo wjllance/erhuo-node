@@ -27,6 +27,7 @@ let injectGoods = exports.injectGoods = async function(goods, user) {
     return {
         has_collected
     };
+
 };
 
 // 获取可以输出的数据

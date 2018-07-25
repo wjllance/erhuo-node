@@ -65,7 +65,7 @@ exports.findOrCreateV2 = async function(goods, user) {
         order_status: ORDER_STATUS.TOPAY
         // sn: generateSerialNumber()
     });
-    order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary']);
+    order.goodsInfo = _.pick(goods, ['gname', 'gprice', 'gcost', 'glocation', 'gsummary', 'category']);
     order.goodsInfo.img = goods.gpics[0].thumbnails;
     order.markModified('goodsInfo');
     await order.save();
