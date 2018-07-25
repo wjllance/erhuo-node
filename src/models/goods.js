@@ -148,7 +148,7 @@ goodsSchema.methods.cardInfo = function() {
 
 goodsSchema.methods.myRemove = async function() {
 	this.removed_date = Date.now();
-	// this.status = GOODS_STATUS.UNDERCARRIAGE;
+	this.status = GOODS_STATUS.UNDERCARRIAGE;
 	await this.save();
 };
 
@@ -163,10 +163,10 @@ let getGoodsState = (self)=>{
             return "待发布";
         case GOODS_STATUS.REJECT:
         	return "审核未通过";
+        case GOODS_STATUS.RELEASED:
+            return "已发布";
         case GOODS_STATUS.UNDERCARRIAGE:
             return "已下架";
-        // case GOODS_STATUS.RELEASED:
-        //     return "已发布";
 		default:
 			return self.removed_date ? "已下架" : "在售"
     }
