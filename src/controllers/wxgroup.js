@@ -144,12 +144,17 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/info', async (ctx, next) => {
+router.get('/group/:groupId/info', auth.loginRequired, async (ctx, next) => {
 
     let wxgroup = await wxGroup.findById(ctx.params.groupId);
     auth.assert(wxgroup, "群不在");
 
-    if(!wxgroup.name){
+    let userGroup = await UserGroup.findOne({
+        'userID': ctx.state.user._id,
+        'group_id' : wxgroup._id,
+        'delete_date' : null
+    });
+    if(userGroup.invited_by && !wxgroup.name){
         wxgroup.name = "二货兔-人家的群集市";
     }
     let ret = {
