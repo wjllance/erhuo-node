@@ -5,6 +5,8 @@ let Router = require('koa-router');
 let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
+
+let superagent = require('superagent');
 let body = require('koa-convert')(require('koa-better-body')());
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -531,3 +533,21 @@ router.get('/goods/base/:goods_id', async (ctx, next) => {
         data: goods
     };
 });
+
+
+router.get('/goods/getBookByISBN/:isbn', async(ctx, next) => {
+    let isbn = ctx.params.isbn;
+
+    let api_url = "https://api.douban.com/v2/book/isbn/"+isbn;
+    let {text} = await superagent.get(api_url);
+    console.log(text);
+
+    let res = JSON.parse(text);
+
+    // let ret = _.pick(res, ['title', 'price', 'image', 'author', 'summary', 'publisher', 'subtitle', 'tags', 'translator', 'pages', '']);
+
+    ctx.body = {
+        success: 1,
+        data: res
+    }
+})
