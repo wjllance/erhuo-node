@@ -535,7 +535,7 @@ router.get('/goods/base/:goods_id', async (ctx, next) => {
 });
 
 
-router.get('/goods/getBookByISBN/:isbn', async(ctx, next) => {
+router.get('/goods/get_book_by_isbn/:isbn', async(ctx, next) => {
     let isbn = ctx.params.isbn;
 
     let api_url = "https://api.douban.com/v2/book/isbn/"+isbn;
