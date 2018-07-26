@@ -41,33 +41,40 @@ exports.createUserGroup = async (wxgroup, user, inviter)=>{
     };
     if (inviter){
         data.invited_by = inviter.userID;
+    }else{
+        data.invited_by = null;
     }
     let userGroup = await UserGroup.findOne(condi);
 
-    if(!userGroup || userGroup.deleted_date){
-        userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
-
-        wxgroup.updated_date = moment();
-        if(inviter){
-            inviter.invite_times ++;
-            await inviter.save();
-            console.log("inviter info...", inviter);
+    if(userGroup){
+        if(!userGroup.deleted_date){
+            if(!userGroup.invited_by || inviter){
+                console.log("created before...", userGroup);
+                return;
+            }
         }
-        if(wxgroup.member_num === 0){
-            userGroup.is_admin = moment();
-        }
-        await userGroup.save();
-
-        console.log("creating user group...", userGroup);
-        wxgroup.member_num = await UserGroup.find({
-            group_id: wxgroup._id,
-            deleted_date: null
-        }).count();
-        await wxgroup.save();
-
-    }else{
-        console.log("created before...", userGroup);
     }
+
+    userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
+
+    wxgroup.updated_date = moment();
+    if(inviter){
+        inviter.invite_times ++;
+        await inviter.save();
+        console.log("inviter info...", inviter);
+    }
+    if(wxgroup.member_num === 0){
+        userGroup.is_admin = moment();
+    }
+    await userGroup.save();
+
+    console.log("creating user group...", userGroup);
+    wxgroup.member_num = await UserGroup.find({
+        group_id: wxgroup._id,
+        deleted_date: null
+    }).count();
+    await wxgroup.save();
+
     return wxgroup;
 };
 
