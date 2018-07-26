@@ -87,7 +87,12 @@ let getMembers = exports.getMembers = async (groupId, count, org) => {
             created_date:1
         })
         .limit(count);
-    return _.map(users, u => {
+    if(!users[0].is_admin){
+        users[0].is_admin = moment();
+        await users[0].save();
+    }
+
+    return  _.map(users, u => {
         let assign = {
             is_admin: !!u.is_admin,
             invite_times: u.invite_times,
@@ -98,6 +103,7 @@ let getMembers = exports.getMembers = async (groupId, count, org) => {
         }
         return _.assign(u.userID.cardInfo(), assign)
     });
+
 };
 
 
