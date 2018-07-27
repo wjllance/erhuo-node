@@ -7,7 +7,7 @@ let auth = require('../services/auth');
 let tools = require('./tools')
 const school_map = require('../config').CONSTANT.SCHOOL_MAP
 
-const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他"];
+const goodsCates = exports.CATES = ["美妆","女装","女鞋","配饰","包包","日用","其他", "求购", "书籍"];
 // 对商品注入额外信息
 let injectGoods = exports.injectGoods = async function(goods, user) {
     if (!user) return {};
