@@ -5,6 +5,8 @@ let Router = require('koa-router');
 let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
+
+let superagent = require('superagent');
 let body = require('koa-convert')(require('koa-better-body')());
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -364,6 +366,32 @@ router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
 });
 
 
+router.post('/v2/goods/publish_book', auth.loginRequired, async (ctx, next) => {
+
+    let params = ctx.request.body;
+    auth.assert(params.gsummary && params.gprice, "缺少参数");
+    auth.assert(params.npics && params.npics.length > 0, "没图");
+
+    let goods = new Goods();
+    goods.userID = ctx.state.user._id;
+    // goods.gpics = images.map(x => x._id);
+
+    _.assign(goods, _.pick(params, ['gname', 'gsummary', 'glabel', 'gprice', 'npics', 'gstype', 'glocation', 'gcost', 'gcity', 'remark']));
+
+    goods.category = params.category || "其他";
+    goods.gname = params.gname || params.gsummary.substr(0, 20);
+    if(!goods.glocation){
+        goods.glocation = ctx.state.user.location || 0;
+    }
+    await goods.save();
+
+    ctx.body = {
+        success: 1,
+        data: goods._id
+    };
+});
+
+
 // 下架
 // 参数：gid
 
@@ -531,3 +559,29 @@ router.get('/goods/base/:goods_id', async (ctx, next) => {
         data: goods
     };
 });
+
+
+router.get('/goods/get_book_by_isbn/:isbn', async(ctx, next) => {
+    let isbn = ctx.params.isbn;
+
+    let api_url = "https://api.douban.com/v2/book/isbn/"+isbn;
+
+    try{
+
+        let {text} = await superagent.get(api_url);
+        console.log(text);
+        let res = JSON.parse(text);
+        ctx.body = {
+            success: 1,
+            data: res
+        }
+    }catch (e) {
+        console.error(e);
+        ctx.body = {
+            success:1
+        }
+    }
+
+
+
+})

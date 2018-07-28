@@ -6,7 +6,7 @@ let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
 let body = require('koa-convert')(require('koa-better-body')());
-
+const image2base64 = require('image-to-base64');
 let config = require('../config');
 let auth = require('../services/auth');
 let { User, Image, Goods } = require('../models');
@@ -21,6 +21,7 @@ AV.init({
     appKey: config.LEAN_APPKEY,
     masterKey: config.LEAN_MASTERKEY
 });
+
 
 // 上传图片
 router.post('/images/upload', auth.loginRequired, body, async (ctx, next) => {
@@ -89,6 +90,26 @@ router.post('/v2/images/upload', auth.loginRequired, body, async (ctx, next) => 
     };
 });
 
+router.post('/v2/images/upload_pic_url', auth.loginRequired, async (ctx, next) => {
+
+    let imgUrl = ctx.request.body.img;
+    auth.assert(imgUrl, '没有图片链接');
+
+    let b64 = await image2base64(imgUrl);
+
+    console.log("base64", b64);
+    let urls = imgUrl.split('/');
+    console.log(urls);
+    let file = new AV.File(urls[urls.length-1], {base64: b64});
+    let res = await file.save();
+    console.log(res);
+
+    ctx.body = {
+        success: 1,
+        data: res.url()
+    };
+
+});
 
 router.post('/v2/images/uploadByAdmin/:openid', body, async (ctx, next) => {
     let image_file = ctx.request.fields.image ? ctx.request.fields.image[0] : null;

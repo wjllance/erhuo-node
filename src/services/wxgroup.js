@@ -13,9 +13,9 @@ let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
-
 let {Order, Goods, UserGroup, GroupCheckIn, wxGroup} = require('../models');
 
+let default_group_name = exports.default_group_name = "二货兔-本校粉丝群";
 // exports.findOrCreate = async (openGId, user) =>{
 //
 //     let condi = {openGId:openGId};
@@ -41,33 +41,40 @@ exports.createUserGroup = async (wxgroup, user, inviter)=>{
     };
     if (inviter){
         data.invited_by = inviter.userID;
+    }else{
+        data.invited_by = null;
     }
     let userGroup = await UserGroup.findOne(condi);
 
-    if(!userGroup || userGroup.deleted_date){
-        userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
-
-        wxgroup.updated_date = moment();
-        if(inviter){
-            inviter.invite_times ++;
-            await inviter.save();
-            console.log("inviter info...", inviter);
+    if(userGroup){
+        if(!userGroup.deleted_date){
+            if(!userGroup.invited_by || inviter){
+                console.log("created before...", userGroup);
+                return;
+            }
         }
-        if(wxgroup.member_num === 0){
-            userGroup.is_admin = moment();
-        }
-        await userGroup.save();
-
-        console.log("creating user group...", userGroup);
-        wxgroup.member_num = await UserGroup.find({
-            group_id: wxgroup._id,
-            deleted_date: null
-        }).count();
-        await wxgroup.save();
-
-    }else{
-        console.log("created before...", userGroup);
     }
+
+    userGroup = await UserGroup.findOneAndUpdate(condi, data, {new: true, upsert:true});
+
+    wxgroup.updated_date = moment();
+    if(inviter){
+        inviter.invite_times ++;
+        await inviter.save();
+        console.log("inviter info...", inviter);
+    }
+    if(wxgroup.member_num === 0){
+        userGroup.is_admin = moment();
+    }
+    await userGroup.save();
+
+    console.log("creating user group...", userGroup);
+    wxgroup.member_num = await UserGroup.find({
+        group_id: wxgroup._id,
+        deleted_date: null
+    }).count();
+    await wxgroup.save();
+
     return wxgroup;
 };
 
@@ -87,7 +94,12 @@ let getMembers = exports.getMembers = async (groupId, count, org) => {
             created_date:1
         })
         .limit(count);
-    return _.map(users, u => {
+    if(!users[0].is_admin){
+        users[0].is_admin = moment();
+        await users[0].save();
+    }
+
+    return  _.map(users, u => {
         let assign = {
             is_admin: !!u.is_admin,
             invite_times: u.invite_times,
@@ -98,6 +110,7 @@ let getMembers = exports.getMembers = async (groupId, count, org) => {
         }
         return _.assign(u.userID.cardInfo(), assign)
     });
+
 };
 
 
@@ -135,7 +148,7 @@ exports.getGroupList = async (user) => {
     for (let i = 0; i < groups.length; i++){
         let ginfo = groups[i].group_id;
         if(groups[i].invited_by && !ginfo.name){
-            ginfo.name = "二货兔-人家的群集市";
+            ginfo.name = default_group_name;
             ginfo.invited_by = groups[i].invited_by;
         }
         let res = {
