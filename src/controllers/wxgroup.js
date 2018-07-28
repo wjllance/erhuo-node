@@ -155,7 +155,7 @@ router.get('/group/:groupId/info', auth.loginRequired, async (ctx, next) => {
         'delete_date' : null
     });
     if(userGroup.invited_by && !wxgroup.name){
-        wxgroup.name = "二货兔-人家的群集市";
+        wxgroup.name = srv_wxgroup.default_group_name;
     }
     let ret = {
         group : wxgroup
