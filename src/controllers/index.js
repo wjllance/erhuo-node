@@ -4,7 +4,11 @@ let Router = require('koa-router');
 
 let config = require('../config');
 let _ = require('lodash');
+
+let {  User } = require('../models');
+
 const router = module.exports = new Router();
+
 
 router.get('/ping', async ctx => {
     ctx.body = {
@@ -27,4 +31,15 @@ router.get('/schools', async(ctx, next) =>{
         data:ret
     }
 });
+
+router.get('/schools/population/:name', async(ctx, next)=>{
+    let name = ctx.params.name;
+    let schoolIdx = config.CONSTANT.SCHOOL_MAP.indexOf(name);
+    console.log(schoolIdx);
+    let population = await User.find({location:schoolIdx}).count();
+    ctx.body = {
+        success:1,
+        data:population
+    }
+})
 
