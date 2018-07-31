@@ -40,13 +40,13 @@ let goodsSchema = new mongoose.Schema({
     deleted_date: { type: Date, default: null},   // 删除
     updated_date: { type: Date, default: Date.now},
 
-	status: {type: Number, default: 0},
+	status: {type: Number, default: 3}, //3已发布,4下架
 
 	remark: String,
 
 
     is_special: Boolean,
-    amount: Number,
+    amount: Number,  //库存
 
 
     //new
@@ -61,6 +61,10 @@ let goodsSchema = new mongoose.Schema({
         default: 0
     },
 
+    examine_status: { //0初始，1已审核，2不通过
+	    type: Number,
+        default: 0
+    }
 
 },{versionKey:false});
 
