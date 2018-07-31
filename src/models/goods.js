@@ -4,6 +4,7 @@ let _ = require('lodash');
 let myUtils = require("../myUtils/mUtils");
 const school_map = require('../config').CONSTANT.SCHOOL_MAP;
 const GOODS_STATUS = require('../config').CONSTANT.GOODS_STATUS;
+const EXAMINE_STATUS = require('../config').CONSTANT.EXAMINE_STATUS;
 // 商品
 let goodsSchema = new mongoose.Schema({
 
@@ -160,20 +161,25 @@ goodsSchema.methods.myRemove = async function() {
 
 let getGoodsState = (self)=>{
 
-    switch (self.status){
-        case GOODS_STATUS.INIT:
-            return "待审核";
-        case GOODS_STATUS.PASS:
-            return "待发布";
-        case GOODS_STATUS.REJECT:
-        	return "审核未通过";
-        case GOODS_STATUS.RELEASED:
-            return "已发布";
-        case GOODS_STATUS.UNDERCARRIAGE:
-            return "已下架";
-		default:
-			return self.removed_date ? "已下架" : "在售"
-    }
+    if(self.examine_status === EXAMINE_STATUS.REJECT)
+        return "审核不通过";
+
+    return self.removed_date ? "已下架" : "在售"
+
+    // switch (self.status){
+    //     case GOODS_STATUS.INIT:
+    //         return "待审核";
+    //     case GOODS_STATUS.PASS:
+    //         return "待发布";
+    //     case GOODS_STATUS.REJECT:
+    //     	return "审核未通过";
+    //     case GOODS_STATUS.RELEASED:
+    //         return "已发布";
+    //     case GOODS_STATUS.UNDERCARRIAGE:
+    //         return "已下架";
+		// default:
+		// 	return self.removed_date ? "已下架" : "在售"
+    // }
 };
 
 module.exports = mongoose.model("Goods", goodsSchema);

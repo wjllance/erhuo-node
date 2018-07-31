@@ -235,7 +235,8 @@ router.get('/v4/goods/index', async (ctx, next) => {
             // removed_date:1,
             glocation: -1,
             updated_date:-1
-        }
+        };
+        condi.category = {$ne: "求购"}
     }
     else if(cate === "今日"){
         let ddl = moment({hour:20}).subtract(1,'d');
