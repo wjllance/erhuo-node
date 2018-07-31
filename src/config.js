@@ -89,14 +89,8 @@ exports.CONSTANT = {
         INIT:0,             //待审核
         PASS:1,             //审核通过
         REJECT:2,           //审核失败
-        RELEASED:3,         //已发布
-        UNDERCARRIAGE:4     //下架
     },
-    EXAMINE_STATUS:{
-        INIT:0,             //待审核
-        PASS:1,             //审核通过
-        REJECT:2,           //审核失败
-    },
+    GOODS_CATE: ["美妆","女装","女鞋","配饰","包包","日用","其他", "求购", "书籍"],
     required_population: 1,
 };
 

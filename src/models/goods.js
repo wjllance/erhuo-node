@@ -4,7 +4,6 @@ let _ = require('lodash');
 let myUtils = require("../myUtils/mUtils");
 const school_map = require('../config').CONSTANT.SCHOOL_MAP;
 const GOODS_STATUS = require('../config').CONSTANT.GOODS_STATUS;
-const EXAMINE_STATUS = require('../config').CONSTANT.EXAMINE_STATUS;
 // 商品
 let goodsSchema = new mongoose.Schema({
 
@@ -41,7 +40,7 @@ let goodsSchema = new mongoose.Schema({
     deleted_date: { type: Date, default: null},   // 删除
     updated_date: { type: Date, default: Date.now},
 
-	status: {type: Number, default: 3}, //3已发布,4下架
+	status: {type: Number, default: 0}, //审核状态0初，2不通过, 1已审核(其他)
 
 	remark: String,
 
@@ -62,10 +61,6 @@ let goodsSchema = new mongoose.Schema({
         default: 0
     },
 
-    examine_status: { //0初始，1已审核，2不通过
-	    type: Number,
-        default: 0
-    }
 
 },{versionKey:false});
 
@@ -161,7 +156,7 @@ goodsSchema.methods.myRemove = async function() {
 
 let getGoodsState = (self)=>{
 
-    if(self.examine_status === EXAMINE_STATUS.REJECT)
+    if(self.status === GOODS_STATUS.REJECT)
         return "审核不通过";
 
     return self.removed_date ? "已下架" : "在售"
