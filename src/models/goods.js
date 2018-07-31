@@ -157,7 +157,7 @@ goodsSchema.methods.myRemove = async function() {
 let getGoodsState = (self)=>{
 
     if(self.status === GOODS_STATUS.REJECT)
-        return "审核不通过";
+        return "审核下架";
 
     return self.removed_date ? "已下架" : "在售"
 
