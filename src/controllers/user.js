@@ -119,12 +119,25 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
 });
 
 
+//获取自己主页
 router.get('/user/index', auth.loginRequired, async (ctx, next) => {
 
     let userIndex = await srv_user.indexInfo(ctx.state.user._id);
     ctx.body = {
         success: 1,
         data: userIndex
+    };
+});
+
+
+//获取用户主页
+router.get('/user/:id/profile', auth.loginRequired, async (ctx, next) => {
+    let user = await User.findById(ctx.params.id);
+    profile = user.cardInfo();
+    profile.tags = await tagService.listWithLike(user._id, ctx.state.user);
+    ctx.body = {
+        success: 1,
+        data: profile
     };
 });
 
@@ -178,11 +191,14 @@ router.get('/user/:user_id/publish_list/', auth.loginRequired, async (ctx, next)
     let condi = {
         userID: ctx.params.user_id,
         status: {
-            $in: [
-                config.CONSTANT.GOODS_STATUS.RELEASED,
-                config.CONSTANT.GOODS_STATUS.UNDERCARRIAGE
-            ]
+            $ne: config.CONSTANT.GOODS_STATUS.REJECT
         },
+        // status: {
+        //     $in: [
+        //         config.CONSTANT.GOODS_STATUS.RELEASED,
+        //         config.CONSTANT.GOODS_STATUS.UNDERCARRIAGE
+        //     ]
+        // },
         deleted_date: null,
         removed_date: null
     };  //未删除筛选
@@ -418,36 +434,7 @@ router.post('/user/save_formids', auth.loginRequired, async(ctx, next)=>{
 })
 
 
-/**
- * @api {get}   /user/collections   我的收藏
- * @apiName     Collections
- * @apiGroup    User
- *
- *
- * @apiParam    {Number}    pageNo      当前页码，默认1
- * @apiParam    {Number}    pageSize    每页大小，默认6
- *
- * @apiSuccess  {Number}    success     1success
- * @apiSuccess  {Object}    data        列表
- *
- */
-// router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
-//     let pageNo = ctx.query.pageNo || 1;
-//     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
-//     console.log(pageNo);
-//     console.log(pageSize);
-//     let user = ctx.state.user;
-//     let condi = {_id:user.collections};
-//     let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
-//
-//     ctx.body = {
-//         success: 1,
-//         data: goods
-//     };
-// });
-
-
-router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
+let getUserLikes = async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
     console.log(pageNo);
@@ -467,7 +454,22 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
         success: 1,
         data: goods
     };
-});
+};
+
+/**
+ * @api {get}   /user/collections   我的收藏
+ * @apiName     Collections
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+router.get('/user/collections', auth.loginRequired, getUserLikes);
 
 /**
  * @api {get}   /user/mylikes   我的点赞
@@ -482,26 +484,6 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        列表
  *
  */
-router.get('/user/mylikes', auth.loginRequired, async (ctx, next) => {
-    let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
-    console.log(pageNo);
-    console.log(pageSize);
-
-    let collections = await Like.find({
-        userID: ctx.state.user._id,
-        deleted_date:null
-    });
-    let user = ctx.state.user;
-    let condi = {_id: _.map(collections, col=>col.goods_id)};
-
-    console.log(condi);
-    let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
-
-    ctx.body = {
-        success: 1,
-        data: goods
-    };
-});
+router.get('/user/mylikes', auth.loginRequired, getUserLikes);
 
 
