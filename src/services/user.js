@@ -24,6 +24,12 @@ exports.indexInfo = async (uid) => {
     return user;
 };
 
+exports.profile = async(uid) => {
+    let user = await User.findById(uid);
+    user = user.baseInfo();
+    return user;
+}
+
 let withAccount = exports.withAccount = async (uid) => {
 
     let userAccount = await Account.findOne({userID: uid}).populate('userID');

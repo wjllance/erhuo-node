@@ -20,6 +20,29 @@ exports.baseList = async (userId) => {
     return tags;
 };
 
+exports.listWithLike = async (ownerId, user) => {
+    let userTags = await UserTag.find({
+        userID: ownerId,
+        deleted_date:null
+    }, "_id tag_name like_num");
+
+    let ret = [];
+    for(let i = 0; i < userTags.length; i++){
+        let liked = !!(
+            await TagLike.findOne({
+                user_tag_id: userTags[i]._id,
+                deleted_date: null,
+                userID: user ? user._id : null
+            }));
+
+        ret.push({
+            tag: userTags[i],
+            liked: liked
+        });
+    }
+    return ret;
+};
+
 exports.detailList = async (ownerId, user) =>{
     // console.log("user",user);
     let userTags = await UserTag.find({

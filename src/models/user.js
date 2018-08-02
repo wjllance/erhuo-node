@@ -60,6 +60,8 @@ let userSchema = new mongoose.Schema({
 , {versionKey:false}
 );
 
+
+//自己可以看的信息
 userSchema.methods.baseInfo = function(){
 	let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", 'phoneNumber']);
 	output.location = school_map[this.location];
@@ -70,6 +72,9 @@ userSchema.methods.baseInfo = function(){
 	return output;
 };
 
+
+
+//所有人可见信息
 userSchema.methods.cardInfo = function(){
 
 	let verify = "";

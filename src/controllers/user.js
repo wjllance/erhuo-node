@@ -11,6 +11,7 @@ let auth = require('../services/auth');
 let tools = require('../services/tools');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
+let tagService = require('../services/TagService');
 let srv_user = require('../services/user');
 let { Like, Goods, User } = require('../models');
 // const schools = config.CONSTANT.SCHOOL;
@@ -70,7 +71,7 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 });
 
 
-
+//更新phone
 router.post('/user/phone', auth.loginRequired, async (ctx, next) => {
 
     console.log("here is update phone");
@@ -119,12 +120,25 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
 });
 
 
+//获取自己主页
 router.get('/user/index', auth.loginRequired, async (ctx, next) => {
 
     let userIndex = await srv_user.indexInfo(ctx.state.user._id);
     ctx.body = {
         success: 1,
         data: userIndex
+    };
+});
+
+
+//获取用户主页
+router.get('/user/:id/profile', auth.loginRequired, async (ctx, next) => {
+    let user = await User.findById(ctx.params.id);
+    profile = user.cardInfo();
+    profile.tags = await tagService.listWithLike(user._id, ctx.state.user);
+    ctx.body = {
+        success: 1,
+        data: profile
     };
 });
 
@@ -219,172 +233,6 @@ router.get('/users/mypublish', auth.loginRequired, async (ctx, next) => {
 
 
 
-// 收藏
-/**
- * @api {post}   /user/collect/:goods_id   收藏
- * @apiName     Collect
- * @apiGroup    User
- */
-// router.post('/user/collect/:goods_id', auth.loginRequired, async (ctx, next) => {
-//     let user = ctx.state.user;
-//     let goods = await Goods.findById(ctx.params.goods_id);
-//     auth.assert(goods, '商品不存在');
-//     auth.assert(!_.some(user.collections, x => goods._id.equals(x)), '已经收藏');
-//     user.collections.push(goods._id);
-//     await user.save();
-//     ctx.body = {
-//         success: 1,
-//     }
-// });
-
-router.post('/user/collect/:goodsId', auth.loginRequired, async (ctx, next) => {
-    let goodsId = ctx.params.goodsId;
-    let goods = await Goods.findById(goodsId);
-    auth.assert(goods, '商品不存在');
-    let res = await Like.findOne({
-        userID: ctx.state.user._id,
-        goods_id: goodsId
-    });
-
-    auth.assert(!res || res.deleted_date, "点过了");
-
-    res = await Like.findOneAndUpdate({
-        userID: ctx.state.user._id,
-        goods_id: goodsId
-    }, {
-        deleted_date: null,
-        updated_date: moment()
-    }, {new:true, upsert:true});
-
-    goods.like_num ++;
-    goods.updated_date = moment();
-    await goods.save();
-
-
-    ctx.body = {
-        success: 1,
-        data: res
-    }
-});
-
-/**
- * @api {post}  /user/like   点赞
- * @apiName     Like
- * @apiGroup    User
- *
- *
- * @apiParam    {String}    goodsId
- *
- *
- */
-router.post('/user/like', auth.loginRequired, async (ctx, next) => {
-    let goodsId = ctx.request.body.goodsId;
-    let goods = await Goods.findById(goodsId);
-    auth.assert(goods, '商品不存在');
-    let res = await Like.findOne({
-        userID: ctx.state.user._id,
-        goods_id: goodsId
-    });
-
-    auth.assert(!res || res.deleted_date, "点过了");
-
-    res = await Like.findOneAndUpdate({
-        userID: ctx.state.user._id,
-        goods_id: goodsId
-    }, {
-        deleted_date: null,
-        updated_date: moment()
-    }, {new:true, upsert:true});
-
-    goods.like_num ++;
-    goods.updated_date = moment();
-    await goods.save();
-
-
-    ctx.body = {
-        success: 1,
-        data: res
-    }
-});
-
-/**
- * @api {post}  /user/unlike   取消点赞
- * @apiName     Unlike
- * @apiGroup    User
- *
- *
- * @apiParam    {String}    goodsId
- *
- *
- */
-router.post('/user/unlike', auth.loginRequired, async (ctx, next) => {
-    let goodsId = ctx.request.body.goodsId;
-    console.log(ctx.params);
-    let goods = await Goods.findById(goodsId);
-    auth.assert(goods, '商品不存在');
-
-    let res = await Like.findOne({
-        userID: ctx.state.user._id,
-        goods_id: goodsId
-    });
-
-    auth.assert(res && !res.deleted_date, "没赞过");
-
-    res.deleted_date = moment();
-    res.updated_date = moment();
-    goods.like_num --;
-    await res.save();
-    await goods.save();
-
-    ctx.body = {
-        success: 1,
-        data: res
-    }
-});
-
-
-// 取消收藏
-/**
- * @api {post}   /user/uncollect/:goods_id   取消收藏
- * @apiName     Uncollect
- * @apiGroup    User
- */
-// router.post('/user/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
-//     let user = ctx.state.user;
-//     let goods = await Goods.findById(ctx.params.goods_id);
-//     auth.assert(goods, '商品不存在');
-//     auth.assert(_.some(user.collections, x => goods._id.equals(x)), '已经收藏');
-//     user.collections = user.collections.filter(x => !goods._id.equals(x));
-//     await user.save();
-//     ctx.body = {
-//         success: 1,
-//     }
-// });
-
-router.post('/user/uncollect/:goodsId', auth.loginRequired, async (ctx, next) => {
-    let goodsId = ctx.params.goodsId;
-    console.log(ctx.params);
-    let goods = await Goods.findById(goodsId);
-    auth.assert(goods, '商品不存在');
-
-    let res = await Like.findOne({
-        userID: ctx.state.user._id,
-        goods_id: goodsId
-    });
-
-    auth.assert(res && !res.deleted_date, "没赞过");
-
-    res.deleted_date = moment();
-    res.updated_date = moment();
-    goods.like_num --;
-    await res.save();
-    await goods.save();
-
-    ctx.body = {
-        success: 1,
-        data: res
-    }
-});
 
 
 router.get('/user/wallet', auth.loginRequired, async (ctx, next) => {
@@ -418,36 +266,7 @@ router.post('/user/save_formids', auth.loginRequired, async(ctx, next)=>{
 })
 
 
-/**
- * @api {get}   /user/collections   我的收藏
- * @apiName     Collections
- * @apiGroup    User
- *
- *
- * @apiParam    {Number}    pageNo      当前页码，默认1
- * @apiParam    {Number}    pageSize    每页大小，默认6
- *
- * @apiSuccess  {Number}    success     1success
- * @apiSuccess  {Object}    data        列表
- *
- */
-// router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
-//     let pageNo = ctx.query.pageNo || 1;
-//     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
-//     console.log(pageNo);
-//     console.log(pageSize);
-//     let user = ctx.state.user;
-//     let condi = {_id:user.collections};
-//     let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
-//
-//     ctx.body = {
-//         success: 1,
-//         data: goods
-//     };
-// });
-
-
-router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
+let getUserLikes = async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
     console.log(pageNo);
@@ -467,7 +286,22 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
         success: 1,
         data: goods
     };
-});
+};
+
+/**
+ * @api {get}   /user/collections   我的收藏
+ * @apiName     Collections
+ * @apiGroup    User
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+router.get('/user/collections', auth.loginRequired, getUserLikes);
 
 /**
  * @api {get}   /user/mylikes   我的点赞
@@ -482,26 +316,6 @@ router.get('/user/collections', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        列表
  *
  */
-router.get('/user/mylikes', auth.loginRequired, async (ctx, next) => {
-    let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
-    console.log(pageNo);
-    console.log(pageSize);
-
-    let collections = await Like.find({
-        userID: ctx.state.user._id,
-        deleted_date:null
-    });
-    let user = ctx.state.user;
-    let condi = {_id: _.map(collections, col=>col.goods_id)};
-
-    console.log(condi);
-    let goods = await srv_goods.goodsListV2(user, pageNo, pageSize, condi);
-
-    ctx.body = {
-        success: 1,
-        data: goods
-    };
-});
+router.get('/user/mylikes', auth.loginRequired, getUserLikes);
 
 

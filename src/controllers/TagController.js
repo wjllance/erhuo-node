@@ -17,7 +17,7 @@ let {Order, Goods, UserTag, TagLike} = require('../models');
 const router = module.exports = new Router();
 
 //tag detail
-router.get('/tags', async(ctx, next) => {
+router.get('/tags', auth.loginRequired, async(ctx, next) => {
     let userId = ctx.query.user_id;
     // auth.loginRequired();
     let res = await tagService.detailList(userId, ctx.state.user);
