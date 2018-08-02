@@ -200,7 +200,7 @@ router.get('/user/:user_id/publish_list/', auth.loginRequired, async (ctx, next)
         //     ]
         // },
         deleted_date: null,
-        removed_date: null
+        // removed_date: null
     };  //未删除筛选
 
     console.log(condi);
