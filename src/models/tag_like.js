@@ -19,6 +19,11 @@ let tagLikeSchema = new mongoose.Schema({
         ref: 'UserTag',
         require:true
     },
+    to_user_id:{
+        type:  mongoose.Schema.ObjectId,
+        ref: "User",
+        require: true
+    },
     created_date: { type: Date, default: Date.now },
     updated_date: {type: Date, default: Date.now},
     deleted_date: Date,

@@ -17,8 +17,14 @@ let {Order, Goods, UserTag, TagLike} = require('../models');
 const router = module.exports = new Router();
 
 //tag detail
-router.get('/tags/', auth.loginRequired, async(ctx, next) => {
-
+router.get('/tags', async(ctx, next) => {
+    let userId = ctx.query.user_id;
+    // auth.loginRequired();
+    let res = await tagService.detailList(userId, ctx.state.user);
+    ctx.body = {
+        success:1,
+        data: res
+    }
 });
 
 
@@ -65,6 +71,7 @@ router.post('/tags/like', auth.loginRequired, async(ctx, next) => {
         userID: ctx.state.user._id,
         user_tag_id: userTag._id
     }, {
+        to_user_id: userTag.userID,
         deleted_date: null,
         updated_date: new Date()
     }, {new:true, upsert:true});
@@ -87,13 +94,8 @@ router.post('/tags/unlike', auth.loginRequired, async(ctx, next) => {
     });
 
     auth.assert(tagLike && !tagLike.deleted_date, "没赞过");
-
-    tagLike = await TagLike.findOneAndUpdate({
-        userID: ctx.state.user._id,
-        user_tag_id: userTag._id
-    }, {
-        deleted_date: new Date(),
-    }, {new:true, upsert:true});
+    tagLike.deleted_date = new Date();
+    tagLike.save();
 
     userTag.like_num --;
     userTag.save();

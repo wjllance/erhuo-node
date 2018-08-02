@@ -20,6 +20,38 @@ exports.baseList = async (userId) => {
     return tags;
 };
 
+exports.detailList = async (ownerId, user) =>{
+    // console.log("user",user);
+    let userTags = await UserTag.find({
+        userID: ownerId,
+        deleted_date:null
+    }, "_id tag_name like_num");
+
+    let ret = []
+    for(let i = 0; i < userTags.length; i++){
+        let likeUsers = await TagLike.find({
+            user_tag_id: userTags[i]._id,
+            deleted_date: null
+        }).populate('userID');
+
+        likeUsers = _.map(likeUsers, u => u.userID.cardInfo());
+        let liked = !!(
+            await TagLike.findOne({
+            user_tag_id: userTags[i]._id,
+            deleted_date: null,
+            userID: user ? user._id : null
+        }));
+
+        ret.push({
+            tag: userTags[i],
+            like_users: likeUsers,
+            liked: liked
+        });
+        // console.log(ret);
+    }
+    return ret;
+};
+
 exports.userPostTag = async(user, tag_name) => {
     let tag = await Tag.findOne({
         name: tag_name
@@ -45,4 +77,4 @@ exports.userPostTag = async(user, tag_name) => {
         updated_date: new Date()
     }, {new:true, upsert:true});
     return userTag;
-}
+};
