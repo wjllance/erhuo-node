@@ -9,6 +9,7 @@ let myUtil = require('../myUtils/mUtils');
 
 let { log } = require('../config');
 let { User, Account, Order, UserFormid, Transaction } = require('../models');
+let tagService = require('../services/TagService');
 
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -19,6 +20,7 @@ exports.indexInfo = async (uid) => {
     let account = user.account;
     user = user.baseInfo();
     user.balance = account.balance.toFixed(2);
+    user.tags = await tagService.baseList(user._id);
     return user;
 };
 

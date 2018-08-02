@@ -41,6 +41,13 @@ let TodayBonus = exports.TodayBonusSchema = require('./today_bonus');
 
 let Version = exports.Version = require('./version');
 
+
+let Tag = exports.Tag = require('./tag');
+
+let TagLike = exports.TagLike = require('./tag_like');
+
+let UserTag = exports.UserTag = require('./user_tag');
+
 mongoose.connect(config.MONGODB_URL, {
 }, function (err) {
 	if (err) {
