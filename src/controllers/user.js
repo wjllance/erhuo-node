@@ -192,11 +192,14 @@ router.get('/user/:user_id/publish_list/', auth.loginRequired, async (ctx, next)
     let condi = {
         userID: ctx.params.user_id,
         status: {
-            $in: [
-                config.CONSTANT.GOODS_STATUS.RELEASED,
-                config.CONSTANT.GOODS_STATUS.UNDERCARRIAGE
-            ]
+            $ne: config.CONSTANT.GOODS_STATUS.REJECT
         },
+        // status: {
+        //     $in: [
+        //         config.CONSTANT.GOODS_STATUS.RELEASED,
+        //         config.CONSTANT.GOODS_STATUS.UNDERCARRIAGE
+        //     ]
+        // },
         deleted_date: null,
         removed_date: null
     };  //未删除筛选

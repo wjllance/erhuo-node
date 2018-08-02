@@ -354,9 +354,9 @@ router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
         goods.glocation = ctx.state.user.location || 0;
     }
 
-    if(goods.category === "书籍"){
-        goods.status = config.CONSTANT.GOODS_STATUS.RELEASED;
-    }
+    // if(goods.category === "书籍"){
+    //     goods.status = config.CONSTANT.GOODS_STATUS.RELEASED;
+    // }
     await goods.save();
 
     ctx.body = {

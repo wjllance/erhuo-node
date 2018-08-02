@@ -23,7 +23,7 @@ exports.register = function () {
 
     scheduleOrderTimeout();
 
-    scheduleGoodsExamine();
+    // scheduleGoodsExamine();
 
     // scheduleOldPicsUpload();
 
@@ -75,7 +75,9 @@ let scheduleOldGoodsNotify = () =>{
                 $lt: moment().subtract(3, 'd'),
                 $gt: moment().subtract(4, 'd')
             },
-            status: config.CONSTANT.GOODS_STATUS.RELEASED
+            // status: config.CONSTANT.GOODS_STATUS.RELEASED
+            status: {$ne: config.CONSTANT.GOODS_STATUS.REJECT},
+            removed_date: null
         });
         console.log('checking old goods notify...', goodsAll.length);
 
