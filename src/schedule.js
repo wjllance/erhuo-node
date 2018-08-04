@@ -316,6 +316,7 @@ let pubbook = async(users, books, locationNum)=>{
     let docs = [];
     let school_log = [];
     let total = 0;
+    let k = 0;
     for (let j = 0; j < books.length; j++){
         let cnt = locationNum || _.random(3,7);
         let book = books[j].book;
@@ -329,7 +330,8 @@ let pubbook = async(users, books, locationNum)=>{
 
 
         for (let i = 0; i < cnt; i++){
-            let idx = i % users.length;
+            k++;
+            let idx = k % users.length;
             // console.log(idx, users[idx]);
             let params = {
                 userID: users[idx]._id,
