@@ -80,8 +80,8 @@ let uploadFakeGoods = ()=>{
         total += await pubbook(users, books);
 
         // total += books.length;
-        console.log("fake process...", total);
-        logger.info("fake process...", total);
+        console.log("fake process...", start, total);
+        logger.info("fake process...", start, total);
     })
 }
 
