@@ -46,6 +46,7 @@ exports.register = function () {
 
 let uploadFakeGoods = ()=>{
 
+    // let count = 12;
     let count = 12;
     let api_url = "https://api.douban.com/v2/book/user/tongchu/collections";
 
@@ -75,7 +76,8 @@ let uploadFakeGoods = ()=>{
         // console.log(books);
 
         console.log("books len", books.length);
-        total += await pubbook(users, books,3);
+        // total += await pubbook(users, books,3);
+        total += await pubbook(users, books);
 
         // total += books.length;
         console.log("fake process...", total);
