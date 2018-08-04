@@ -80,7 +80,7 @@ exports.login = async function(ctx, code) {
         user = await User.findOneAndUpdate({openid: data.openid}, data, {new: true, upsert: true});
     }
     ctx.session.user_id = user._id;
-    await Account.findOneOrCreate({userID: user._id});
+    return user;
 }
 
 /// 需用户登录

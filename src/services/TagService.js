@@ -75,7 +75,7 @@ exports.detailList = async (ownerId, user) =>{
     return ret;
 };
 
-exports.userPostTag = async(user, tag_name) => {
+let userAddTag = exports.userPostTag = async(user, tag_name) => {
     let tag = await Tag.findOne({
         name: tag_name
     });
@@ -101,4 +101,17 @@ exports.userPostTag = async(user, tag_name) => {
     }, {new:true, upsert:true});
 
     return userTag;
+};
+
+exports.defaultTag = async(user)=>{
+    let userTags = await UserTag.find({
+        userID: user._id
+    });
+    console.log("userTag,,,",userTags);
+    if(userTags.length === 0){
+        let res = await userAddTag(user, "佛系");
+        console.log(res);
+        res = await userAddTag(user, "回复神速");
+        console.log(res);
+    }
 };

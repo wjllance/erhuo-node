@@ -13,7 +13,7 @@ let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let tagService = require('../services/TagService');
 let srv_user = require('../services/user');
-let { Like, Goods, User } = require('../models');
+let { Like, Goods, User, Account } = require('../models');
 // const schools = config.CONSTANT.SCHOOL;
 const school_map = config.CONSTANT.SCHOOL_MAP;
 let moment = require('moment');
@@ -32,10 +32,12 @@ const router = module.exports = new Router();
  *
  */
 router.post('/user/login', async (ctx, next) => {
-    await auth.login(ctx, ctx.request.body.code);
+    let user = await auth.login(ctx, ctx.request.body.code);
+    await Account.findOneOrCreate({userID: user._id});
+    await tagService.defaultTag(user);
     ctx.body = {
         success: 1,
-        data: {user_id: ctx.session.user_id}
+        data: {user_id: user._id}
     };
 });
 
