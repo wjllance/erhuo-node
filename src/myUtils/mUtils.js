@@ -3,7 +3,15 @@ let _ = require('lodash');
 require('should');
 let moment = require('moment')
 let config = require('../config');
+const image2base64 = require('image-to-base64');
 moment.locale('zh-cn');
+const AV = require('leancloud-storage');
+AV.init({
+    appId: config.LEAN_APPID,
+    appKey: config.LEAN_APPKEY,
+    masterKey: config.LEAN_MASTERKEY
+});
+
 
 /*
 var Sig = require('../libs/tlssdk/lib/TimGenerateSig.js');
@@ -71,4 +79,14 @@ exports.thumbnail = (imgurl, width) =>{
 };
 
 
+exports.uploadImgByUrl = async(url) => {
+    let b64 = await image2base64(url);
 
+    // console.log("base64", b64);
+    let urls = url.split('/');
+    // console.log(urls);
+    let file = new AV.File(urls[urls.length-1], {base64: b64});
+    let res = await file.save();
+    // console.log(res);
+    return res.url();
+}

@@ -6,11 +6,12 @@ let _ = require('lodash');
 let mzfs = require('mz/fs');
 let path = require('path');
 let body = require('koa-convert')(require('koa-better-body')());
-const image2base64 = require('image-to-base64');
 let config = require('../config');
 let auth = require('../services/auth');
 let { User, Image, Goods } = require('../models');
 const sharp = require('sharp');
+const mUtils = require('../myUtils/mUtils');
+
 const router = module.exports = new Router();
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -95,18 +96,11 @@ router.post('/v2/images/upload_pic_url', auth.loginRequired, async (ctx, next) =
     let imgUrl = ctx.request.body.img;
     auth.assert(imgUrl, '没有图片链接');
 
-    let b64 = await image2base64(imgUrl);
-
-    console.log("base64", b64);
-    let urls = imgUrl.split('/');
-    console.log(urls);
-    let file = new AV.File(urls[urls.length-1], {base64: b64});
-    let res = await file.save();
-    console.log(res);
+    let res = await mUtils.uploadImgByUrl(imgUrl);
 
     ctx.body = {
         success: 1,
-        data: res.url()
+        data: res
     };
 
 });
@@ -129,3 +123,4 @@ router.post('/v2/images/uploadByAdmin/:openid', body, async (ctx, next) => {
     };
 
 });
+

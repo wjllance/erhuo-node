@@ -288,29 +288,7 @@ router.get('/goods/hot_words', async (ctx, next) => {
     }
 });
 
-// 发布
-/**
- * @api {post} /v2/goods/publish  发布商品
- * @apiName     GoodsPublish
- * @apiGroup    Goods
- *
- *
- * @apiParam    {Array}     [gpics]    图片id列表
- * @apiParam    {Array}     npics    图片id列表
- * @apiParam    {String}    gname
- * @apiParam    {String}    gsummary
- * @apiParam    {String}    glabel
- * @apiParam    {Number}    gprice
- * @apiParam    {String}    gstype
- * @apiParam    {String}    glocation
- * @apiParam    {Number}    gcost
- * @apiParam    {Number}    gcity
- * @apiParam    {String}    category
- *
- * @apiSuccess  {Number}    success     1success
- * @apiSuccess  {Object}    data        goods_id
- *
- */
+//deprecated
 router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     let images = await Image.find({_id: ctx.request.body.gpics});
     auth.assert(images.length === ctx.request.body.gpics.length, '图片不正确');
@@ -335,7 +313,29 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     };
 });
 
-
+// 发布
+/**
+ * @api {post} /v2/goods/publish  发布商品
+ * @apiName     GoodsPublish
+ * @apiGroup    Goods
+ *
+ *
+ * @apiParam    {Array}     [gpics]    图片id列表
+ * @apiParam    {Array}     npics    图片id列表
+ * @apiParam    {String}    gname
+ * @apiParam    {String}    gsummary
+ * @apiParam    {String}    glabel
+ * @apiParam    {Number}    gprice
+ * @apiParam    {String}    gstype
+ * @apiParam    {String}    glocation
+ * @apiParam    {Number}    gcost
+ * @apiParam    {Number}    gcity
+ * @apiParam    {String}    category
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        goods_id
+ *
+ */
 router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
 
     let params = ctx.request.body;
@@ -346,7 +346,11 @@ router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
     goods.userID = ctx.state.user._id;
     // goods.gpics = images.map(x => x._id);
 
-    _.assign(goods, _.pick(params, ['gname', 'gsummary', 'glabel', 'gprice', 'npics', 'gstype', 'glocation', 'gcost', 'gcity', 'remark']));
+    _.assign(goods, _.pick(params, ['gname', 'gsummary', 'glabel', 'npics', 'gprice', 'gstype', 'glocation', 'gcity', 'remark']));
+
+    let reg = /\d+(.\d+)/;
+    let res = reg.exec(params.gcost);
+    goods.gcost = res ? res[0] : parseFloat(params.gcost);
 
     goods.category = params.category || "其他";
     goods.gname = params.gname || params.gsummary.substr(0, 20);
@@ -364,33 +368,6 @@ router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
         data: goods._id
     };
 });
-
-
-router.post('/v2/goods/publish_book', auth.loginRequired, async (ctx, next) => {
-
-    let params = ctx.request.body;
-    auth.assert(params.gsummary && params.gprice, "缺少参数");
-    auth.assert(params.npics && params.npics.length > 0, "没图");
-
-    let goods = new Goods();
-    goods.userID = ctx.state.user._id;
-    // goods.gpics = images.map(x => x._id);
-
-    _.assign(goods, _.pick(params, ['gname', 'gsummary', 'glabel', 'gprice', 'npics', 'gstype', 'glocation', 'gcost', 'gcity', 'remark']));
-
-    goods.category = params.category || "其他";
-    goods.gname = params.gname || params.gsummary.substr(0, 20);
-    if(!goods.glocation){
-        goods.glocation = ctx.state.user.location || 0;
-    }
-    await goods.save();
-
-    ctx.body = {
-        success: 1,
-        data: goods._id
-    };
-});
-
 
 // 下架
 // 参数：gid

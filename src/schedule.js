@@ -1,21 +1,28 @@
 const schedule = require('node-schedule');
+const _ = require('lodash');
 let moment = require('moment');
 moment.locale('zh-cn');
+const superagent = require('superagent');
+let path = require('path');
+let fs = require('fs');
+let log4js = require('log4js');
+let logger = log4js.getLogger('errorLogger');
+
 const myUtils = require("./myUtils/mUtils");
 const {Transaction, Order, Goods, User, Like} = require('./models');
 const srv_transaction = require('./services/transaction');
 const srv_order = require('./services/order');
 const srv_wx_template = require("./services/wechat_template");
-let path = require('path');
-let fs = require('fs');
-
+const schools = require('./myUtils/school_list');
 let config = require('./config');
+
 const AV = require('leancloud-storage');
 AV.init({
     appId: config.LEAN_APPID,
     appKey: config.LEAN_APPKEY,
     masterKey: config.LEAN_MASTERKEY
 });
+
 exports.register = function () {
     console.log("register!");
 
@@ -32,7 +39,50 @@ exports.register = function () {
     scheduleOldGoodsNotify();
 
     scheduleUpdateCollection();
+
+    uploadFakeGoods();
 };
+
+
+let uploadFakeGoods = ()=>{
+
+    let count = 12;
+    let api_url = "https://api.douban.com/v2/book/user/tongchu/collections";
+
+    let total = 0;
+
+
+
+    // schedule.scheduleJob('*/5 * * * * *', async function(){
+    schedule.scheduleJob('0 */1 * * * *', async function(){
+
+        let users = await User.find({
+            openid: {
+                // $in: ["oA1su5ZB33if_ZmYp-Syw0LG5UAE","oA1su5Yr4YJ_YO1Xp9L-bDF6OB4g", "123456789", "oA1su5SVjjSD2TZn9-CjkrUqtT7s"],
+                $in: ["oA1su5ZbA1EUjAYi_TK70BIUKy5A","oA1su5c0T7V6LXQ5bGSOjObnflu0","oA1su5eYCt3SZ7UxocVhthxO5hMw","oA1su5SVjjSD2TZn9-CjkrUqtT7s","oA1su5UM4XryAgfwP-WY5VN0CudU","oA1su5fETBeKhu9g5g50A1RR3eYc","oA1su5WvztU5dOK2JYcINmaVzOuI","oA1su5X5ZeNlkhIHC1xGZ0Fa27ms","oA1su5X5OXS9tbae748UEycrJ9OA","oA1su5Xf1lzpnwKQIVWz1zBLvPBY","oA1su5dM9W7zGyiRFiLlL00dQ6Pk","oA1su5R0RJg6hSCkaFZ_z8A5h6mU","oA1su5ZpvX5ZzQk9jlcqLbPwXBeY","oA1su5V-ci2oRTbRlljKLVHcrw2M","oA1su5alrmL0qelxp3ySL0Pi8S20","oA1su5c0ICX3Zp172fxyjuMdJMtI","oA1su5WePnNHcLPAfBXOmMlireY4","oA1su5dDrpmMSIgYitfqZsJ4T2QE","oA1su5T-IQarkbhxXlo8EuImQoFc","oA1su5ZELx6fGYrO0wY9pKwsak6Q","oA1su5UsI8C2yPGdjcS1n2LwZGzc","ockK80fSSg9bxNnsB5wMSJKt1m-o"]
+            }
+        });
+        // console.log(users);
+
+        let start = _.random(0, 1900);
+        // let start = 0;
+        let query_params = {
+            start: start,
+            count: count
+        };
+        let {text} = await superagent.get(api_url).query(query_params);
+        let books = JSON.parse(text).collections;
+        // console.log(books);
+
+        console.log("books len", books.length);
+        total += await pubbook(users, books,3);
+
+        // total += books.length;
+        console.log("fake process...", total);
+        logger.info("fake process...", total);
+    })
+}
+
 
 let scheduleUpdateCollection = ()=>{
     schedule.scheduleJob('*/30 * * * * *', async function(){
@@ -258,3 +308,46 @@ let scheduleOrderCountDown = ()=>{
     }
 };
 
+
+let pubbook = async(users, books, locationNum)=>{
+
+    let docs = [];
+    let school_log = [];
+    let total = 0;
+    for (let j = 0; j < books.length; j++){
+        let cnt = locationNum || _.random(3,7);
+        let book = books[j].book;
+        // console.log("book",book);
+        let img = book.image;
+        let url = await myUtils.uploadImgByUrl(img);
+
+        let reg = /\d+(.\d+)/;
+        let res = reg.exec(book.price);
+        let price = res ? res[0] : parseFloat(book.price);
+
+
+        for (let i = 0; i < cnt; i++){
+            let idx = i % users.length;
+            // console.log(idx, users[idx]);
+            let params = {
+                userID: users[idx]._id,
+                npics: [url],
+                gname: book.title,
+                gsummary: book.summary,
+                gcost: parseFloat(price),
+                gprice: ((Math.random()*0.5 + 0.2)*price).toFixed(2),
+                category: "书籍",
+                status: 999,
+                glocation: _.random(2, schools.length)
+            };
+            docs.push(params);
+            school_log.push(schools[params.glocation]);
+        }
+        total += cnt;
+    }
+    console.log(school_log);
+    // console.log(docs);
+    let goods = await Goods.insertMany(docs);
+    // console.log(goods);
+    return total;
+};
