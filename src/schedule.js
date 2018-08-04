@@ -325,7 +325,7 @@ let pubbook = async(users, books, locationNum)=>{
 
         let reg = /\d+(.\d+)/;
         let res = reg.exec(book.price);
-        let price = res ? res[0] : parseFloat(book.price);
+        let price = (res ? res[0] : parseFloat(book.price)) || 20;
 
 
         for (let i = 0; i < cnt; i++){
