@@ -16,7 +16,8 @@ exports.baseList = async (userId) => {
     let tags = await UserTag.find({
         userID: userId,
         deleted_date:null
-    }, "_id tag_name like_num");
+    }, "_id tag_name like_num")
+        .sort({like_num:-1});
     return tags;
 };
 
@@ -24,7 +25,8 @@ exports.listWithLike = async (ownerId, user) => {
     let userTags = await UserTag.find({
         userID: ownerId,
         deleted_date:null
-    }, "_id tag_name like_num");
+    }, "_id tag_name like_num")
+        .sort({like_num:-1});
 
     let ret = [];
     for(let i = 0; i < userTags.length; i++){
@@ -48,7 +50,8 @@ exports.detailList = async (ownerId, user) =>{
     let userTags = await UserTag.find({
         userID: ownerId,
         deleted_date:null
-    }, "_id tag_name like_num");
+    }, "_id tag_name like_num")
+        .sort({like_num:-1});
 
     let ret = []
     for(let i = 0; i < userTags.length; i++){
