@@ -362,24 +362,23 @@ exports.oldGoodsNotify = async (goods)=>{
 };
 
 
-exports.tagLike = async (tagLike)=>{
+exports.tagLike = async (userTag, user)=>{
 
-    let touser = await User.findOne({_id:tagLike.to_user_id});
-    let user = await User.findOne({_id: tagLike.userID});
+    let touser = await User.findOne({_id: userTag.userID});
     let formid = await getFormid(touser._id);
     if(!formid){
         return false;
     }
     let template_id = "SG0B82OZyrYOOeHWvqc82ewzsJGNfKKdVklLCFQcOYY";
-    let page = "pages/mainuser/mainuser?scene="+tagLike.user._id;
+    let page = "pages/mainuser/mainuser?scene="+touser._id;
     let data = {
         //点赞通知
         keyword1:{
-            value: "你的标签又被人认同啦！"
+            value: "又有人认同了你的个性标签！"
         },
         //作品名称
         keyword2:{
-            value: tagLike.name
+            value: userTag.tag_name+"("+userTag.like_num+"赞)"
         },
         //点赞人
         keyword3: {

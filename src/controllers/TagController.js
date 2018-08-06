@@ -80,7 +80,7 @@ router.post('/tags/like', auth.loginRequired, async(ctx, next) => {
     userTag.like_num ++;
     userTag.save();
 
-    await wxTempService.tagLike(tagLike);
+    await wxTempService.tagLike(userTag, ctx.state.user);
 
     ctx.body = {
         success: 1,
