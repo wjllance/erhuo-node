@@ -40,7 +40,7 @@ exports.register = function () {
 
     scheduleUpdateCollection();
 
-    uploadFakeGoods();
+    // uploadFakeGoods();
 };
 
 
@@ -342,7 +342,7 @@ let pubbook = async(users, books, locationNum)=>{
                 gprice: ((Math.random()*0.5 + 0.2)*price).toFixed(2),
                 category: "书籍",
                 status: 999,
-                glocation: _.random(2, schools.length)
+                glocation: _.random(2, schools.length-1)
             };
             docs.push(params);
             school_log.push(schools[params.glocation]);
