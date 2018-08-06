@@ -362,4 +362,40 @@ exports.oldGoodsNotify = async (goods)=>{
 };
 
 
+exports.tagLike = async (tagLike)=>{
+
+    let touser = await User.findOne({_id:tagLike.to_user_id});
+    let user = await User.findOne({_id: tagLike.userID});
+    let formid = await getFormid(touser._id);
+    if(!formid){
+        return false;
+    }
+    let template_id = "SG0B82OZyrYOOeHWvqc82ewzsJGNfKKdVklLCFQcOYY";
+    let page = "pages/mainuser/mainuser?scene="+tagLike.user._id;
+    let data = {
+        //点赞通知
+        keyword1:{
+            value: "你的标签又被人认同啦！"
+        },
+        //作品名称
+        keyword2:{
+            value: tagLike.name
+        },
+        //点赞人
+        keyword3: {
+            value: user.nickName
+        },
+        //点赞时间
+        keyword4:{
+            value: moment().format('lll')
+        }
+    };
+    formid.used = 1;
+    await formid.save();
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    return true;
+};
+
+
+
 

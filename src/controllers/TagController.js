@@ -11,6 +11,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let wechat = require('../services/wechat');
 let tagService = require('../services/TagService');
+let wxTempService = require('../services/wechat_template');
 let srv_bargain = require('../services/bargain');
 let {Order, Goods, UserTag, TagLike} = require('../models');
 
@@ -78,6 +79,9 @@ router.post('/tags/like', auth.loginRequired, async(ctx, next) => {
 
     userTag.like_num ++;
     userTag.save();
+
+    await wxTempService.tagLike(tagLike);
+
     ctx.body = {
         success: 1,
         data: tagLike
