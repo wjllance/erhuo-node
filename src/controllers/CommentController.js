@@ -11,7 +11,7 @@ let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let srv_wechat = require('../services/wechat');
-let { User, Image, Goods } = require('../models');
+let { Account, User, Image, Goods, Like } = require('../models');
 let srv_wxtemplate = require('../services/wechat_template');
 
 const router = module.exports = new Router();
@@ -100,11 +100,11 @@ router.post('/user/collect/:goodsId', auth.loginRequired, async (ctx, next) => {
         goods_id: goodsId
     }, {
         deleted_date: null,
-        updated_date: moment()
+        updated_date: new Date()
     }, {new:true, upsert:true});
 
     goods.like_num ++;
-    goods.updated_date = moment();
+    goods.updated_date = new Date();
     await goods.save();
 
 
@@ -140,11 +140,11 @@ router.post('/user/like', auth.loginRequired, async (ctx, next) => {
         goods_id: goodsId
     }, {
         deleted_date: null,
-        updated_date: moment()
+        updated_date: new Date()
     }, {new:true, upsert:true});
 
     goods.like_num ++;
-    goods.updated_date = moment();
+    goods.updated_date = new Date();
     await goods.save();
 
 
@@ -177,8 +177,8 @@ router.post('/user/unlike', auth.loginRequired, async (ctx, next) => {
 
     auth.assert(res && !res.deleted_date, "没赞过");
 
-    res.deleted_date = moment();
-    res.updated_date = moment();
+    res.deleted_date = new Date();
+    res.updated_date = new Date();
     goods.like_num --;
     await res.save();
     await goods.save();
@@ -221,8 +221,8 @@ router.post('/user/uncollect/:goodsId', auth.loginRequired, async (ctx, next) =>
 
     auth.assert(res && !res.deleted_date, "没赞过");
 
-    res.deleted_date = moment();
-    res.updated_date = moment();
+    res.deleted_date = new Date();
+    res.updated_date = new Date();
     goods.like_num --;
     await res.save();
     await goods.save();
