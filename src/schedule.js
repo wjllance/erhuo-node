@@ -41,8 +41,62 @@ exports.register = function () {
     scheduleUpdateCollection();
 
     // uploadFakeGoods();
+
+    scheduleComeBack();
 };
 
+
+let scheduleComeBack = ()=>{
+
+    let ti = '0 0 20 * * *';
+    if(config.ENV === 'local'){
+        ti = '0 */1 * * * *';
+    }
+    schedule.scheduleJob(ti, async function(){
+        let condi = {
+            $or: [
+                {
+                    updated_date: {
+                        $gte: moment().subtract(2,'days').toDate(),
+                        $lt: moment().subtract(1,'days').toDate()
+                    }
+                },
+                {
+                    updated_date: {
+                        $gte: moment().subtract(7,'days').toDate(),
+                        $lt: moment().subtract(6,'days').toDate()
+                    }
+                }
+            ]
+        };
+        if(config.ENV === 'local'){
+            condi = {
+                $or: [
+                    {
+                        updated_date: {
+                            $gte: moment().subtract(11,'m').toDate(),
+                            $lt: moment().subtract(10,'m').toDate()
+                        }
+                    },
+                    {
+                        updated_date: {
+                            $gte: moment().subtract(3,'m').toDate(),
+                            $lt: moment().subtract(2,'m').toDate()
+                        }
+                    }
+                ]
+            }
+        }
+        // console.log(condi.$or[1]);
+        let users = await User.find(condi);
+        console.log("daily notify ...population:", users.length);
+        logger.info("daily notify ...population:", users.length);
+        for (let i = 0; i < users.length; i++){
+            await srv_wx_template.comeBack(users[i]);
+        }
+        // total += books.length;
+    })
+};
 
 let uploadFakeGoods = ()=>{
 
@@ -116,21 +170,30 @@ let scheduleUpdateCollection = ()=>{
 
 
 let scheduleOldGoodsNotify = () =>{
-    // schedule.scheduleJob('*/30 * * * * *', async function() {
-    schedule.scheduleJob('0 */10 * * * *', async function(){
 
-        let goodsAll = await Goods.find({
-            created_date: {
-                $gt: moment().subtract(5, 'd')
-            },
+    let ti = '0 0 8 * * *';
+    if(config.ENV === 'local'){
+        ti = '0 */5 * * * *';
+    }
+    // schedule.scheduleJob('*/30 * * * * *', async function() {
+    schedule.scheduleJob(ti, async function(){
+        let condi = {
             updated_date: {
-                $lt: moment().subtract(3, 'd'),
-                $gt: moment().subtract(4, 'd')
+                $lte: moment().subtract(3, 'd').toDate(),
+                $gt: moment().subtract(4, 'd').toDate()
             },
             // status: config.CONSTANT.GOODS_STATUS.RELEASED
             status: {$ne: config.CONSTANT.GOODS_STATUS.REJECT},
             removed_date: null
-        });
+        };
+        if(config.ENV === 'local'){
+            condi.updated_date = {
+                $lte: moment().subtract(15, 'm').toDate(),
+                $gt: moment().subtract(10, 'm').toDate()
+            }
+        }
+
+        let goodsAll = await Goods.find(condi);
         console.log('checking old goods notify...', goodsAll.length);
 
         for (let i = 0; i < goodsAll.length; i++) {
@@ -259,7 +322,7 @@ let scheduleOrderTimeout = ()=>{
         console.log('checking order timeout...');
         let orders = await Order.find({
             updated_date: {
-                $lt: moment().subtract(15, 'm')
+                $lt: moment().subtract(15, 'm').toDate()
             },
             order_status: config.CONSTANT.ORDER_STATUS.TOPAY
         });
@@ -271,12 +334,13 @@ let scheduleOrderTimeout = ()=>{
 };
 
 let scheduleOrderCountDown = ()=>{
+
     if(config.ENV === "local") {
         schedule.scheduleJob('*/30 * * * * *', async function(){
             console.log('checking normal order countdown...');
             let transactions = await Transaction.find({
                 countdown_date: {
-                    $lt: moment().subtract(30, 's')
+                    $lt: moment().subtract(30, 's').toDate()
                 },
                 status: config.CONSTANT.TRANSACTION_STATUS.INIT,
                 finished_date: {$exists: false}
@@ -295,7 +359,7 @@ let scheduleOrderCountDown = ()=>{
             console.log('checking normal order countdown...');
             let transactions = await Transaction.find({
                 countdown_date: {
-                    $lt: moment().subtract(71, 'h').subtract(50, 'm')
+                    $lt: moment().subtract(71, 'h').subtract(50, 'm').toDate()
                 },
                 status: config.CONSTANT.TRANSACTION_STATUS.INIT,
                 finished_date: {$exists: false}

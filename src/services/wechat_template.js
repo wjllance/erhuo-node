@@ -96,8 +96,8 @@ exports.sendPaidTemplate = async(order) => {
     };
 
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
     return true;
 };
 
@@ -149,8 +149,8 @@ exports.confirmReceipt = async(order) =>{
     };
 
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
     return true;
 };
 
@@ -185,8 +185,8 @@ exports.moneyArrive = async(order)=>{
     };
 
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
     return true;
 };
 
@@ -235,8 +235,8 @@ exports.refundApply = async(order) => {
     };
 
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
     return true;
 };
 
@@ -274,8 +274,8 @@ exports.refundConfirm = async(order) =>{
     };
 
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
     return true;
 };
 
@@ -321,8 +321,8 @@ exports.commentNotify = async (comment_id)=>{
         },
     };
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await formid.save();
     return true;
 };
 
@@ -356,8 +356,7 @@ exports.oldGoodsNotify = async (goods)=>{
         }
     };
     formid.used = 1;
-    await formid.save();
-    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page)
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);await formid.save();
     return true;
 };
 
@@ -390,11 +389,41 @@ exports.tagLike = async (userTag, user)=>{
         }
     };
     formid.used = 1;
-    await formid.save();
     await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
     return true;
 };
 
+
+
+exports.comeBack = async (touser)=>{
+
+    let formid = await getFormid(touser._id);
+    if(!formid){
+        return false;
+    }
+    let template_id = "Hs22s60y7vyh-A7dxDeqtxVTLOfv6WyrWxz7QDTYfP8";
+    let delta = moment(touser.updated_date).toNow(true);
+    let page = "pages/index/index";
+    let data = {
+        //服务项目
+        keyword1:{
+            value: "二货兔校园二手"
+        },
+        //状态
+        keyword2:{
+            value: "距离上次登录已经过了"+delta+"啦，快来看看二货兔新发布了什么宝贝吧"
+        },
+        //温馨提示
+        keyword3: {
+            value: "好物不等人，刷刷贴别错过属于好物，结识你的好友~"
+        },
+    };
+    formid.used = 1;
+    await sendMinaTempMsg(touser.openid, template_id, formid.formid, data, page);
+    await formid.save();
+    return true;
+};
 
 
 
