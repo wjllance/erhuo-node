@@ -115,8 +115,9 @@ router.get('/center/version', async (ctx, next) => {
 
 router.get('/center/banners', async(ctx, next) =>{
     let banners = [{
-        picUrl: 'https://two.jicunbao.com/44f1e0fbaab11b7aa0f2.jpg',
+        // picUrl: 'https://two.jicunbao.com/44f1e0fbaab11b7aa0f2.jpg',//毕业季
         // redirectTo : "/pages/message/message"
+        picUrl: "http://m.jicunbao.com/app/0900.jpg"
     },{
         picUrl: 'https://two.jicunbao.com/6814582c82a135db79c7.jpg'
     }
