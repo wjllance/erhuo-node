@@ -333,7 +333,7 @@ exports.refund_apply = async(order) =>{
 };
 
 exports.refund_confirm = async(order) =>{
-    auth.assert(order.refund_status !== REFUND_STATUS.REFUND, "不可确认退款");
+    auth.assert(order.refund_status === REFUND_STATUS.APPLYING, "不可确认退款");
     order.refund_status = REFUND_STATUS.SUCCEED;
     await order.save();
     //TODO SEND NOTIFY
