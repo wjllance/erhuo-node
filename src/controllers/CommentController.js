@@ -30,7 +30,7 @@ const router = module.exports = new Router();
  * @apiSuccess  {Object}    data        商品详情
  *
  */
-router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
+router.post('/comment/:goods_id', auth.stuAuthRequired, async (ctx, next) => {
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
     let cmt_str = ctx.request.body.comment;
@@ -43,13 +43,16 @@ router.post('/comment/:goods_id', auth.loginRequired, async (ctx, next) => {
     goods.updated_date = Date.now();
     await goods.save();
 
-
-    // goods = await srv_goods.getDetailById(goods._id, ctx.state.user);
     goods = await srv_goods.getDetailByIdV2(goods._id, ctx.state.user);
-    let sended = await srv_wxtemplate.commentNotify(res._id);
-    if(!sended){
-        await srv_wechat.sendReplyNotice(res._id);
+    try{
+        let sended = await srv_wxtemplate.commentNotify(res._id);
+        if(!sended){
+            await srv_wechat.sendReplyNotice(res._id);
+        }
+    }catch (e) {
+        console.error("通知失败", e.message);
     }
+
 
     ctx.body = {
         success: 1,

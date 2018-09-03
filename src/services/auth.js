@@ -11,7 +11,7 @@ let { Account } = require('../models');
 let moment = require('moment');
 let myUtils = require("../myUtils/mUtils");
 
-const ERR_CODE = 978;
+const ERR_CODE = 1;
 
 const FRIENDLY_CHARSET = "123456789qwertyuplkjhgfdsazxcvbnmQWERTYUPKJHGFDSAZXCVBNM";
 
@@ -42,7 +42,7 @@ let userM = exports.userM = async function (ctx, next) {
 		await next();
 	} catch(e) {
         ctx.body = {
-            err: 1,
+            err: e.status,
             msg: e.message || 'unknow'
         };
 
@@ -84,7 +84,7 @@ exports.login = async function(ctx, code) {
 }
 
 /// 需用户登录
-exports.loginRequired = async function (ctx, next) {
+let loginRequired = exports.loginRequired = async function (ctx, next) {
     if(config.ENV == "local" && !ctx.state.user)
     {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
@@ -105,5 +105,15 @@ exports.loginRequired = async function (ctx, next) {
     if(ctx.state.user.active_date){
         assert(moment().isAfter(ctx.state.user.active_date), "账号封禁，将于"+moment(ctx.state.user.active_date).format('lll')+"解禁");
     }
-	await next();
-}
+    if(typeof next === "function"){
+        await next();
+    }
+};
+
+
+exports.stuAuthRequired = async function(ctx, next){
+    await loginRequired(ctx);
+    let user = ctx.state.user;
+    assert(user.stu_verified, "需认证", config.CONSTANT.ERR_CODE.NEED_AUTH);
+    await next();
+};

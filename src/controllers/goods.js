@@ -336,7 +336,7 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        goods_id
  *
  */
-router.post('/v2/goods/publish', auth.loginRequired, async (ctx, next) => {
+router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
 
     let params = ctx.request.body;
     auth.assert(params.gsummary && params.gprice, "缺少参数");

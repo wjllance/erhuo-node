@@ -83,7 +83,8 @@ exports.CONSTANT = {
     SCHOOL_MAP: require('./myUtils/school_list'),
     ERR_CODE: {
         ERROR: 978,
-        MSG_FAIL: 985
+        MSG_FAIL: 985,
+        NEED_AUTH: 996,
     },
     GOODS_STATUS:{
         INIT:0,             //待审核
