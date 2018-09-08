@@ -68,6 +68,9 @@ userSchema.methods.baseInfo = function(){
     output.stu_verified = this.stu_verified ? "已认证" : "未认证";
     if(this.stu_verified){
         output.verify = "学生认证";
+        output.school = this.school;
+        output.realname = this.realname;
+
     }
 	return output;
 };
