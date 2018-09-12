@@ -13,7 +13,7 @@ let wechat = require('../services/wechat');
 let srv_wxtemplate = require('../services/wechat_template');
 let srv_order = require('../services/order');
 let srv_transaction = require('../services/transaction');
-let {Order} = require('../models');
+let {Order, Identity} = require('../models');
 
 const router = module.exports = new Router();
 
@@ -198,4 +198,13 @@ router.post('/wechat/refund', async(ctx, next) => {
 
 });
 
+
+router.post('/wechat/notify_auth_result', async(ctx, next) => {
+    let identity = await Identity.findById(ctx.request.body.identity_id);
+    console.log(identity);
+    await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 1);
+    ctx.body = {
+        success:1
+    }
+});
 
