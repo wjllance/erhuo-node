@@ -9,7 +9,7 @@ let myUtil = require('../myUtils/mUtils');
 
 let { log } = require('../config');
 let { User, Account, Order, UserFormid, Transaction } = require('../models');
-let tagService = require('../services/TagService');
+let tagService = require('./tag');
 
 let moment = require('moment');
 moment.locale('zh-cn');
