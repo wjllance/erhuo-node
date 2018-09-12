@@ -60,4 +60,26 @@ commentSchema.methods.getFullInfo = function() {
 };
 
 
+
+commentSchema.methods.getSimpleInfo = function() {
+    if(!this.fromId){
+        logger.error("fromid not exist")
+        logger.error(this);
+        return {}
+    }
+    let title = "";
+    if(this.secret){
+        title += "(密)";
+    }
+    title += this.fromId.nickName;
+    let ret = {
+        _id: this._id,
+        content: this.content,
+        created_date: myUtils.dateStr(this.created_date)
+    };
+    ret.title = title;
+    return ret;
+};
+
+
 module.exports = mongoose.model("Comment", commentSchema);
