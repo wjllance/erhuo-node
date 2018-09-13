@@ -202,9 +202,9 @@ router.post('/wechat/refund', async(ctx, next) => {
 router.post('/wechat/notify_auth_result', async(ctx, next) => {
     let identity = await Identity.findById(ctx.request.body.identity_id);
     console.log(identity);
-    await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 1);
+    let res = await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 1);
     ctx.body = {
-        success:1
+        success: res
     }
 });
 
