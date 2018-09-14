@@ -20,6 +20,7 @@ const router = module.exports = new Router();
  * @apiGroup    Goods
  *
  *
+ *
  * @apiParam    {String}    name            学生姓名
  * @apiParam    {String}    tel             电话号码
  * @apiParam    {String}    school           所属学校
