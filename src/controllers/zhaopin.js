@@ -27,14 +27,14 @@ const router = module.exports = new Router();
  * @apiParam    {String}    grade             年级
  * @apiParam    {String}    profession        专业
  *
- * @apiParam  {Number}    IsDurable         是否坐班
- * @apiParam  {Number}    IsUnderstand       是否需要深入了解
+ * @apiParam  {Number}    [IsDurable]       是否坐班
+ * @apiParam  {Number}    [IsUnderstand]       是否需要深入了解
  *
  *
  */
 router.post("/v2/zhaopin/save", auth.loginRequired, async (ctx, next) => {
     let params = ctx.request.body;
-    auth.assert(params.name && params.tel && params.school && params.grade && params.profession && params.IsDurable && params.IsUnderstand &&params.preference, "缺少参数");
+    auth.assert(params.name && params.tel && params.school && params.grade && params.profession&&params.preference, "缺少参数");
 
     let zhaopin = await Zhaopin.findOne({ userID: ctx.state.user._id });
     if (!zhaopin) {
