@@ -4,7 +4,11 @@ let _ = require('lodash');
 
 let zhaopinSchema=new Schema({
 
-
+    userID: {
+        type:  mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
     IsUnderstand:Number,//是否要深入了解
     name:String,
     tel:String,
