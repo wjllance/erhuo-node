@@ -246,18 +246,18 @@ router.post('/wechat_mp', async (ctx, next) => {
     auth.assert(msgType, "MISS");
     switch (msgType){
         case "event":
+            const event = xmlData.Event[0];
             auth.assert(event, "MISS");
             let mes = "success";
             switch (event){
                 case "user_enter_tempsession":
                    let mes4 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
                    ret_body = wechat.dealText(mes4,toUserName, fromUserName);
+                   break;
                 default:
-                    let mes2 = "success";
-                    ret_body = wechat.dealText(mes2,toUserName, fromUserName);
+                    ret_body = wechat.dealText(mes,toUserName, fromUserName);
                     break;
             }
-            ret_body = wechat.dealText(mes,toUserName, fromUserName);
             break;
         case "text":
             let mes3 = "success";
@@ -271,7 +271,7 @@ router.post('/wechat_mp', async (ctx, next) => {
         case "image":
         case "miniprogrampage":
         default:
-            let mes2 = "success";
+            let mes2 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
             ret_body = wechat.dealText(mes2,toUserName, fromUserName);
             break;
     }
