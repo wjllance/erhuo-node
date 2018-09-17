@@ -234,7 +234,7 @@ router.post('/wechat/notify_auth_result', async(ctx, next) => {
 /**
  * @apiName 微信服务器事件监听窗口
  */
-router.post('/mina_server', async (ctx, next) => {
+router.post('/wechat_mp', async (ctx, next) => {
     let xmlData = ctx.data.xml;
     console.log(xmlData);
     let ret_body = "";
@@ -246,22 +246,12 @@ router.post('/mina_server', async (ctx, next) => {
     auth.assert(msgType, "MISS");
     switch (msgType){
         case "event":
-            const event = xmlData.Event[0];  // 事件类型，subscribe
             auth.assert(event, "MISS");
             let mes = "success";
             switch (event){
-                case "subscribe":
-                    wechat.update_userInfo_by_openId(fromUserName);
-                    let mes="欢迎关注IM二货兔，本兔兔是 校内小仙女的二手衣妆交易平台，发现本校周边童鞋的闲置物品，越省钱越美丽\n" +
-                        "IM二货兔刚刚发布，各位公主担待点，一起走向未来~\n" +
-                        "有爱的家庭，欢迎大家~";
-                    ret_body = wechat.dealText(mes,toUserName, fromUserName);
-                    break;
-                case "unsubscribe":
-                case "SCAN":
-                case "LOCATION":
-                case "CLICK":
-                case "VIEW":
+                case "user_enter_tempsession":
+                   let mes4 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
+                   ret_body = wechat.dealText(mes4,toUserName, fromUserName);
                 default:
                     let mes2 = "success";
                     ret_body = wechat.dealText(mes2,toUserName, fromUserName);
@@ -279,11 +269,7 @@ router.post('/mina_server', async (ctx, next) => {
             ret_body = wechat.dealText(mes3,toUserName, fromUserName);
             break;
         case "image":
-        case "voice":
-        case "video":
-        case "shortvideo":
-        case "location":
-        case "link":
+        case "miniprogrampage":
         default:
             let mes2 = "success";
             ret_body = wechat.dealText(mes2,toUserName, fromUserName);
