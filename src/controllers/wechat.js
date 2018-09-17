@@ -234,7 +234,7 @@ router.post('/wechat/notify_auth_result', async(ctx, next) => {
 /**
  * @apiName 微信服务器事件监听窗口
  */
-router.post('/mina_server', async (ctx, next) => {
+router.post('/wechat_mp', async (ctx, next) => {
     let xmlData = ctx.data.xml;
     console.log(xmlData);
     let ret_body = "";
