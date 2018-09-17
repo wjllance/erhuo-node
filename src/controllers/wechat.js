@@ -244,37 +244,24 @@ router.post('/wechat_mp', async (ctx, next) => {
         msgType = xmlData.MsgType[0];	//消息类型，event
     auth.assert(fromUserName, "MISS");
     auth.assert(msgType, "MISS");
+    let mes4 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
     switch (msgType){
         case "event":
             const event = xmlData.Event[0];
             auth.assert(event, "MISS");
-            let mes = "success";
             switch (event){
                 case "user_enter_tempsession":
-                   let mes4 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
                    ret_body = wechat.dealText(mes4,toUserName, fromUserName);
                    break;
-                default:
-                    ret_body = wechat.dealText(mes,toUserName, fromUserName);
-                    break;
             }
-            break;
-        case "text":
-            let mes3 = "success";
-            const content = xmlData.Content;
-            auth.assert(content, "MISS");
-            if (String(content).match(/购买|买|卖|出售/)){
-                mes3 = "要买卖的话可以用二货兔小程序哦~戳菜单栏“进入平台”，即可参与买卖啦，还不快去做生意~"
-            }
-            ret_body = wechat.dealText(mes3,toUserName, fromUserName);
-            break;
         case "image":
         case "miniprogrampage":
-        default:
-            let mes2 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
-            ret_body = wechat.dealText(mes2,toUserName, fromUserName);
+        case "text":
+            wechat.mpmsg(fromUserName,mes4);
             break;
     }
+    let mes2 = "success";
+    ret_body = wechat.dealText(mes2,toUserName, fromUserName);
     ctx.res.setHeader('Content-Type', 'application/xml');
     ctx.res.end(ret_body)
 });
