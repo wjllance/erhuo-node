@@ -41,6 +41,13 @@ let userSchema = new mongoose.Schema({
 		}],
 		default: []
 	},
+	followers: {
+		type: [{
+			type : mongoose.Schema.ObjectId,
+			ref : 'Follow',
+		}],
+		default: []
+	}
 	tls_imported: {
         type: Boolean,
         default: 0
