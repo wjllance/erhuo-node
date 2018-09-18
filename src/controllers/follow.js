@@ -37,7 +37,7 @@ router.post('/follow', auth.loginRequired, async (ctx, next) => {
     
     let follow = new Follow();
     follow.fromID = ctx.state.user._id;
-    _.assign(follow, _.pick(ctx.request.body, ['toID']);
+    _.assign(follow, _.pick(ctx.request.body, ['toID']));
     await follow.save();
 
     ctx.body = {
