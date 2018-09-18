@@ -26,6 +26,9 @@ let UserFormid = exports.UserFormid = require('./user_formid');
 
 let Identity = exports.Identity = require('./identity');
 
+
+let Zhaopin = exports.Zhaopin = require('./zhaopin');
+
 let Bargain = exports.Bargain = require('./bargain');
 
 let UserGroup = exports.UserGroup = require('./user_group');

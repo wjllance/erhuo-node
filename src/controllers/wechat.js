@@ -13,7 +13,7 @@ let wechat = require('../services/wechat');
 let srv_wxtemplate = require('../services/wechat_template');
 let srv_order = require('../services/order');
 let srv_transaction = require('../services/transaction');
-let {Order} = require('../models');
+let {Order, Identity} = require('../models');
 
 const router = module.exports = new Router();
 
@@ -45,7 +45,30 @@ router.get('/wechat', async (ctx, next) => {
     }
 });
 
+router.get('/wechat_mp', async (ctx, next) => {
+    let params = ctx.query;
+    // let params = ctx.data.xml;
+    console.log(params)
 
+    const token = config.SA_TOKEN, // 自定义，与公众号设置的一致
+        signature = params.signature,
+        timestamp = params.timestamp,
+        nonce = params.nonce;
+    auth.assert(signature, "MISS")
+    auth.assert(timestamp, "MISS")
+    auth.assert(nonce, "MISS")
+
+    // 字典排序
+    const arr = [token, timestamp, nonce].sort()
+    console.log(arr);
+    const result = utils.sha1(arr.join(''));
+
+    if (result === signature) {
+        ctx.body = params.echostr
+    } else {
+        ctx.body = { code: -1, msg: "fail"}
+    }
+});
 /**
  * @apiName 微信服务器事件监听窗口
  */
@@ -199,3 +222,46 @@ router.post('/wechat/refund', async(ctx, next) => {
 });
 
 
+router.post('/wechat/notify_auth_result', async(ctx, next) => {
+    let identity = await Identity.findById(ctx.request.body.identity_id);
+    console.log(identity);
+    let res = await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 1);
+    ctx.body = {
+        success: res
+    }
+});
+
+/**
+ * @apiName 微信服务器事件监听窗口
+ */
+router.post('/wechat_mp', async (ctx, next) => {
+    let xmlData = ctx.data.xml;
+    console.log(xmlData);
+    let ret_body = "";
+    const toUserName = xmlData.ToUserName[0],  // 开发者微信号
+        fromUserName = xmlData.FromUserName[0],  // 发送方帐号（一个OpenID）
+        createTime = xmlData.CreateTime[0],  //	消息创建时间 （整型）
+        msgType = xmlData.MsgType[0];	//消息类型，event
+    auth.assert(fromUserName, "MISS");
+    auth.assert(msgType, "MISS");
+    let mes4 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
+    switch (msgType){
+        case "event":
+            const event = xmlData.Event[0];
+            auth.assert(event, "MISS");
+            switch (event){
+                case "user_enter_tempsession":
+                   ret_body = wechat.dealText(mes4,toUserName, fromUserName);
+                   break;
+            }
+        case "image":
+        case "miniprogrampage":
+        case "text":
+            wechat.mpmsg(fromUserName,mes4);
+            break;
+    }
+    let mes2 = "success";
+    ret_body = wechat.dealText(mes2,toUserName, fromUserName);
+    ctx.res.setHeader('Content-Type', 'application/xml');
+    ctx.res.end(ret_body)
+});
