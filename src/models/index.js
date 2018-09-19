@@ -28,6 +28,8 @@ let Identity = exports.Identity = require('./identity');
 
 let University= exports.University = require('./university');
 
+let City= exports.City = require("./city");
+
 let Zhaopin = exports.Zhaopin = require('./zhaopin');
 
 let Bargain = exports.Bargain = require('./bargain');
