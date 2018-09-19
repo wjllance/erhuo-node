@@ -26,6 +26,7 @@ let UserFormid = exports.UserFormid = require('./user_formid');
 
 let Identity = exports.Identity = require('./identity');
 
+let University= exports.University = require('./university');
 
 let Zhaopin = exports.Zhaopin = require('./zhaopin');
 
@@ -34,7 +35,6 @@ let Bargain = exports.Bargain = require('./bargain');
 let UserGroup = exports.UserGroup = require('./user_group');
 
 let wxGroup = exports.wxGroup = require('./wxgroup');
-
 
 let Like = exports.Like = require('./like');
 
