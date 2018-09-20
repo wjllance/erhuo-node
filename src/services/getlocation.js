@@ -18,7 +18,7 @@ exports.getlocation2 = async  (x,y)=>{
     let { text } = await superagent.get("https://apis.map.qq.com/ws/place/v1/search").query({
         keyword : "大学or学院",
         // location : x+","+y,
-        boundary : "nearby("+x+","+y+",1000)",
+        boundary : "nearby("+y+","+x+",1000)",
         key : "FGPBZ-OX2RV-DLQPQ-UEIK5-JZ2TO-MPB43",
     });
     let data = JSON.parse(text);
