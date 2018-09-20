@@ -4,9 +4,9 @@ let { University } = require('../models');
 
 let _ = require('lodash');
 
-exports.getCityName = async (x, y) => {
+exports.getCityName = async (lng, lat) => {
     let { text } = await superagent.get("https://apis.map.qq.com/ws/geocoder/v1/").query({
-        location: x + "," + y,
+        location: lat + "," + lng,
         key: "FGPBZ-OX2RV-DLQPQ-UEIK5-JZ2TO-MPB43",
     });
     let data = JSON.parse(text);
