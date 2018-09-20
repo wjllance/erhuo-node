@@ -246,16 +246,6 @@ router.post('/wechat_mp', async (ctx, next) => {
     auth.assert(msgType, "MISS");
     let mes4 = "谢谢您的消息，可联系微信 lovelyRHT 快速对接~";
     switch (msgType){
-        case "event":
-            const event = xmlData.Event[0];
-            auth.assert(event, "MISS");
-            switch (event){
-                case "user_enter_tempsession":
-                   ret_body = wechat.dealText(mes4,toUserName, fromUserName);
-                   break;
-            }
-        case "image":
-        case "miniprogrampage":
         case "text":
             wechat.mpmsg(fromUserName,mes4);
             break;
