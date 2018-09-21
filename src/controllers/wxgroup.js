@@ -1,29 +1,24 @@
+require("should");
+let Router = require("koa-router");
+let _ = require("lodash");
 
-require('should');
-let Router = require('koa-router');
-let _ = require('lodash');
+let utils = require("utility");
+let log4js = require("log4js");
+let logger = log4js.getLogger("errorLogger");
+let config = require("../config");
+let mUtils = require("../myUtils/mUtils");
 
-let utils = require('utility');
-let log4js = require('log4js');
-let logger = log4js.getLogger('errorLogger');
-let config = require('../config');
-let mUtils = require('../myUtils/mUtils');
+let moment = require("moment");
+moment.locale("zh-cn");
 
-let moment = require('moment');
-moment.locale('zh-cn');
-
-
-let auth = require('../services/auth');
-
-
-let wechat = require('../services/wechat');
-let srv_wxtemplate = require('../services/wechat_template');
-let srv_bargain = require('../services/bargain');
-let srv_wxgroup = require('../services/wxgroup');
-let srv_goods = require('../services/goods');
-let {User, Goods, UserGroup, wxGroup, GroupCheckIn, TodayBonusSchema} = require('../models');
-
-let WXBizDataCrypt = require('../services/WXBizDataCrypt');
+let auth = require("../services/auth");
+let wechat = require("../services/wechat");
+let srv_wxtemplate = require("../services/wechat_template");
+let srv_bargain = require("../services/bargain");
+let srv_wxgroup = require("../services/wxgroup");
+let srv_goods = require("../services/goods");
+let { User, Goods, UserGroup, wxGroup, GroupCheckIn, TodayBonusSchema } = require("../models");
+let WXBizDataCrypt = require("../services/WXBizDataCrypt");
 
 
 const router = module.exports = new Router();
@@ -39,17 +34,15 @@ const router = module.exports = new Router();
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/my', auth.loginRequired, async (ctx, next) => {
+router.get("/group/my", auth.loginRequired, async (ctx, next) => {
 
     let mygroups = await srv_wxgroup.getGroupList(ctx.state.user);
 
     ctx.body = {
-        success:1,
-        data: mygroups
-    }
+        success: 1,
+        data: mygroups,
+    };
 });
-
-
 
 
 /**
@@ -62,7 +55,9 @@ router.get('/group/my', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/feed', async (ctx, next) => {
+
+
+router.get("/v2/group/:groupId/feed", auth.loginRequired, async (ctx, next) => {
 
     let group = await wxGroup.findById(ctx.params.groupId);
     auth.assert(group, "没有群");
@@ -72,34 +67,29 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     let cate = ctx.query.category;
     let condi = {
-        deleted_date:null,
+        deleted_date: null,
     };
     let sorti = {};
-    if(!cate)
-    {
-        cate = "今日";
+    if (!cate) {
+        cate = "所有";
     }
-
-    console.log(cate);
-
-
     let org = false;
-    if(cate === "今日"){
-        let ddl = moment().subtract(1,'d');
+    if (cate === "今日") {
+        let ddl = moment().subtract(1, "d");
         condi.created_date = {
             // $gt: moment().subtract(1, 'd')
-            $gt: ddl
+            $gt: ddl,
         };
         sorti = {
             removed_date: 1,
-            created_date:-1
+            created_date: -1,
         };
-    }else {
+    } else {
         sorti = {
             removed_date: 1,
-            updated_date:-1
+            updated_date: -1,
         };
-        if(cate === '原住民'){
+        if (cate === "原住民") {
             org = true;
         }
     }
@@ -107,30 +97,68 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
 
     let gusers = await srv_wxgroup.getMembers(group._id, org);
 
-    // console.log("group users...", gusers);
-
     condi.userID = {
-        $in: _.map(gusers, u=>u._id)
+        $in: _.map(gusers, u => u._id),
     };
-
     let user = ctx.state.user;
-    // if(user){ //not other
-    //     condi.$or=[{
-    //         glocation:user.location
-    //     },{
-    //         glocation:0
-    //     }]
-    // }
-    let ret = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
-
+    let ret = await srv_goods.goodsFeedList(user, pageNo, pageSize, condi, sorti);
     ctx.body = {
-        success:1,
-        data:ret
-    }
+        success: 1,
+        data: ret,
+    };
 });
 
+//deprecating....
+router.get("/group/:groupId/feed", async (ctx, next) => {
 
+    let group = await wxGroup.findById(ctx.params.groupId);
+    auth.assert(group, "没有群");
 
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
+
+    let cate = ctx.query.category;
+    let condi = {
+        deleted_date: null,
+    };
+    let sorti = {};
+    if (!cate) {
+        cate = "今日";
+    }
+    let org = false;
+    if (cate === "今日") {
+        let ddl = moment().subtract(1, "d");
+        condi.created_date = {
+            // $gt: moment().subtract(1, 'd')
+            $gt: ddl,
+        };
+        sorti = {
+            removed_date: 1,
+            created_date: -1,
+        };
+    } else {
+        sorti = {
+            removed_date: 1,
+            updated_date: -1,
+        };
+        if (cate === "原住民") {
+            org = true;
+        }
+    }
+    console.log(condi, sorti);
+
+    let gusers = await srv_wxgroup.getMembers(group._id, org);
+
+    condi.userID = {
+        $in: _.map(gusers, u => u._id),
+    };
+    let user = ctx.state.user;
+    let ret = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
+    ctx.body = {
+        success: 1,
+        data: ret,
+    };
+});
 
 
 /**
@@ -144,29 +172,29 @@ router.get('/group/:groupId/feed', async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/info', auth.loginRequired, async (ctx, next) => {
+router.get("/group/:groupId/info", auth.loginRequired, async (ctx, next) => {
 
     let wxgroup = await wxGroup.findById(ctx.params.groupId);
     auth.assert(wxgroup, "群不在");
 
     let userGroup = await UserGroup.findOne({
-        'userID': ctx.state.user._id,
-        'group_id' : wxgroup._id,
-        'delete_date' : null
+        "userID": ctx.state.user._id,
+        "group_id": wxgroup._id,
+        "delete_date": null,
     });
-    if(userGroup.invited_by && !wxgroup.name){
+    if (userGroup.invited_by && !wxgroup.name) {
         wxgroup.name = srv_wxgroup.default_group_name;
     }
     let ret = {
-        group : wxgroup
+        group: wxgroup,
     };
-    if(ctx.query.withMembers){
+    if (ctx.query.withMembers) {
         ret.members = await srv_wxgroup.getMembers(ctx.params.groupId);
     }
     ctx.body = {
-        success:1,
-        data: ret
-    }
+        success: 1,
+        data: ret,
+    };
 });
 
 /**
@@ -183,7 +211,7 @@ router.get('/group/:groupId/info', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
+router.post("/group/update", auth.loginRequired, async (ctx, next) => {
 
     let reqParams = ctx.request.body;
     console.log(reqParams);
@@ -192,27 +220,27 @@ router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
     let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
     let decryptedData = pc.decryptData(reqParams.encryptedData, reqParams.iv);
 
-    auth.assert(decryptedData.watermark.appid === config.APP_ID, '水印错误');
+    auth.assert(decryptedData.watermark.appid === config.APP_ID, "水印错误");
 
     console.log(decryptedData);
     auth.assert(decryptedData.openGId, "没");
 
-    let condi = {openGId:decryptedData.openGId};
+    let condi = { openGId: decryptedData.openGId };
 
     let wxgroup = await wxGroup.findOne(condi);
-    if(!wxgroup){
+    if (!wxgroup) {
         wxgroup = new wxGroup(condi);
         await wxgroup.save();
     }
 
-    if(reqParams.join){
+    if (reqParams.join) {
         wxgroup = await srv_wxgroup.createUserGroup(wxgroup, ctx.state.user);
     }
 
     ctx.body = {
-        success:1,
-        data: wxgroup
-    }
+        success: 1,
+        data: wxgroup,
+    };
 });
 
 
@@ -225,12 +253,12 @@ router.post('/group/update', auth.loginRequired, async (ctx, next) =>{
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/members', auth.loginRequired, async (ctx, next) => {
+router.get("/group/:groupId/members", auth.loginRequired, async (ctx, next) => {
     let ret = await srv_wxgroup.getMembers(ctx.params.groupId);
     ctx.body = {
-        success:1,
-        data:ret
-    }
+        success: 1,
+        data: ret,
+    };
 });
 
 
@@ -243,46 +271,46 @@ router.get('/group/:groupId/members', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/group/check_in', auth.loginRequired, async (ctx, next) => {
+router.post("/group/check_in", auth.loginRequired, async (ctx, next) => {
     let groupId = ctx.request.body.groupId;
     let wxgroup = await wxGroup.findById(groupId);
     auth.assert(wxgroup, "群不在");
     let condi = {
         group_id: groupId,
         userID: ctx.state.user._id,
-        deleted_date:null
+        deleted_date: null,
     };
-   let userGroup = await UserGroup.findOne(condi);
-   console.log(condi);
+    let userGroup = await UserGroup.findOne(condi);
+    console.log(condi);
 
-   auth.assert(userGroup, "不在这个群");
-   let checkIn = await GroupCheckIn.findOne({
-       userID: ctx.state.user._id,
-       group_id: groupId,
-       created_date: {
-           $gt: moment({hour: 0})
-       }
-   });
-    if(!checkIn){
-       checkIn = await GroupCheckIn.create({
-           userID: ctx.state.user._id,
-           group_id: groupId,
-           created_date: moment()
-       });
-       userGroup.check_in_times ++;
-       await userGroup.save();
-       console.log("updating check in times...", userGroup);
-       wxgroup.updated_date = moment();
-       await wxgroup.save();
-       console.log("updating wx group....", wxgroup);
+    auth.assert(userGroup, "不在这个群");
+    let checkIn = await GroupCheckIn.findOne({
+        userID: ctx.state.user._id,
+        group_id: groupId,
+        created_date: {
+            $gt: moment({ hour: 0 }),
+        },
+    });
+    if (!checkIn) {
+        checkIn = await GroupCheckIn.create({
+            userID: ctx.state.user._id,
+            group_id: groupId,
+            created_date: moment(),
+        });
+        userGroup.check_in_times++;
+        await userGroup.save();
+        console.log("updating check in times...", userGroup);
+        wxgroup.updated_date = moment();
+        await wxgroup.save();
+        console.log("updating wx group....", wxgroup);
 
-    }else{
+    } else {
         console.log("签过了");
     }
     ctx.body = {
-       success:1,
-        data: checkIn
-    }
+        success: 1,
+        data: checkIn,
+    };
 
 });
 
@@ -296,16 +324,16 @@ router.post('/group/check_in', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/check_in_members', auth.loginRequired, async (ctx, next) => {
+router.get("/group/:groupId/check_in_members", auth.loginRequired, async (ctx, next) => {
     let res = await srv_wxgroup.getCheckInMembers(ctx.params.groupId, ctx.query.limitCount);
     ctx.body = {
-        success:1,
+        success: 1,
         data: {
             require: config.CONSTANT.required_population,
             count: res.length,
-            members: res
-        }
-    }
+            members: res,
+        },
+    };
 });
 
 
@@ -318,18 +346,18 @@ router.get('/group/:groupId/check_in_members', auth.loginRequired, async (ctx, n
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next) => {
+router.get("/group/:groupId/my_check_ins", auth.loginRequired, async (ctx, next) => {
     let res = await GroupCheckIn.find({
-        userID:ctx.state.user._id
+        userID: ctx.state.user._id,
     });
-    res = _.map(res, x=>moment(x.created_date).format('lll'));
+    res = _.map(res, x => moment(x.created_date).format("lll"));
     ctx.body = {
-        success:1,
+        success: 1,
         data: {
             count: res.length,
-            list: res
-        }
-    }
+            list: res,
+        },
+    };
 });
 
 
@@ -342,25 +370,24 @@ router.get('/group/:groupId/my_check_ins', auth.loginRequired, async (ctx, next)
  * @apiSuccess  {Object}    data
  *
  */
-router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
+router.get("/group/:groupId/bonus", auth.loginRequired, async (ctx, next) => {
     let res = await srv_wxgroup.getCheckInMembers(ctx.params.groupId);
     auth.assert(ctx.query.god_bless_you || res.length >= config.CONSTANT.required_population, "未满");
-    res = await TodayBonusSchema.findOne().sort({created_date:-1});
-    if(!res){
+    res = await TodayBonusSchema.findOne().sort({ created_date: -1 });
+    if (!res) {
         res = await TodayBonusSchema.create({
-            content:"empty"
-        })
+            content: "empty",
+        });
     }
     let ret = {
         content: res.content,
-        date: moment(res.created_date).format('L')
-    }
+        date: moment(res.created_date).format("L"),
+    };
     ctx.body = {
-        success:1,
-        data:ret
-    }
+        success: 1,
+        data: ret,
+    };
 });
-
 
 
 /**
@@ -379,7 +406,7 @@ router.get('/group/:groupId/bonus', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/group/join', auth.loginRequired, async (ctx, next) => {
+router.post("/group/join", auth.loginRequired, async (ctx, next) => {
 
     let groupId = ctx.request.body.groupId;
 
@@ -389,9 +416,9 @@ router.post('/group/join', auth.loginRequired, async (ctx, next) => {
     wxgroup = await srv_wxgroup.createUserGroup(wxgroup, ctx.state.user, ctx.request.body.invited_by);
 
     ctx.body = {
-        success:1,
-        data: wxgroup
-    }
+        success: 1,
+        data: wxgroup,
+    };
 });
 
 
@@ -408,7 +435,7 @@ router.post('/group/join', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/v2/group/:groupId/join', auth.loginRequired, async (ctx, next) => {
+router.post("/v2/group/:groupId/join", auth.loginRequired, async (ctx, next) => {
 
     let groupId = ctx.params.groupId;
 
@@ -416,19 +443,19 @@ router.post('/v2/group/:groupId/join', auth.loginRequired, async (ctx, next) => 
     auth.assert(wxgroup, "群不在");
 
     let inviter = null;
-    if(ctx.request.body.invited_by){
+    if (ctx.request.body.invited_by) {
         inviter = await UserGroup.findOne({
             userID: ctx.request.body.invited_by,
-            group_id: groupId
+            group_id: groupId,
         });
         auth.assert(inviter, "没有邀请权限");
     }
     wxgroup = await srv_wxgroup.createUserGroup(wxgroup, ctx.state.user, inviter);
 
     ctx.body = {
-        success:1,
-        data: wxgroup
-    }
+        success: 1,
+        data: wxgroup,
+    };
 });
 
 /**
@@ -441,7 +468,7 @@ router.post('/v2/group/:groupId/join', auth.loginRequired, async (ctx, next) => 
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/group/:groupId/quit', auth.loginRequired, async (ctx, next)=>{
+router.post("/group/:groupId/quit", auth.loginRequired, async (ctx, next) => {
 
     let wxgroup = await wxGroup.findById(ctx.params.groupId);
     auth.assert(wxgroup, "群不在");
@@ -449,23 +476,23 @@ router.post('/group/:groupId/quit', auth.loginRequired, async (ctx, next)=>{
     let remove_user = await UserGroup.findOne({
         group_id: wxgroup._id,
         userID: ctx.state.user._id,
-        deleted_date: null
+        deleted_date: null,
     });
     auth.assert(remove_user, "不在群里");
 
     remove_user.deleted_date = moment();
 
-    if(remove_user.is_admin){       //换管理员
-                                    //TODO record admin history
+    if (remove_user.is_admin) {       //换管理员
+        //TODO record admin history
 
         let userGroup = await UserGroup.findOne({
             group_id: wxgroup._id,
             is_admin: null,
-            deleted_date: null
+            deleted_date: null,
         }).sort({
-            created_date: 1
+            created_date: 1,
         });
-        if(userGroup){
+        if (userGroup) {
             userGroup.is_admin = moment();
             await userGroup.save();
             console.log("new admin...", userGroup);
@@ -477,15 +504,15 @@ router.post('/group/:groupId/quit', auth.loginRequired, async (ctx, next)=>{
 
     wxgroup.member_num = await UserGroup.find({
         group_id: wxgroup._id,
-        deleted_date: null
+        deleted_date: null,
     }).count();
     console.log("removed...", remove_user);
     await wxgroup.save();
 
     ctx.body = {
-        success:1,
-        data: wxgroup
-    }
+        success: 1,
+        data: wxgroup,
+    };
 });
 
 
@@ -504,21 +531,21 @@ router.post('/group/:groupId/quit', auth.loginRequired, async (ctx, next)=>{
  *
  */
 
-router.post('/group/:groupId/remove_member', auth.loginRequired, async (ctx, next) => {
+router.post("/group/:groupId/remove_member", auth.loginRequired, async (ctx, next) => {
 
     let wxgroup = await wxGroup.findById(ctx.params.groupId);
     auth.assert(wxgroup, "群不在");
 
     let userGroup = await UserGroup.findOne({
         group_id: wxgroup._id,
-        userID: ctx.state.user._id
+        userID: ctx.state.user._id,
     });
     auth.assert(userGroup.is_admin, "不是管理员");
 
     let remove_user = await UserGroup.findOne({
         group_id: wxgroup._id,
         userID: ctx.request.body.user_id,
-        deleted_date: null
+        deleted_date: null,
     });
     auth.assert(remove_user, "不在群里");
     auth.assert(ctx.state.user._id.toString() !== ctx.request.body.user_id.toString(), "别删自己");
@@ -529,12 +556,12 @@ router.post('/group/:groupId/remove_member', auth.loginRequired, async (ctx, nex
 
     wxgroup.member_num = await UserGroup.find({
         group_id: wxgroup._id,
-        deleted_date: null
+        deleted_date: null,
     }).count();
     await wxgroup.save();
 
     ctx.body = {
-        success:1,
-        data: wxgroup
-    }
+        success: 1,
+        data: wxgroup,
+    };
 });
