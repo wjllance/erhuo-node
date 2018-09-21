@@ -1,6 +1,6 @@
 require('should');
 let superagent = require('superagent');
-let { University } = require('../models');
+let { University, User } = require('../models');
 
 let _ = require('lodash');
 
