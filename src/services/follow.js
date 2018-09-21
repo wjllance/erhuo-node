@@ -37,25 +37,46 @@ exports.followList = async (user, pageNo, pageSize, condi, sorti)=>{
         total: total
     }
 }
-/*
-
-let outputify = exports.outputify = async function(goods, user) {
-
-    if (!_.isArray(goods)) {
-        return _.assign(goods.cardInfo(), await injectGoods(goods, user));
-    } else {
-        let ugoods = goods.map(x => x.cardInfo());
-            // FIXME too slow
-        for(let i = 0; i < goods.length; i ++) {
-            _.assign(ugoods[i], await injectGoods(goods[i], user));
-        }
-        return ugoods;
-    }
-};
 
 */
-exports.followList = async function(user_id, pageSize, pageNo){
-	let condition={'toID':user_id};
+let outputify = exports.outputify = async function(followinfo,user_id) {
+         for(let i = 0; i < followinfo.length; i ++) {
+            _.assign(followinfo[i], await injectFollows(followinfo[i],user));
+
+};
+
+let injectFollows = exports.injectFollows = async function(followinfo,user_id) {
+    if (!follow) return {};
+
+    let res = await Follow.findOne({
+        fromId:user_id,
+        toId:fromId,
+        canceled_date: null
+    });
+
+    let has_followed = !(!res);
+
+    // let has_collected = false;
+    if(!has_followed){
+       // has_collected = _.some(user.collections, x => goods._id.equals(x));
+       //这一块还没写
+    }
+    return {
+        has_followed
+    };
+
+};
+
+
+exports.followList = async function(user_id, direction,pageSize, pageNo){
+	if(direction==1){
+    let condition={'toID':user_id};
+    }
+    else 
+    {
+        let condition={'fromID':user_id};
+    }
+
 	let skipnum = (pageNo - 1) * pageSize;  
 	let sort={'created_date':-1};
 	let followers= Follow.find(condition).skip(skipnum).limit(pageSize).sort(sort);
@@ -66,9 +87,10 @@ exports.followList = async function(user_id, pageSize, pageNo){
 	let total=followers.count();
 	let hasMore=total-pageNo*pageSize>0;
 	return {
-        moments : comments.map(y=>getListInfo(y)),
+        items:followinfo,
         total: total,
         hasMore: hasMore
+
     };
 
 };
