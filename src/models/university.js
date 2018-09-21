@@ -10,6 +10,7 @@ let universitySchema = new Schema({
     location: String,
     hierarchy: String, //办学的等级
     remarks: String, //备注
+    locationNum : Number
 });
 
 module.exports = mongoose.model("University", universitySchema);

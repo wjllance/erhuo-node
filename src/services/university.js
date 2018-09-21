@@ -13,14 +13,37 @@ exports.getCityName = async (lng, lat) => {
 
     return data.result.address_component.city;
 };
-
 exports.universityList = async (location1) => {
 
     if (location1 == null) {
         return "";
     }
-    let data = await University.find({
+    let data1 = await University.find({
         location: location1,
-    }).limit(8);
-    return data;
+    });
+    let data2 = [];
+    let result = await User.aggregate([
+        {
+            $group: {
+                _id: "$location", //要聚合的字段 相当于group by
+                count: {$sum: 1} //统计的数量
+            }
+        },
+        {$sort: {count: -1}}//对统计进行排序，1代表升序
+    ]);
+    console.log(result);
+    for (var r in result) {
+        for (var i = 0; i < data1.length; i++) {
+            if (result[r]._id === data1[i].locationNum) {
+                let t = data1[i].toObject();
+                t.population =  result[r].count;
+                data2.push(t);
+                break;
+            }
+        }
+        if (data2.length > 8) {
+            break;
+        }
+    }
+    return data2;
 };
