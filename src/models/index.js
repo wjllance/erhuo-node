@@ -12,6 +12,8 @@ let Image = exports.Image = require('./image');
 
 let Goods = exports.Goods = require('./goods');
 
+let Follow = exports.Follow = require('./follow');
+
 let Comment = exports.Comment = require('./comment');
 
 let AccessToken = exports.AccessToken = require('./access_token');
