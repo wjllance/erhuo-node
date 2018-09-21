@@ -12,7 +12,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let srv_transaction = require('../services/transaction');
 let srv_wechat = require('../services/wechat');
-let { User, Follow } = require('../models');
+let { Follow } = require('../models');
 let srv_follow=require('../services/follow')
 
 const router = module.exports = new Router();
@@ -31,13 +31,14 @@ const router = module.exports = new Router();
  *
  */
 router.post('/follow', auth.loginRequired, async (ctx, next) => {
-    let followed= ctx.request.body. toID;
+    let followed= ctx.request.body.toId;
     auth.assert(followed, "被关注用户无效");
     //let res = await tagService.userPostTag(ctx.state.user, name);
-    
-    let follow = new Follow();
-    follow.fromID = ctx.state.user._id;
-    _.assign(follow, _.pick(ctx.request.body, ['toID']));
+    console.log("follow");
+    let follow = new Follow({fromId:ctx.state.user._id});
+    console.log("follow2");
+    follow.fromId = ctx.state.user._id;
+    follow.toId=ctx.request.body.toId;
     await follow.save();
 
     ctx.body = {
@@ -47,7 +48,7 @@ router.post('/follow', auth.loginRequired, async (ctx, next) => {
 });
 
 
-router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
+router.post('/follow/publish', auth.loginRequired, async (ctx, next) => {
     let follow = await Follow.find({toID: ctx.state.user._id});
 
     for(let i = 0; i < follow.length; i ++) {
