@@ -4,7 +4,6 @@ db
 public
 .idea/
 venv
-doc
 .DS_Store
 logs
 src/cert
