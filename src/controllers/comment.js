@@ -198,8 +198,6 @@ router.post('/user/unlike', auth.loginRequired, async (ctx, next) => {
  * @api {post}   /user/uncollect/:goods_id   取消收藏
  * @apiName     Uncollect
  * @apiGroup    User
- *
- *
  */
 // router.post('/user/uncollect/:goods_id', auth.loginRequired, async (ctx, next) => {
 //     let user = ctx.state.user;

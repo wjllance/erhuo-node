@@ -15,9 +15,9 @@ const router = module.exports = new Router();
 
 
 /**
- * @api {post}    /zhaopin/save  上传申请资料
- * @apiName     GoodsList
- * @apiGroup    Goods
+ * @api {post}    /zhaopin/save  应聘申请
+ * @apiName     zhaopinsave
+ * @apiGroup    zhaopin
  *
  *
  *
@@ -30,8 +30,9 @@ const router = module.exports = new Router();
  * @apiParam  {Number}    [IsDurable]       是否坐班
  * @apiParam  {Number}    [IsUnderstand]       是否需要深入了解
  *
- *
+ * @apiSuccess  {Number}    zhaopin._id        创建的id
  */
+
 router.post("/v2/zhaopin/save", auth.loginRequired, async (ctx, next) => {
     let params = ctx.request.body;
     auth.assert(params.name && params.tel && params.school && params.grade && params.profession&&params.preference, "缺少参数");
