@@ -41,9 +41,18 @@ let userSchema = new mongoose.Schema({
 		}],
 		default: []
 	},
+	/*
+	followers: {
+		type: [{
+			type : mongoose.Schema.ObjectId,
+			ref : 'Follow',
+		}],
+		default: []
+	},
+	*/
 	tls_imported: {
         type: Boolean,
-        default: 0
+        default: 0,
     },
     created_date: { type: Date, default: Date.now },
     updated_date: { type: Date, default: Date.now },
