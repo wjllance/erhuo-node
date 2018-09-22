@@ -16,8 +16,8 @@ const router = module.exports = new Router();
 
 /**
  * @api {post}    /identity/save  上传认证资料
- * @apiName     GoodsList
- * @apiGroup    Goods
+ * @apiName     注册
+ * @apiGroup    identity
  *
  *
  * @apiParam    {String}    ncard            学生证图片id

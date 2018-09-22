@@ -158,7 +158,7 @@ router.get('/user/friend/:uid', async (ctx, next) => {
 /**
  * @api {get}   /user/mypublish   我的发布
  * @apiName     MyPublish
- * @apGroup     User
+ * @apiGroup    User
  *
  * @apiParam    {Number}  [isRemoved]   是否下架
  *
@@ -205,13 +205,10 @@ router.get('/v2/user/mypublish', auth.loginRequired, async (ctx, next) => {
     }
 });
 
-
-
-
 /**
  * @api {get}   /user/:user_id/publish_list   发布列表
  * @apiName     UserPublish
- * @apGroup     User
+ * @apiGroup     User
  *
  *
  */
