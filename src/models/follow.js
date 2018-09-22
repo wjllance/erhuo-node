@@ -17,7 +17,8 @@ let followSchema = new mongoose.Schema({
 
     },
     secret: Boolean,
-    follow_date: { type: Date, default: Date.now },
+    created_date: { type: Date, default: Date.now },
+    updated_date: { type: Date, default: Date.now },
     canceled_date: Date,
 });
 

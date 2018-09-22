@@ -2,116 +2,144 @@ require('should');
 let Router = require('koa-router');
 
 let _ = require('lodash');
-let mzfs = require('mz/fs');
-let path = require('path');
 let body = require('koa-convert')(require('koa-better-body')());
 
 let moment = require('moment');
 moment.locale('zh-cn');
-let config = require('../config');
 let auth = require('../services/auth');
-let srv_transaction = require('../services/transaction');
-let srv_wechat = require('../services/wechat');
-let { Follow } = require('../models');
-let srv_follow=require('../services/follow')
+let { Follow, User } = require('../models');
+let srv_follow = require('../services/follow');
 
 const router = module.exports = new Router();
 
-
-
 /**
- * @api     {post}  /transaction/withdraw/  提现
- * @apiName     TransactionWithdraw
- * @apiGroup    Transaction
+ * @api {post}  /follow/on   关注
+ * @apiName     Follow
+ * @apiGroup    Follow
  *
- * @apiParam    {Number}    amount  数量，最多两位小数
+ * @apiParam    {String}    toId    被关注用户id
  *
- * @apiSuccess  {Number}    success
- * @apiSuccess  {Object}    data
  *
  */
 router.post('/follow/on', auth.loginRequired, async (ctx, next) => {
 
-    auth.assert( ctx.request.body.toId, "被关注用户无效");
-    //let res = await tagService.userPostTag(ctx.state.user, name);
-    let follow = await Follow.findOne({fromId:ctx.state.user._id
-    , toId: ctx.request.body.toId });
-
+    auth.assert(ctx.request.body.toId, "被关注用户无效");
+    let params = {
+        fromId: ctx.state.user._id,
+        toId: ctx.request.body.toId,
+    };
+    let follow = await Follow.findOne(params);
     auth.assert(!follow || follow.canceled_date, "已经关注该用户");
 
 
-    if (!follow) {
-        follow = new follow({
-            fromId:ctx.state.user._id,
-            toId: ctx.request.body.toId
-        });
-    }
-   ;
-    if(canceled_date)canceled_date=null;
-     await follow.save()
+    let res = await Follow.findOneAndUpdate(params, {
+        canceled_date: null,
+        updated_date: Date.now()
+    }, {new:true, upsert:true});
+
+    console.log(res);
     ctx.body = {
         success: 1,
-        data: follow._id.toString()
+        msg: "关注成功",
+        data: res._id.toString(),
     };
 });
 
-/*
-router.post('/follow/myfollowers, auth.loginRequired, async (ctx, next) => {
-    let follower = await Follow.find({toID: ctx.state.user._id});
 
-    for(let i = 0; i < follow.length; i ++) {
-        auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
-    }
-
-    ctx.body = {
-        success: 1,
-        data: follow._id.toString()
-    };
-});
-
-router.post('/follow/, auth.loginRequired, async (ctx, next) => {
-    let followed = await Follow.find({toID: ctx.state.user._id});
-
-    for(let i = 0; i < followed.length; i ++) {
-        auth.assert(images[i].ID.equals(ctx.state.user._id), '图片所有者不正确');
-    }
-
-    ctx.body = {
-        success: 1,
-        data: follow._id.toString()
-    };
-});
-*/
-
+/**
+ * @api {post}  /follow/off   取消关注
+ * @apiName     Unfollow
+ * @apiGroup    Follow
+ *
+ * @apiParam    {String}    toId     被取消用户id
+ *
+ *
+ */
 router.post('/follow/off', auth.loginRequired, async (ctx, next) => {
 
-    auth.assert( ctx.request.body.toId, "取消关注用户无效");
-    //let res = await tagService.userPostTag(ctx.state.user, name);
-    let follow = await Follow.findOne({fromId:ctx.state.user._id
-    , toId: ctx.request.body.toId });
+    auth.assert(ctx.request.body.toId, "取消关注用户无效");
+    let follow = await Follow.findOne({
+        fromId: ctx.state.user._id,
+        toId: ctx.request.body.toId,
+    });
 
-    auth.assert(!follow && follow.canceled_date, "未关注该用户");
-    canceled_date=Date.now();
-     await follow.save()
+    auth.assert(follow && !follow.canceled_date, "未关注该用户");
+
+    follow.canceled_date = Date.now();
+    follow.updated_date = Date.now();
+    await follow.save();
+
     ctx.body = {
         success: 1,
-        data: follow._id.toString()
+        msg: "取关成功",
     };
 });
 
 
-
-
-
-
-
-router.get('/follow/show', auth.loginRequired, async (ctx, next) => {
+/**
+ * @api {get}   /follow/follower 关注他的
+ * @apiName     FollowerList
+ * @apiGroup    Follow
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ * @apiParam    {String}    [user_id]     用户id
+ *
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+//粉丝
+router.get('/follow/follower', auth.loginRequired, async (ctx, next) => {
     let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
-    let followers = await srv_follow.followList(ctx.request.body.Id,ctx.request.body.direction,
-     pageSize, pageNo);
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+
+    let me = ctx.state.user;
+    let user = me;
+    if(ctx.query.user_id){
+        user = await User.findById(ctx.query.user_id);
+    }
+
+    let res = await srv_follow.followerList(me, pageNo, pageSize, user);
+
     ctx.body = {
         success: 1,
-        data: followers
+        data: res
+    };
+});
+
+
+/**
+ * @api {get}   /follow/concerned 他关注的
+ * @apiName     concernedList
+ * @apiGroup    Follow
+ *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
+ * @apiParam    {String}    [user_id]     用户id
+ *
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        列表
+ *
+ */
+//关注的人
+router.get('/follow/concerned', auth.loginRequired, async (ctx, next) => {
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+
+    let me = ctx.state.user;
+    let user = me;
+    if(ctx.query.user_id){
+        user = await User.findById(ctx.query.user_id);
+    }
+    let res = await srv_follow.concernedList(me, pageNo, pageSize, user);
+
+    ctx.body = {
+        success: 1,
+        data: res
     };
 });
