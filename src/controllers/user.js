@@ -13,7 +13,7 @@ let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let tagService = require('../services/tag');
 let srv_user = require('../services/user');
-let { Like, Goods, User, Account } = require('../models');
+let { Like, Goods, User, Account, Follow } = require('../models');
 // const schools = config.CONSTANT.SCHOOL;
 const school_map = config.CONSTANT.SCHOOL_MAP;
 let moment = require('moment');
@@ -138,6 +138,12 @@ router.get('/user/:id/profile', auth.loginRequired, async (ctx, next) => {
     let user = await User.findById(ctx.params.id);
     profile = user.cardInfo();
     profile.tags = await tagService.listWithLike(user._id, ctx.state.user);
+    let followed = await Follow.find({
+        fromId: ctx.state.user._id,
+        toId: user._id,
+        canceled_date: null
+    });
+    profile.followed = !!followed;
     ctx.body = {
         success: 1,
         data: profile
