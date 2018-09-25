@@ -87,6 +87,7 @@ userSchema.methods.cardInfo = function(){
 	}
 	let ret = _.pick(this, ['_id', 'nickName', 'avatarUrl']);
 	ret.verify = verify;
+    ret.location = school_map[this.location];
 	return ret;
 };
 

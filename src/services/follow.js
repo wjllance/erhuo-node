@@ -32,8 +32,12 @@ let injectFollow = exports.injectFollow = async function (user, me) {
         toId: user._id,
         canceled_date: null,
     });
+    let fansNum = await Follow.find({
+        toId: user._id
+    }).count();
     return {
-        followed: !(!res)
+        followed: !(!res),
+        fansNum
     };
 
 };
