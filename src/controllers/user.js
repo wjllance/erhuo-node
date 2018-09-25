@@ -136,7 +136,8 @@ router.get('/user/index', auth.loginRequired, async (ctx, next) => {
 //获取用户主页
 router.get('/user/:id/profile', auth.loginRequired, async (ctx, next) => {
     let user = await User.findById(ctx.params.id);
-    profile = user.cardInfo();
+    let baseInfo = user.baseInfo();
+    profile = _.pick(baseInfo, ["_id", "nickName", "avatarUrl", "gender", 'location', 'stu_verified']);
     profile.tags = await tagService.listWithLike(user._id, ctx.state.user);
     let followed = await Follow.find({
         fromId: ctx.state.user._id,
