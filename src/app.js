@@ -77,7 +77,13 @@ app.use(require('koa-static')(PUBLIC.root, {
 
 
 logUtil.initLogPath();
-schedule.register();
+
+
+console.log(process.env.NODE_APP_INSTANCE)
+if (process.env.NODE_APP_INSTANCE === '0') {
+    // 定时任务
+    schedule.register();
+}
 
 app.listen(SERVER.PORT, SERVER.ADDRESS);
 
