@@ -93,6 +93,7 @@ let scheduleComeBack = ()=>{
         logger.info("daily notify ...population:", users.length);
         for (let i = 0; i < users.length; i++){
             await srv_wx_template.comeBack(users[i]);
+            await myUtils.sleep(100);
         }
         // total += books.length;
     })
