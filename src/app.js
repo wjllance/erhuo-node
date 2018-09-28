@@ -79,7 +79,7 @@ app.use(require('koa-static')(PUBLIC.root, {
 logUtil.initLogPath();
 
 
-console.log(process.env.NODE_APP_INSTANCE)
+console.log("NODE APP INSTANCE", process.env.NODE_APP_INSTANCE)
 if (process.env.NODE_APP_INSTANCE === '0') {
     // 定时任务
     schedule.register();
