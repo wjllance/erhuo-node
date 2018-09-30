@@ -80,7 +80,7 @@ exports.CONSTANT = {
         SUCCEED: 1,
         FAILED: 2
     },
-    SCHOOL_MAP: require('./myUtils/school_list'),
+    SCHOOL_MAP: require('./tool/school_list'),
     ERR_CODE: {
         ERROR: 978,
         MSG_FAIL: 985,

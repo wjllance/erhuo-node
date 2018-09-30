@@ -23,38 +23,8 @@ const GOODS_STATUS = config.CONSTANT.GOODS_STATUS;
 // 返回值为 goods(list), hasMore(有下一页), totle(记录总条数)
 
 /**
- * deprecated
- * @api {get} /goods/index  商品列表
- * @apiName     GoodsList
- * @apiGroup    Goods
  *
- *
- * @apiParam    {Number}    pageNo      当前页码，默认1
- * @apiParam    {Number}    pageSize    每页大小，默认6
- *
- * @apiSuccess  {Number}    success     1success
- * @apiSuccess  {Object}    data        分页商品列表
- * @apiSuccess  {Array}     data.goods  商品列表
- * @apiSuccess  {Boolean}     data.hasMore  还有更多
- * @apiSuccess  {Number}     data.total  总数
- *
- */
-router.get('/goods/index', async (ctx, next) => {
-
-    let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
-
-    let data = await srv_goods.goodsList(ctx.state.user, pageNo, pageSize);
-    ctx.body = {
-        success: 1,
-        data: data
-    }
-});
-
-
-/**
- * deprecated
- * @api {get} /v2/goods/index  商品列表
+ * @api {get} /v3/goods/index  商品列表
  * @apiName     GoodsList
  * @apiGroup    Goods
  *
@@ -70,72 +40,6 @@ router.get('/goods/index', async (ctx, next) => {
  * @apiSuccess  {Number}     data.total  总数
  *
  */
-router.get('/v2/goods/index', async (ctx, next) => {
-    // let condi= {
-    //     $or: [
-    //         {removed_date: null}, {removed_date:{$gt:Date.now()}}  //加入未下架筛选
-    //     ]
-    // };
-    // await auth.loginRequired(ctx, next)
-    let pageNo = ctx.query.pageNo || 1;
-    let pageSize = Math.min(ctx.query.pageSize || 12, 20); // 最大20，默认6
-
-    let cate = ctx.query.category;
-    let condi = {
-        deleted_date:null
-    };
-    let sorti = {};
-    if(!cate)
-    {
-        cate = "推荐";
-    }
-
-    console.log(cate);
-    if(cate === "推荐"){
-        sorti = {
-            gpriority:-1,
-            // removed_date:1,
-            glocation: -1,
-            updated_date:-1
-        }
-    }
-    else if(cate === "今日"){
-        condi.created_date = {
-            $gt: moment().subtract(1, 'd')
-        };
-        sorti = {
-            gpriority:-1,
-            // removed_date:1,
-            glocation: -1,
-            updated_date:-1
-        }
-        console.log(condi, sorti);
-    }
-    else if(srv_goods.CATES.indexOf(cate) !== -1){
-        condi.category = cate;
-        sorti = {
-            // gpriority:-1,
-            removed_date:1,
-            glocation: -1,
-            updated_date:-1
-        }
-    }
-    let user = ctx.state.user;
-    if(user){ //not other
-        condi.$or=[{
-            glocation:user.location
-        },{
-            glocation:0
-        }]
-    }
-
-    console.log(condi, sorti);
-    let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
-    ctx.body = {
-        success: 1,
-        data: data
-    }
-});
 
 //加入审核状态
 router.get('/v3/goods/index', async (ctx, next) => {

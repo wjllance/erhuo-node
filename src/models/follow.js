@@ -1,7 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 
 // 商品
 let followSchema = new mongoose.Schema({

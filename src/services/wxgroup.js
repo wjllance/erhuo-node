@@ -6,7 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
-let mUtils = require("../myUtils/mUtils");
+let mUtils = require("../tool/mUtils");
 
 
 let moment = require('moment');

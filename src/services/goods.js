@@ -3,7 +3,7 @@ let _ = require("lodash");
 let { User, Comment, Goods, Like } = require("../models");
 
 let auth = require("../services/auth");
-let tools = require("./tools");
+let myUtil = require("../tool/mUtils");
 const school_map = require("../config").CONSTANT.SCHOOL_MAP;
 
 const goodsCates = exports.CATES = ["美妆", "女装", "女鞋", "配饰", "包包", "日用", "其他", "求购", "书籍"];
@@ -172,11 +172,13 @@ let getCardInfoById = exports.getCardInfoById = async function (goods_id) {
 
 
 let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
-    let goods = await getCardInfoById(goods_id);
+
+    let goods = await Goods.findById(goods_id);
     auth.assert(goods, "商品不存在");
 
-    let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "glocation", "gcost"]);
-    g.gpics = goods.gpics.map(y => y.urlwithid());
+    let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "glocation", "gcost", 'category']);
+    g.gpics = goods.npics.map(y => myUtil.thumbnail(y));
+
     g.glocation = school_map[goods.glocation];
     return g;
 };

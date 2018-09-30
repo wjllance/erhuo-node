@@ -6,7 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 let auth = require('./auth');
 let moment = require('moment');
 moment.locale('zh-cn');

@@ -1,7 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 const school_map = require('../config').CONSTANT.SCHOOL_MAP;
 const GOODS_STATUS = require('../config').CONSTANT.GOODS_STATUS;
 // 商品

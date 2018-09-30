@@ -1,7 +1,7 @@
 
 let mongoose = require('mongoose');
 let _ = require('lodash');
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');

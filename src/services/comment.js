@@ -5,7 +5,7 @@ let superagent = require('superagent');
 let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 /*-----------------------------------------------*/
 
 let { log } = require('../config');
