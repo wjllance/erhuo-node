@@ -425,15 +425,6 @@ router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     };
 });
 
-//deprecated
-router.get('/goods/detail/:goods_id', async (ctx, next) => {
-    let goods = await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user);
-    // auth.assert(!isRemoved, '商品已下架');
-    ctx.body = {
-        success: 1,
-        data: goods,
-    };
-});
 
 
 /**

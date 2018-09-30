@@ -74,7 +74,6 @@ let updateStatus = async (goods) => {
 // 获取商品详情
 let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userInfo) {
 
-
     let goods = await Goods
         .findById(goods_id)
         .populate("gpics")
@@ -115,52 +114,6 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     }
     g.remark = goods.remark;
 
-    return g;
-};
-
-
-// 获取商品详情 deprecated
-let getDetailById = exports.getDetailById = async function (goods_id, userInfo) {
-
-    let goods = await Goods
-        .findById(goods_id)
-        .populate("gpics")
-        .populate("userID");
-    auth.assert(goods, "商品不存在");
-
-    let g = goods.baseInfo(1); //fullpic
-    // g.gpics = goods.gpics.map(y => y.url());
-
-    // let g = _.pick(goods, ['_id', 'gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity']);
-    // g.state = goods.removed_date ? "已下架" : "在售";
-    // g.created_date = tools.dateStr(goods.created_date);
-    // g.glocation = school_map[goods.glocation] ;
-
-    g.user = {
-        _id: goods.userID._id,
-        name: goods.userID.nickName,
-        avatar: goods.userID.avatarUrl,
-    };
-
-    let userid = userInfo ? userInfo._id : null;
-
-    let condi = { goodsId: goods_id };
-    if (userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)) {
-        condi.$or = [
-            { fromId: userid },
-            { toId: userid },
-            { secret: { $ne: true } },
-        ];
-    }
-    console.log(condi);
-    let comments = await Comment
-        .find(condi)
-        .populate(["fromId", "toId"]);
-    g.comments = comments.map(y => y.getFullInfo());
-
-    if (userInfo) {
-        _.assign(g, await hasCollected(g, userInfo));
-    }
     return g;
 };
 
