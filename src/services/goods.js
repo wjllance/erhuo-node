@@ -165,11 +165,6 @@ let getDetailById = exports.getDetailById = async function (goods_id, userInfo) 
 };
 
 
-let getCardInfoById = exports.getCardInfoById = async function (goods_id) {
-    return await Goods.findById(goods_id)
-        .populate("gpics");
-};
-
 
 let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 
