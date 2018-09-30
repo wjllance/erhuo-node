@@ -1,4 +1,3 @@
-
 require('should');
 let Router = require('koa-router');
 
@@ -48,66 +47,65 @@ router.get('/v3/goods/index', async (ctx, next) => {
 
     let cate = ctx.query.category;
     let condi = {
-        deleted_date:null,
-        status: {$ne: GOODS_STATUS.REJECT}
+        deleted_date: null,
+        status: { $ne: GOODS_STATUS.REJECT },
     };
     let sorti = {};
-    if(!cate)
-    {
+    if (!cate) {
         cate = "推荐";
     }
 
     console.log(cate);
-    if(cate === "推荐"){
+    if (cate === "推荐") {
         sorti = {
-            gpriority:-1,
+            gpriority: -1,
             // removed_date:1,
             glocation: -1,
-            updated_date:-1
+            updated_date: -1,
         };
-        condi.category = {$ne: "求购"}
+        condi.category = { $ne: "求购" };
     }
-    else if(cate === "今日"){
-        let ddl = moment({hour:20}).subtract(1,'d');
-        if(moment().isBefore(moment({hour:20}))){
-            ddl = ddl.subtract(1,'d');
+    else if (cate === "今日") {
+        let ddl = moment({ hour: 20 }).subtract(1, 'd');
+        if (moment().isBefore(moment({ hour: 20 }))) {
+            ddl = ddl.subtract(1, 'd');
         }
         condi.created_date = {
             // $gt: moment().subtract(1, 'd')
-            $gt: ddl
+            $gt: ddl,
         };
         sorti = {
-            gpriority:-1,
+            gpriority: -1,
             // removed_date:1,
             glocation: -1,
-            updated_date:-1
-        }
+            updated_date: -1,
+        };
         console.log(condi, sorti);
     }
-    else if(srv_goods.CATES.indexOf(cate) !== -1){
+    else if (srv_goods.CATES.indexOf(cate) !== -1) {
         condi.category = cate;
         sorti = {
             // gpriority:-1,
-            removed_date:1,
+            removed_date: 1,
             glocation: -1,
-            updated_date:-1
-        }
+            updated_date: -1,
+        };
     }
     let user = ctx.state.user;
-    if(user){ //not other
-        condi.$or=[{
-            glocation:user.location
-        },{
-            glocation:0
-        }]
+    if (user) { //not other
+        condi.$or = [{
+            glocation: user.location,
+        }, {
+            glocation: 0,
+        }];
     }
 
     console.log(condi, sorti);
     let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
     ctx.body = {
         success: 1,
-        data: data
-    }
+        data: data,
+    };
 });
 
 /**
@@ -136,35 +134,35 @@ router.get('/goods/search', async (ctx, next) => {
     let keyword = ctx.query.keyword;
     let reg = new RegExp(keyword, 'i');
 
-    let condi = {$and:[]}; //审核
+    let condi = { $and: [] }; //审核
     condi.$and.push({
-        $or:[
-            {gname: reg},
-            {gsummary: reg}
-        ]
+        $or: [
+            { gname: reg },
+            { gsummary: reg },
+        ],
     });
 
     let sorti = {
-        gpriority:-1,
+        gpriority: -1,
         // removed_date:1,
         glocation: -1,
-        updated_date:-1
+        updated_date: -1,
     };
     let user = ctx.state.user;
-    if(user){ //not other
+    if (user) { //not other
         condi.$and.push({
-            $or:[
-                {glocation:user.location},
-                {glocation:0}
-            ]
+            $or: [
+                { glocation: user.location },
+                { glocation: 0 },
+            ],
         });
     }
     console.log(JSON.stringify(condi.$and), sorti);
     let data = await srv_goods.goodsListV2(user, pageNo, pageSize, condi, sorti);
     ctx.body = {
         success: 1,
-        data: data
-    }
+        data: data,
+    };
 });
 
 
@@ -184,20 +182,20 @@ router.get('/goods/search', async (ctx, next) => {
 
 router.get('/goods/hot_words', async (ctx, next) => {
 
-    let data = ["面膜","防晒","唇膏", "眉笔"];
+    let data = ["面膜", "防晒", "唇膏", "眉笔"];
 
     ctx.body = {
         success: 1,
-        data: data
-    }
+        data: data,
+    };
 });
 
 //deprecated
 router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
-    let images = await Image.find({_id: ctx.request.body.gpics});
+    let images = await Image.find({ _id: ctx.request.body.gpics });
     auth.assert(images.length === ctx.request.body.gpics.length, '图片不正确');
 
-    for(let i = 0; i < images.length; i ++) {
+    for (let i = 0; i < images.length; i++) {
         auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
     }
 
@@ -206,14 +204,14 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
     goods.gpics = images.map(x => x._id);
     _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gstype', 'glocation', 'gcost', 'gcity', 'category', 'remark']));
 
-    if(!goods.glocation){
+    if (!goods.glocation) {
         goods.glocation = ctx.state.user.location || 0;
     }
     await goods.save();
 
     ctx.body = {
         success: 1,
-        data: goods._id.toString()
+        data: goods._id.toString(),
     };
 });
 
@@ -258,7 +256,7 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
 
     goods.category = params.category || "其他";
     goods.gname = params.gname || params.gsummary.substr(0, 20);
-    if(!goods.glocation){
+    if (!goods.glocation) {
         goods.glocation = ctx.state.user.location || 0;
     }
 
@@ -269,7 +267,7 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
 
     ctx.body = {
         success: 1,
-        data: goods._id
+        data: goods._id,
     };
 });
 
@@ -286,7 +284,7 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
  *
  */
 router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
-    let myGood = await Goods.findOne({_id: ctx.params.goods_id});
+    let myGood = await Goods.findOne({ _id: ctx.params.goods_id });
     auth.assert(myGood, '商品不存在');
     // let isRemoved = await srv_goods.isGoodRemoved(myGood);
     auth.assert(!myGood.removed_date, '商品已下架');
@@ -299,7 +297,7 @@ router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     // await myGood.save();
     ctx.body = {
         success: 1,
-        data: myGood._id.toString()
+        data: myGood._id.toString(),
     };
 });
 
@@ -311,7 +309,7 @@ router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
     await myGood.myRemove();
     ctx.body = {
         success: 1,
-        data: myGood._id.toString()
+        data: myGood._id.toString(),
     };
 });
 
@@ -329,21 +327,20 @@ router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.delete('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
-    let myGood = await Goods.findOne({_id: ctx.params.goods_id});
+    let myGood = await Goods.findOne({ _id: ctx.params.goods_id });
     auth.assert(false, "暂时不能删除商品");
-
 
 
     auth.assert(myGood, '商品不存在');
     let isRemoved = srv_goods.isGoodRemoved(myGood);
     auth.assert(isRemoved, '商品未下架，不能删除');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限删除商品');
-    _.assign(myGood, {'deleted_date':Date.now()});
+    _.assign(myGood, { 'deleted_date': Date.now() });
     console.log(myGood);
     await myGood.save();
     ctx.body = {
         success: 1,
-        data: myGood._id.toString()
+        data: myGood._id.toString(),
     };
 });
 
@@ -368,11 +365,11 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     auth.assert(goods, '商品不存在');
     auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
 
-    if(ctx.request.body.gpics){
-        let images = await Image.find({_id: ctx.request.body.gpics});
+    if (ctx.request.body.gpics) {
+        let images = await Image.find({ _id: ctx.request.body.gpics });
         auth.assert(images.length == ctx.request.body.gpics.length, '图片不正确');
 
-        for(let i = 0; i < images.length; i ++) {
+        for (let i = 0; i < images.length; i++) {
             auth.assert(images[i].userID.equals(ctx.state.user._id), '图片所有者不正确');
         }
 
@@ -386,7 +383,24 @@ router.put('/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
     ctx.body = {
         success: 1,
         // data: await srv_goods.getDetailById(ctx.params.goods_id, ctx.state.user)
-        data: await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user)
+        data: await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user),
+    };
+});
+
+router.put('/v2/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
+    let goods = await Goods.findById(ctx.params.goods_id);
+    auth.assert(goods, '商品不存在');
+    auth.assert(goods.userID.equals(ctx.state.user._id), '无权限');
+
+    if (ctx.request.body.gpics) {
+        goods.npics = ctx.request.body.gpics;
+    }
+    _.assign(goods, _.pick(ctx.request.body, ['gname', 'gsummary', 'glabel', 'gprice', 'gcost']));
+    goods.updated_date = Date.now();
+    await goods.save();
+    ctx.body = {
+        success: 1,
+        data: await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user),
     };
 });
 
@@ -407,7 +421,7 @@ router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,
-        data: goods
+        data: goods,
     };
 });
 
@@ -417,10 +431,9 @@ router.get('/goods/detail/:goods_id', async (ctx, next) => {
     // auth.assert(!isRemoved, '商品已下架');
     ctx.body = {
         success: 1,
-        data: goods
+        data: goods,
     };
 });
-
 
 
 /**
@@ -437,32 +450,31 @@ router.get('/goods/base/:goods_id', async (ctx, next) => {
     let goods = await srv_goods.getBaseInfoById(ctx.params.goods_id);
     ctx.body = {
         success: 1,
-        data: goods
+        data: goods,
     };
 });
 
 
-router.get('/goods/get_book_by_isbn/:isbn', async(ctx, next) => {
+router.get('/goods/get_book_by_isbn/:isbn', async (ctx, next) => {
     let isbn = ctx.params.isbn;
 
-    let api_url = "https://api.douban.com/v2/book/isbn/"+isbn;
+    let api_url = "https://api.douban.com/v2/book/isbn/" + isbn;
 
-    try{
+    try {
 
-        let {text} = await superagent.get(api_url);
+        let { text } = await superagent.get(api_url);
         console.log(text);
         let res = JSON.parse(text);
         ctx.body = {
             success: 1,
-            data: res
-        }
-    }catch (e) {
+            data: res,
+        };
+    } catch (e) {
         console.error(e);
         ctx.body = {
-            success:1
-        }
+            success: 1,
+        };
     }
 
 
-
-})
+});
