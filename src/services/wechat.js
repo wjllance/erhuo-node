@@ -139,6 +139,74 @@ let sendReplyNotice = exports.sendReplyNotice = async function (comment_id) {
 
 };
 
+let sendReplyNotice2 = exports.sendReplyNotice2 = async function (model,messagetype) {
+
+
+    if(messagetype == "0"){
+        if (model.sa_openid == null) {
+            if (model.sa_openid == null) {
+                logger.error(model);
+            }
+            return;
+        }
+        console.log("send notify to..." + model.sa_openid);
+        let access_token = await get_access_token(0);
+        console.log(access_token);
+        let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+        let { text } = await superagent.post(post_url).send({
+            touser: model.sa_openid,
+            template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
+            miniprogram: {
+                appid: config.APP_ID,
+                pagepath: "pages/index/index",
+            },
+            data: {
+                first: {
+                    value: "有新的用户注册，请审核,用户的名字是：",
+                },
+                keyword2: {
+                    value: model.nickName,
+                },
+            },
+        });
+        let res = JSON.parse(text);
+        console.log(res);
+        return res;
+
+
+    }else if(messagetype == "1"){
+        if (model.sa_openid == null) {
+            if (model.sa_openid == null) {
+                logger.error(model);
+            }
+            return;
+        }
+        console.log("send notify to..." + model.sa_openid);
+        let access_token = await get_access_token(0);
+        console.log(access_token);
+        let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+        let { text } = await superagent.post(post_url).send({
+            touser: model.sa_openid,
+            template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
+            miniprogram: {
+                appid: config.APP_ID,
+                pagepath: "pages/index/index",
+            },
+            data: {
+                first: {
+                    value: "用户有新的商品发布请审核，该用户是：",
+                },
+                keyword2: {
+                    value: model.nickName,
+                }
+            },
+        });
+        let res = JSON.parse(text);
+        console.log(res);
+        return res;
+    }
+};
+
 let sendMinaTempMsg = exports.sendMinaTempMsg = async (touser, template_id, form_id, data, page, color, emphasis_keyword) => {
     let access_token = await get_access_token(TYPE_MINA);
     console.log(access_token);
