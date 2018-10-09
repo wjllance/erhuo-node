@@ -156,10 +156,6 @@ let sendReplyNotice2 = exports.sendReplyNotice2 = async function (model,messaget
         let { text } = await superagent.post(post_url).send({
             touser: model.sa_openid,
             template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
-            miniprogram: {
-                appid: config.APP_ID,
-                pagepath: "pages/index/index",
-            },
             data: {
                 first: {
                     value: "有新的用户注册，请审核,用户的名字是：",
@@ -188,10 +184,6 @@ let sendReplyNotice2 = exports.sendReplyNotice2 = async function (model,messaget
         let { text } = await superagent.post(post_url).send({
             touser: model.sa_openid,
             template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
-            miniprogram: {
-                appid: config.APP_ID,
-                pagepath: "pages/index/index",
-            },
             data: {
                 first: {
                     value: "用户有新的商品发布请审核，该用户是：",
