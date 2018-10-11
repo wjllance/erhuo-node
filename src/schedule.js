@@ -43,23 +43,8 @@ exports.register = function () {
     // uploadFakeGoods();
 
     scheduleComeBack();
-
-
-    scheduleUpdateUniversity();
 };
 
-
-let count = 2;
-let scheduleUpdateUniversity = () => {
-    let schools = config.CONSTANT.SCHOOL_MAP;
-
-    for (; count < schools.length; count++){
-        let name = schools[i];
-        console.log(i, name);
-    }
-
-
-};
 
 let scheduleComeBack = ()=>{
 
