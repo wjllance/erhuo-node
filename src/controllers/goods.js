@@ -363,7 +363,7 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
     //     goods.status = config.CONSTANT.GOODS_STATUS.RELEASED;
     // }
     await goods.save();
-    let user =await User.findOne({userID : ctx.state.user._id});
+    let user =await User.findOne({_id : ctx.state.user._id});
     await wechatService.sendReplyNotice2(user,"1");
 
     ctx.body = {
