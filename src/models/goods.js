@@ -31,6 +31,7 @@ let goodsSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    locationName: String,
     gcost: Number,
     gcity: String,
     gpriority: { type: Number, default: 0 },
@@ -93,7 +94,8 @@ goodsSchema.methods.baseInfoV2 = function (fullPic) {
 
     // g.state = this.removed_date ? "已下架" : "在售";
     g.created_date = myUtils.dateStr(this.created_date);
-    g.glocation = school_map[this.glocation];
+
+    g.glocation = this.locationName || school_map[this.glocation];
 
     g.state = getGoodsState(this);
     return g;
@@ -111,7 +113,8 @@ goodsSchema.methods.baseInfo = function (fullPic) {
     }
     // g.state = this.removed_date ? "已下架" : "在售";
     g.created_date = myUtils.dateStr(this.created_date);
-    g.glocation = school_map[this.glocation];
+
+    g.glocation = this.locationName || school_map[this.glocation];
 
     g.state = getGoodsState(this);
     return g;
@@ -132,7 +135,8 @@ goodsSchema.methods.cardInfo = function () {
     }
 
     g.created_date = myUtils.dateStr(this.created_date);
-    g.glocation = school_map[this.glocation];
+
+    g.glocation = this.locationName || school_map[this.glocation];
     if (this.userID._id) {
         g.user = this.userID.cardInfo();
     }

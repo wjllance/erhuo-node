@@ -124,10 +124,10 @@ let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
     let goods = await Goods.findById(goods_id);
     auth.assert(goods, "商品不存在");
 
-    let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "glocation", "gcost", 'category']);
+    let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "gcost", 'category']);
     g.gpics = goods.npics.map(y => myUtil.thumbnail(y));
 
-    g.glocation = school_map[goods.glocation];
+    g.glocation = goods.locationName || school_map[goods.glocation];
     return g;
 };
 

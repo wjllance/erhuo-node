@@ -259,6 +259,10 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
     goods.gname = params.gname || params.gsummary.substr(0, 20);
     if (!goods.glocation) {
         goods.glocation = ctx.state.user.location || 0;
+
+        if(ctx.state.user.locationName){
+            goods.locationName = ctx.state.user.locationName;
+        }
     }
 
     // if(goods.category === "书籍"){

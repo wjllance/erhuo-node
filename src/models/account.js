@@ -2,7 +2,6 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 let _ = require('lodash');
 // let tools = require('../services/tools')
-// let school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 // 钱包
 let accountSchema = new Schema({
