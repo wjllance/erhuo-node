@@ -7,7 +7,7 @@ let path = require("path");
 let body = require("koa-convert")(require("koa-better-body")());
 let config = require("../config");
 let auth = require("../services/auth");
-
+let wechatService = require('../services/wechat');
 
 let { User, Image, Identity } = require("../models");
 
