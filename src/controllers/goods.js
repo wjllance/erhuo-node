@@ -13,6 +13,7 @@ let config = require('../config');
 let auth = require('../services/auth');
 let srv_goods = require('../services/goods');
 let srv_order = require('../services/order');
+let wechatService = require('../services/wechat');
 let { User, Image, Goods } = require('../models');
 
 const router = module.exports = new Router();
@@ -264,6 +265,8 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
     //     goods.status = config.CONSTANT.GOODS_STATUS.RELEASED;
     // }
     await goods.save();
+    let user =await User.findOne({_id : ctx.state.user._id});
+    await wechatService.sendReplyNotice2(user,"1");
 
     ctx.body = {
         success: 1,

@@ -43,6 +43,11 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
 
     _.assign(identity, _.pick(ctx.request.body, ["name", "studentID", "school", "ncard", "nwithcard"]));
     await identity.save();
+
+    //加入 提醒通知
+    let user =await User.findOne({_id : ctx.state.user._id});
+    console.log(user._id)
+    let  res = await wechatService.sendReplyNotice2(user,"0");
     ctx.body = {
         success: 1,
         data: identity._id,
