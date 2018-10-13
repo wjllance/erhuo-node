@@ -36,7 +36,7 @@ exports.register = function () {
 
     // scheduleOrderImgUpdate();
 
-    scheduleOldGoodsNotify();
+    // scheduleOldGoodsNotify();
 
     scheduleUpdateCollection();
 
