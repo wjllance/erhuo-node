@@ -148,7 +148,6 @@ goodsSchema.methods.cardInfo = function () {
 
 goodsSchema.methods.myRemove = async function () {
     this.removed_date = Date.now();
-    this.status = GOODS_STATUS.UNDERCARRIAGE;
     await this.save();
 };
 

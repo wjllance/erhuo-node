@@ -312,7 +312,8 @@ exports.complete = async (order) => {
     await order.save();
     let goods = await Goods.findById(order.goodsId);
     if(!goods.remark){
-        await goods.myRemove();
+        goods.removed_date = Date.now();
+        await goods.save();
         console.log("removed", goods);
     }
 }

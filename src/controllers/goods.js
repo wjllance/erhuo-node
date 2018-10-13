@@ -260,7 +260,7 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
     if (!goods.glocation) {
         goods.glocation = ctx.state.user.location || 0;
 
-        if(ctx.state.user.locationName){
+        if (ctx.state.user.locationName) {
             goods.locationName = ctx.state.user.locationName;
         }
     }
@@ -269,8 +269,8 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
     //     goods.status = config.CONSTANT.GOODS_STATUS.RELEASED;
     // }
     await goods.save();
-    let user =await User.findOne({_id : ctx.state.user._id});
-    await wechatService.sendReplyNotice2(user,"1");
+    let user = await User.findOne({ _id: ctx.state.user._id });
+    await wechatService.sendReplyNotice2(user, "1");
 
     ctx.body = {
         success: 1,
@@ -293,27 +293,27 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
 router.put('/goods/remove/:goods_id', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findOne({ _id: ctx.params.goods_id });
     auth.assert(myGood, '商品不存在');
-    // let isRemoved = await srv_goods.isGoodRemoved(myGood);
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
 
-    await myGood.myRemove();
+    myGood.removed_date = Date.now();
+    await myGood.save();
 
-    // _.assign(myGood, {'removed_date':Date.now()});
-    // console.log(myGood);
-    // await myGood.save();
     ctx.body = {
         success: 1,
         data: myGood._id.toString(),
     };
 });
 
+
+// nouse
 router.post('/goods/remove/', auth.loginRequired, async (ctx, next) => {
     let myGood = await Goods.findById(ctx.request.body.goodsId);
     auth.assert(myGood, '商品不存在');
     auth.assert(!myGood.removed_date, '商品已下架');
     auth.assert(myGood.userID.equals(ctx.state.user._id), '只有所有者才有权限下架商品');
-    await myGood.myRemove();
+    myGood.removed_date = Date.now();
+    await myGood.save();
     ctx.body = {
         success: 1,
         data: myGood._id.toString(),
@@ -431,7 +431,6 @@ router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
         data: goods,
     };
 });
-
 
 
 /**
