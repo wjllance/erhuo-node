@@ -62,8 +62,9 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
  *
  */
 router.get("/identity/userInfoDetail", auth.loginRequired, async (ctx, next) => {
-    let identity = await Identity.findOne({ userID: ctx.state.user._id });
-    let ret = identity || null;
+
+    let user = await User.findOne({ _id: ctx.query.user_id });
+    let ret = user || null;
     ctx.body = {
         success: 1,
         data: ret,
@@ -92,4 +93,4 @@ router.get("/identity/userlist", auth.loginRequired, async (ctx, next) => {
         success: 1,
         data: identitys,
     };
-}
+});

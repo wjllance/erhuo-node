@@ -14,7 +14,7 @@ exports.userList = async (pageNo, pageSize) => {
     let hasMore = total - pageNo * pageSize > 0;
     let identity =[];
     for(var i=0;i<identitys.length;i++){
-        identity[i]= _.pick(identitys[i], ["name", "studentID", "school", "ncard", "nwithcard","status"]);
+        identity[i]= _.pick(identitys[i], ["name", "studentID", "school", "ncard", "nwithcard","status",'userID']);
     }
     return {
         users: identity,

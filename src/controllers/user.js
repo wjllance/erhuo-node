@@ -79,6 +79,20 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
         data: userIndex
     };
 });
+router.post('/user/apdate_auth', auth.loginRequired, async (ctx, next) => {
+
+    console.log("here is update userAuth");
+   let userId = ctx.request.body.userId;
+   let user = await User.findOne({ _id : userId });
+    console.log(userId+"====="+user);
+   let nested=  _.pick(ctx.request.body, ['realname', 'jiguan', 'despartment', 'bron', 'gender', 'school']);
+    user.nested=nested;
+    let user2 = await user.save();
+    ctx.body = {
+        success: 1,
+        data: user2
+    };
+});
 
 
 //更新phone
