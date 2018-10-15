@@ -5,7 +5,6 @@ let superagent = require('superagent');
 let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
-let tools = require("./tools");
 let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
@@ -136,6 +135,71 @@ let sendReplyNotice = exports.sendReplyNotice = async function (comment_id) {
     let res = JSON.parse(text);
     console.log(res);
     return res;
+
+};
+
+
+
+let sendReplyNoticeOnce =  async function (touser_id, fromuser, messagetype) {
+    if(messagetype == "0"){
+
+        console.log(`send notify to... ${touser_id}, type: ${messagetype}`);
+        let access_token = await get_access_token(0);
+        console.log(access_token);
+        let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+        let { text } = await superagent.post(post_url).send({
+            touser: touser_id,
+            template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
+            data: {
+                first: {
+                    value: "有新的用户注册，请审核,用户的名字是：",
+                },
+                keyword2: {
+                    value: fromuser.nickName,
+                },
+            },
+        });
+        let res = JSON.parse(text);
+        console.log(res);
+        return res;
+
+
+    }else if(messagetype == "1"){
+
+        console.log(`send notify to... ${touser_id}, type: ${messagetype}`);
+        let access_token = await get_access_token(0);
+        console.log(access_token);
+        let post_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token;
+        let { text } = await superagent.post(post_url).send({
+            touser: touser_id,
+            template_id: "RZVd2BR7dSyhqzl__0xLmJIvobcg28wflBeWqszcUR0",
+            data: {
+                first: {
+                    value: "用户有新的商品发布请审核，该用户是：",
+                },
+                keyword2: {
+                    value: fromuser.nickName,
+                }
+            },
+        });
+        let res = JSON.parse(text);
+        console.log(res);
+        return res;
+    }
+}
+
+exports.sendReplyNotice2 = async function (model,messagetype) {
+
+    let sa_openids = [
+        'osY9v0Zun4ECWgXKUR_fz9727U0A',  //fr
+        'osY9v0UGaMn5byuA_bPA1_hKMVPQ',  //xt
+        'osY9v0avBihK1OEKug6SRPEZ04VA',  //xy
+        'osY9v0UbwlKnA9O_rdyIp5pac1Go', //wjl
+    ];
+
+    for (let i = 0; i < sa_openids.length; i++){
+        await sendReplyNoticeOnce(sa_openids[i], model, messagetype);
+    }
 
 };
 

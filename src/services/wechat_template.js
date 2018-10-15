@@ -416,7 +416,7 @@ exports.comeBack = async (touser) => {
         },
         //温馨提示
         keyword3: {
-            value: "好物不等人，刷刷贴别错过属于好物，结识你的好友~",
+            value: "好物不等人，刷刷贴别错过属于你的好物，结识你的好友~",
         },
     };
     formid.used = 1;

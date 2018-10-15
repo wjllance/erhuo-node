@@ -9,7 +9,7 @@ let { User } = require('../models');
 let { Visit } = require('../models');
 let { Account } = require('../models');
 let moment = require('moment');
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 
 const ERR_CODE = 1;
 

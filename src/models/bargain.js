@@ -6,7 +6,7 @@ let _ = require('lodash');
 let moment = require('moment');
 moment.locale('zh-cn');
 let config = require('../config');
-let myUtils = require('../myUtils/mUtils');
+let myUtils = require('../tool/mUtils');
 
 // 砍价
 let bargainSchema = new Schema({

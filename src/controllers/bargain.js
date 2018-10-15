@@ -18,7 +18,7 @@ const router = module.exports = new Router();
 
 
 /**
- * @api {get} /bargain/goods/:goods_id  砍价商品详情？
+ * @api {get} /bargain/goods/:goods_id  砍价商品详情
  * @apiName     BargainGoods
  * @apiGroup    Bargain
  *

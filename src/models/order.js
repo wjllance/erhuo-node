@@ -7,7 +7,6 @@ let moment = require('moment');
 moment.locale('zh-cn');
 let config = require('../config');
 // let tools = require('../services/tools')
-// let school_map = require('../config').CONSTANT.SCHOOL_MAP
 
 // 商品
 let orderSchema = new Schema({

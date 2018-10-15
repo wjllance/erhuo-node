@@ -115,7 +115,7 @@ router.get('/v2/order/sell/', auth.loginRequired, async (ctx, next) => {
 });
 
 /**
- * @api {post} /order/  下单
+ * @api {post} /v2/order/  下单
  * @apiName     OrderCreate
  * @apiGroup    Order
  *
@@ -125,21 +125,10 @@ router.get('/v2/order/sell/', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/order/', auth.loginRequired, async(ctx, next) => {
-    let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
-    auth.assert(goods, "商品不存在");
-
-    let order = await srv_order.findOrCreateV2(goods, ctx.state.user);
-    console.log(order);
-    ctx.body = {
-        success: 1,
-        data: order._id
-    };
-});
 
 
 router.post('/v2/order/', auth.loginRequired, async(ctx, next) => {
-    let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
+    let goods = await Goods.findById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
 
     let price = goods.gprice;
@@ -245,7 +234,7 @@ router.get('/v2/order/pay/:orderId', auth.loginRequired, async(ctx, next) => {
  *
  */
 router.post('/order/create_pay', auth.loginRequired, async(ctx, next) => {
-    let goods = await srv_goods.getCardInfoById(ctx.request.body.goodsId);
+    let goods = await Goods.findById(ctx.request.body.goodsId);
     auth.assert(goods, "商品不存在");
     let order = await srv_order.findOrCreateV3(goods, ctx.state.user);
     console.log(order);

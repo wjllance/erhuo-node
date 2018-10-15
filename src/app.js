@@ -8,7 +8,7 @@ let path = require('path');
 let session = require('koa-session');
 let config = require('./config');
 let { log, SERVER, PUBLIC } = require('./config');
-const logUtil = require('./myUtils/logUtil');
+const logUtil = require('./tool/logUtil');
 let app = new Koa();
 const router2controller = require('./router2controller.js');
 let schedule = require('./schedule');
@@ -77,7 +77,13 @@ app.use(require('koa-static')(PUBLIC.root, {
 
 
 logUtil.initLogPath();
-schedule.register();
+
+
+console.log("NODE APP INSTANCE", process.env.NODE_APP_INSTANCE)
+if (process.env.NODE_APP_INSTANCE === '0') {
+    // 定时任务
+    schedule.register();
+}
 
 app.listen(SERVER.PORT, SERVER.ADDRESS);
 

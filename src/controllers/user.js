@@ -13,9 +13,8 @@ let srv_goods = require('../services/goods');
 let srv_comment = require('../services/comment');
 let tagService = require('../services/tag');
 let srv_user = require('../services/user');
-let { Like, Goods, User, Account } = require('../models');
+let { Like, Goods, User, Account, Follow, University } = require('../models');
 // const schools = config.CONSTANT.SCHOOL;
-const school_map = config.CONSTANT.SCHOOL_MAP;
 let moment = require('moment');
 const router = module.exports = new Router();
 
@@ -52,20 +51,29 @@ router.post('/user/update', auth.loginRequired, async (ctx, next) => {
 
     console.log("here is update");
 
-    auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + ctx.state.user.session_key), '签名错误1');
+    let loginUser = ctx.state.user;
+    auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + loginUser.session_key), '签名错误1');
 
-    let pc = new WXBizDataCrypt(config.APP_ID, ctx.state.user.session_key);
+    let pc = new WXBizDataCrypt(config.APP_ID, loginUser.session_key);
     let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
 
     auth.assert(data.openId === ctx.state.user.openid, '签名错误2');
     auth.assert(data.watermark.appid === config.APP_ID, '水印错误');
     console.log(data);
-    _.assign(ctx.state.user, _.pick(ctx.request.body.userInfo, ['nickName', 'unionid', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
-    ctx.state.user.unionid = data.unionId;
-    ctx.state.user.updated_date = moment();
-    let user = await ctx.state.user.save();
+    _.assign(loginUser, _.pick(ctx.request.body.userInfo, ['nickName', 'unionid', 'avatarUrl', 'gender', 'city', 'province', 'country', 'language']));
+    loginUser.unionid = data.unionId;
+    loginUser.updated_date = moment();
 
-    let userIndex = await srv_user.indexInfo(user._id);
+
+    if(loginUser.location && !loginUser.locationName){
+        let univ = await University.findOne({
+            locationNum: loginUser.location
+        });
+        loginUser.locationName = univ.name;
+    }
+    ctx.state.user = await loginUser.save();
+
+    let userIndex = await srv_user.indexInfo(loginUser._id);
     ctx.body = {
         success: 1,
         data: userIndex
@@ -106,11 +114,16 @@ router.post('/user/update_mina', auth.loginRequired, async (ctx, next) => {
 
     let userInfo = ctx.request.body.userInfo;
     if(userInfo.location){
-        let locationIndex = school_map.indexOf(userInfo.location);
-        userInfo.location =  locationIndex > 0 ? locationIndex : 0;
+
+        // let locationIndex = school_map.indexOf(userInfo.location);
+        let university = await University.findOne({
+            name: userInfo.location
+        });
+        userInfo.locationName = userInfo.location;
+        userInfo.location = university ? university.locationNum : 0;
         // userInfo.location = tools.locationTransform(userInfo.location);
     }
-    _.assign(ctx.state.user, _.pick(userInfo, ['nickName', 'avatarUrl', 'gender', 'location']));
+    _.assign(ctx.state.user, _.pick(userInfo, ['nickName', 'avatarUrl', 'gender', 'location', 'locationName']));
     console.log(ctx.state.user);
     let user = await ctx.state.user.save();
 
@@ -136,8 +149,15 @@ router.get('/user/index', auth.loginRequired, async (ctx, next) => {
 //获取用户主页
 router.get('/user/:id/profile', auth.loginRequired, async (ctx, next) => {
     let user = await User.findById(ctx.params.id);
-    profile = user.cardInfo();
+    let baseInfo = user.baseInfo();
+    profile = _.pick(baseInfo, ["_id", "nickName", "avatarUrl", "gender", 'location', 'stu_verified']);
     profile.tags = await tagService.listWithLike(user._id, ctx.state.user);
+    let followed = await Follow.findOne({
+        fromId: ctx.state.user._id,
+        toId: user._id,
+        canceled_date: null
+    });
+    profile.followed = !!followed;
     ctx.body = {
         success: 1,
         data: profile
@@ -158,7 +178,7 @@ router.get('/user/friend/:uid', async (ctx, next) => {
 /**
  * @api {get}   /user/mypublish   我的发布
  * @apiName     MyPublish
- * @apGroup     User
+ * @apiGroup    User
  *
  * @apiParam    {Number}  [isRemoved]   是否下架
  *
@@ -208,7 +228,7 @@ router.get('/v2/user/mypublish', auth.loginRequired, async (ctx, next) => {
 /**
  * @api {get}   /user/:user_id/publish_list   发布列表
  * @apiName     UserPublish
- * @apGroup     User
+ * @apiGroup     User
  *
  *
  */

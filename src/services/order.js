@@ -6,7 +6,7 @@ let config = require('../config');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 let tools = require("./tools");
-let myUtils = require("../myUtils/mUtils");
+let myUtils = require("../tool/mUtils");
 let auth = require('./auth');
 let moment = require('moment');
 moment.locale('zh-cn');
@@ -312,7 +312,8 @@ exports.complete = async (order) => {
     await order.save();
     let goods = await Goods.findById(order.goodsId);
     if(!goods.remark){
-        await goods.myRemove();
+        goods.removed_date = Date.now();
+        await goods.save();
         console.log("removed", goods);
     }
 }

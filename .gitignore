@@ -3,8 +3,8 @@ config.yml
 db
 public
 .idea/
-venv
 doc
+venv
 .DS_Store
 logs
 src/cert

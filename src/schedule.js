@@ -8,12 +8,12 @@ let fs = require('fs');
 let log4js = require('log4js');
 let logger = log4js.getLogger('errorLogger');
 
-const myUtils = require("./myUtils/mUtils");
+const myUtils = require("./tool/mUtils");
 const {Transaction, Order, Goods, User, Like} = require('./models');
 const srv_transaction = require('./services/transaction');
 const srv_order = require('./services/order');
 const srv_wx_template = require("./services/wechat_template");
-const schools = require('./myUtils/school_list');
+const schools = require('./tool/school_list');
 let config = require('./config');
 
 const AV = require('leancloud-storage');
@@ -36,7 +36,7 @@ exports.register = function () {
 
     // scheduleOrderImgUpdate();
 
-    scheduleOldGoodsNotify();
+    // scheduleOldGoodsNotify();
 
     scheduleUpdateCollection();
 
