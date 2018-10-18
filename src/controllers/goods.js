@@ -31,7 +31,7 @@ const GOODS_STATUS = config.CONSTANT.GOODS_STATUS;
  *
  * @apiParam    {Number}    pageNo      当前页码，默认1
  * @apiParam    {Number}    pageSize    每页大小，默认6
- * @apiParam    {String}    category    列表类别 ["美妆","女装","女鞋","配饰","包包","日用","其他"]
+ * @apiParam    {String}    category    列表类别 ["美妆","女装","女鞋","数码","配饰","包包","日用","其他"]
  *
  * @apiSuccess  {Number}    success     1success
  * @apiSuccess  {Object}    data        分页商品列表
@@ -54,6 +54,12 @@ router.get('/v3/goods/index', async (ctx, next) => {
     let sorti = {};
     if (!cate) {
         cate = "推荐";
+    }
+    if (cate === '服装'){
+        cate = '女装'
+    }
+    if (cate.indexOf('鞋') != -1){
+        cate = '女鞋';
     }
 
     console.log(cate);
@@ -207,6 +213,12 @@ router.post('/goods/publish', auth.loginRequired, async (ctx, next) => {
 
     if (!goods.glocation) {
         goods.glocation = ctx.state.user.location || 0;
+    }
+    if(goods.category === '服装'){
+        goods.category = '女装';
+    }
+    if(goods.category.indexOf('鞋') != -1){
+        goods.category = '女鞋';
     }
     await goods.save();
 
