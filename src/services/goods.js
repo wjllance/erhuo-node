@@ -211,6 +211,39 @@ exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti) => {
     };
 };
 
+
+
+exports.admingoodsList = async ( pageNo, pageSize) => {
+
+    let     sorti = { created_date: -1 };
+
+    let total = await Goods.find().count();//表总记录数
+    let outGoodsInfo = [];
+    let goods = await Goods.find()
+        .sort(sorti)
+        .limit(pageSize)
+        .skip((pageNo - 1) * pageSize)
+        .populate("gpics")
+        .populate("userID");
+    for(var i =0;i<goods.length;i++){
+
+        outGoodsInfo[i] =_.pick(goods[i], ['_id','gname', 'category', 'status','gpriority','userID','gprice','glable']);
+        if(outGoodsInfo[i].glabel== null){
+            outGoodsInfo[i].glabel="暂时没有标签";
+        }
+        outGoodsInfo[i].schoolName = outGoodsInfo[i].userID.locationName;
+        outGoodsInfo[i].userID=null;
+    }
+    let hasMore = total - pageNo * pageSize > 0;
+    return {
+        goods: outGoodsInfo,
+        hasMore: hasMore,
+        total: total,
+    };
+};
+
+
+
 exports.goodsFeedList = async (user, pageNo, pageSize, condi, sorti) => {
 
     if (!condi) {
