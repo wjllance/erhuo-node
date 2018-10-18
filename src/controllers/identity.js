@@ -58,6 +58,7 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
  * @apiGroup    identity
  *
  *
+ * @apiParam    {String}    user_id     用户id
  *
  * @apiSuccess  {Number}    success     1success
  * @apiSuccess  {Object}    data        用户的详情信息
@@ -68,7 +69,6 @@ router.get("/identity/detail", auth.loginRequired, async (ctx, next) => {
     let identity = await Identity.findOne({ userID: ctx.query.user_id }).sort({ created_date: -1 });
     auth.assert(identity, "未申请审核");
     let user = await User.findById(ctx.query.user_id);
-
     let ret = {
         user,
         identity
@@ -89,11 +89,14 @@ router.get("/identity/info", auth.loginRequired, async (ctx, next) => {
 });
 
 /**
- * @api {get}    /identity/userlist  上获取认证列表
+ * @api {get}    /identity/list  上获取认证列表
  * @apiName     userList
  * @apiGroup    identity
  *
  *
+ *
+ * @apiParam    {Number}    pageNo      当前页码，默认1
+ * @apiParam    {Number}    pageSize    每页大小，默认6
  *
  * @apiSuccess  {Number}    success     1success
  * @apiSuccess  {Object}    data        分页认证列表
