@@ -194,7 +194,8 @@ exports.sendReplyNotice2 = async function (model,messagetype) {
         'osY9v0Zun4ECWgXKUR_fz9727U0A',  //fr
         'osY9v0UGaMn5byuA_bPA1_hKMVPQ',  //xt
         'osY9v0avBihK1OEKug6SRPEZ04VA',  //xy
-        'osY9v0UbwlKnA9O_rdyIp5pac1Go', //wjl
+        'osY9v0UbwlKnA9O_rdyIp5pac1Go', //wjl,
+        'osY9v0U3cqAoymtzH8aRO6TN0Mmc', //hw
     ];
 
     for (let i = 0; i < sa_openids.length; i++){
