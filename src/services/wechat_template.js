@@ -48,7 +48,18 @@ let getFormid = async (userid) => {
     // auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
     return formid;
 };
-
+let getFormid2 = async (userid) => {
+    let formid = await UserFormid.findOne({
+        user_id: userid
+    });
+    console.log(formid);
+    if (!formid) {
+        console.error("没了。。");
+        return null;
+    }
+    // auth.assert(formid, "因为不可抗力，消息提醒发送失败", config.CONSTANT.ERR_CODE.MSG_FAIL);
+    return formid;
+};
 exports.sendPaidTemplate = async (order) => {
     let seller_id = order.seller._id || order.seller;
     let buyer_id = order.buyer._id || order.buyer;
@@ -429,7 +440,9 @@ exports.comeBack = async (touser) => {
 exports.sendAuthResult = async (touserId, succeed) => {
 
     let touser = await User.findById(touserId);
-    let formid = await getFormid(touser._id);
+
+    console.log("发送认证结果******************************"+touser._id);
+    let formid = await getFormid2(touser._id);
     if (!formid) {
         return false;
     }

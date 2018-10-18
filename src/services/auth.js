@@ -5,7 +5,7 @@ let utils = require('utility');
 let superagent = require('superagent');
 let config = require('../config');
 let { log } = require('../config');
-let { User } = require('../models');
+let { User,Adminuser } = require('../models');
 let { Visit } = require('../models');
 let { Account } = require('../models');
 let moment = require('moment');
@@ -37,6 +37,17 @@ let userM = exports.userM = async function (ctx, next) {
 	if (user_id) {
         ctx.state.user = await User.findById(user_id);
 	}
+
+	// console.log(ctx.session)
+    let adminUserId = ctx.session.adminUserId;
+    // console.log(adminUserId+"=====================================")
+    ctx.state.adminuser = null;
+
+    if (adminUserId) {
+        ctx.state.adminuser = await Adminuser.findById(adminUserId);
+        console.log(ctx.state.adminuser);
+
+    }
 
 	try {
 		await next();
@@ -109,6 +120,31 @@ let loginRequired = exports.loginRequired = async function (ctx, next) {
         await next();
     }
 };
+
+
+/// 需用户登录
+let adminRequired = exports.adminRequired = async function (ctx, next) {
+    if(config.ENV == "local" && !ctx.state.adminuser)
+    {
+        // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
+        // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
+        let user_id = ctx.session.adminUserId ||"5bc5d33724ea0662ed7d8844";  //wjl
+        // let user_id = ctx.session.user_id ||"5ad8b906a2e0c833c24819cd";  //mirror
+        // let user_id = ctx.session.user_id ||"5ac4367c758e552f03111fc8";  //hw
+        ctx.state.adminuser = await Adminuser.findById(user_id);
+        if(!ctx.state.adminuser){
+            console.log(user_id+"not exist")
+        }
+    }
+
+    assert(ctx.state.adminuser, '尚未登录');
+
+
+    if(typeof next === "function"){
+        await next();
+    }
+};
+
 
 
 exports.stuAuthRequired = async function(ctx, next){

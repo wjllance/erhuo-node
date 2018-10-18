@@ -25,6 +25,10 @@ exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
 exports.ENV = config['ENV'];
 
+
+exports.ADMIN_APP_ID = config['ADMIN_APP_ID'];
+exports.ADMIN_APP_SECRET = config['ADMIN_APP_SECRET'];
+
 exports.MCH_ID = ""+config['MCH_ID'];
 exports.API_KEY = config['API_KEY'];
 exports.CERT_PATH = path.join(ROOTPATH, config['CERT_PATH']);

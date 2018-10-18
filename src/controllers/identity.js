@@ -1,3 +1,4 @@
+
 require("should");
 let Router = require("koa-router");
 
@@ -7,7 +8,8 @@ let path = require("path");
 let body = require("koa-convert")(require("koa-better-body")());
 let config = require("../config");
 let auth = require("../services/auth");
-let wechatService = require('../services/wechat');
+let identityService = require('../services/identity');
+
 
 let { User, Image, Identity } = require("../models");
 
@@ -16,8 +18,8 @@ const router = module.exports = new Router();
 
 /**
  * @api {post}    /identity/save  上传认证资料
- * @apiName     注册
- * @apiGroup    identity
+ * @apiName     GoodsList
+ * @apiGroup    Goods
  *
  *
  * @apiParam    {String}    ncard            学生证图片id
@@ -43,22 +45,52 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
 
     _.assign(identity, _.pick(ctx.request.body, ["name", "studentID", "school", "ncard", "nwithcard"]));
     await identity.save();
-
-    //加入 提醒通知
-    let user =await User.findOne({_id : ctx.state.user._id});
-    console.log(user._id)
-    let  res = await wechatService.sendReplyNotice2(user,"0");
     ctx.body = {
         success: 1,
         data: identity._id,
     };
 });
+/**
+ * @api {get}    /identity/userInfoDetail  获取单个用户的认证详情
+ * @apiName     userList
+ * @apiGroup    identity
+ *
+ *
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        用户的详情信息
+ *
+ */
+router.get("/identity/userInfoDetail", auth.loginRequired, async (ctx, next) => {
 
-router.get("/identity/info", auth.loginRequired, async (ctx, next) => {
-    let identity = await Identity.findOne({ userID: ctx.state.user._id }).sort({ created_date: -1 });
-    let ret = identity || null;
+    let user = await User.findOne({ _id: ctx.query.user_id });
+    let ret = user || null;
     ctx.body = {
         success: 1,
         data: ret,
+    };
+});
+/**
+ * @api {get}    /identity/userlist  上获取认证列表
+ * @apiName     userList
+ * @apiGroup    identity
+ *
+ *
+ *
+ * @apiSuccess  {Number}    success     1success
+ * @apiSuccess  {Object}    data        分页认证列表
+ *
+ */
+router.get("/identity/userlist", auth.loginRequired, async (ctx, next) => {
+
+
+    let pageNo = ctx.query.pageNo || 1;
+    let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
+
+    let identitys = await identityService.userList(pageNo, pageSize);
+    console.log(identitys);
+    ctx.body = {
+        success: 1,
+        data: identitys,
     };
 });
