@@ -1,6 +1,8 @@
 let _ = require("lodash");
 let Identity = require('../models/identity');
 let User = require('../models/user');
+let moment = require('moment');
+
 exports.userList = async (pageNo, pageSize) => {
 
     let sorti = {
@@ -8,23 +10,23 @@ exports.userList = async (pageNo, pageSize) => {
     };
     let total = await Identity.find().count();//表总记录数
 
-    let identitys= await Identity.find()
+    let identitys = await Identity.find()
         .sort(sorti)
         .limit(pageSize)
         .skip((pageNo - 1) * pageSize)
+        .populate('userID');
     let hasMore = total - pageNo * pageSize > 0;
-    let identity =[];
-    for(var i=0;i<identitys.length;i++){
-        identity[i]= _.pick(identitys[i], ["name", "studentID", "school", "ncard", "nwithcard","status",'userID']);
-        console.log(identitys[i]);
-        console.log("+++++++++++++++++++++++++++++")
-        let userId = identitys[i].userID;
-        let user = await User.findOne({_id : userId});
-        identity[i].avatarUrl = user.avatarUrl;
-        identity[i].nickName = user.nickName;
-    }
+
+    let items = _.map(identitys, item => {
+        // let ret = _.pick(item, ["name", "studentID", "school", "ncard", "nwithcard", "status"]);
+        let ret = _.pick(item, ["_id","name", "studentID", "school", "status"]);
+        ret.created_date = moment(item.created_date).format('lll');
+        ret.user = item.userID.cardInfo();
+        return ret;
+    });
+
     return {
-        users: identity,
+        users: items,
         hasMore: hasMore,
         total: total,
     };

@@ -55,7 +55,15 @@ let userSchema = new mongoose.Schema({
         stu_verified: Date,
         realname: String,
         school: String,
-        nested: {},
+        nested: {
+            gender: String,
+            birthday: String,
+            realname:String,
+            school: String,
+            department:String,
+            number:String,
+            origin:String
+        },
 
         active_date: { type: Date, default: moment().subtract(1, 'days') },
     }

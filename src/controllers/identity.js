@@ -1,15 +1,12 @@
-
 require("should");
 let Router = require("koa-router");
 
 let _ = require("lodash");
-let mzfs = require("mz/fs");
-let path = require("path");
 let body = require("koa-convert")(require("koa-better-body")());
 let config = require("../config");
 let auth = require("../services/auth");
 let identityService = require('../services/identity');
-
+let wechatService = require('../services/wechat');
 
 let { User, Image, Identity } = require("../models");
 
@@ -18,8 +15,8 @@ const router = module.exports = new Router();
 
 /**
  * @api {post}    /identity/save  上传认证资料
- * @apiName     GoodsList
- * @apiGroup    Goods
+ * @apiName     upload
+ * @apiGroup    identity
  *
  *
  * @apiParam    {String}    ncard            学生证图片id
@@ -45,14 +42,19 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
 
     _.assign(identity, _.pick(ctx.request.body, ["name", "studentID", "school", "ncard", "nwithcard"]));
     await identity.save();
+
+    //加入 提醒通知
+    let user = await User.findOne({ _id: ctx.state.user._id });
+    console.log(user._id);
+    let res = await wechatService.sendReplyNotice2(user, "0");
     ctx.body = {
         success: 1,
         data: identity._id,
     };
 });
 /**
- * @api {get}    /identity/userInfoDetail  获取单个用户的认证详情
- * @apiName     userList
+ * @api {get}    /identity/detail  获取单个用户的认证详情
+ * @apiName     detail
  * @apiGroup    identity
  *
  *
@@ -61,10 +63,16 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        用户的详情信息
  *
  */
-router.get("/identity/userInfoDetail", auth.loginRequired, async (ctx, next) => {
+router.get("/identity/detail", auth.loginRequired, async (ctx, next) => {
 
-    let user = await User.findOne({ _id: ctx.query.user_id });
-    let ret = user || null;
+    let identity = await Identity.findOne({ userID: ctx.query.user_id }).sort({ created_date: -1 });
+    auth.assert(identity, "未申请审核");
+    let user = await User.findById(ctx.query.user_id);
+
+    let ret = {
+        user,
+        identity
+    };
     ctx.body = {
         success: 1,
         data: ret,
@@ -91,8 +99,7 @@ router.get("/identity/info", auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        分页认证列表
  *
  */
-router.get("/identity/userlist", auth.loginRequired, async (ctx, next) => {
-
+router.get("/identity/list", auth.loginRequired, async (ctx, next) => {
 
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6

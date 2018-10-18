@@ -223,14 +223,10 @@ exports.admingoodsList = async ( pageNo, pageSize) => {
         .sort(sorti)
         .limit(pageSize)
         .skip((pageNo - 1) * pageSize)
-        .populate("gpics")
         .populate("userID");
     for(var i =0;i<goods.length;i++){
 
-        outGoodsInfo[i] =_.pick(goods[i], ['_id','gname', 'category', 'status','gpriority','userID','gprice','glable']);
-        if(outGoodsInfo[i].glabel== null){
-            outGoodsInfo[i].glabel="暂时没有标签";
-        }
+        outGoodsInfo[i] =_.pick(goods[i], ['_id','gname', 'category', 'status','gpriority','userID','gprice']);
         outGoodsInfo[i].schoolName = outGoodsInfo[i].userID.locationName;
         outGoodsInfo[i].userID=null;
     }

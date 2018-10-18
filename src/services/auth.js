@@ -101,7 +101,6 @@ let loginRequired = exports.loginRequired = async function (ctx, next) {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
         // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
         let user_id = ctx.session.user_id ||"5ad31bfba2e0c833c23d9d56";  //wjl
-
         // let user_id = ctx.session.user_id ||"5ad8b906a2e0c833c24819cd";  //mirror
         // let user_id = ctx.session.user_id ||"5ac4367c758e552f03111fc8";  //hw
         ctx.state.user = await User.findById(user_id);
@@ -125,11 +124,12 @@ let loginRequired = exports.loginRequired = async function (ctx, next) {
 
 /// 需用户登录
 let adminRequired = exports.adminRequired = async function (ctx, next) {
+    console.log(config.ENV)
     if(config.ENV == "local" && !ctx.state.adminuser)
     {
         // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
         // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
-        let user_id = ctx.session.adminUserId ||"5bc5d33724ea0662ed7d8844";  //wjl
+        let user_id = ctx.session.adminUserId || "5bc888b9bb51781020b2ad52";  //wjl
         // let user_id = ctx.session.user_id ||"5ad8b906a2e0c833c24819cd";  //mirror
         // let user_id = ctx.session.user_id ||"5ac4367c758e552f03111fc8";  //hw
         ctx.state.adminuser = await Adminuser.findById(user_id);
@@ -137,9 +137,7 @@ let adminRequired = exports.adminRequired = async function (ctx, next) {
             console.log(user_id+"not exist")
         }
     }
-
     assert(ctx.state.adminuser, '尚未登录');
-
 
     if(typeof next === "function"){
         await next();
