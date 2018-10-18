@@ -85,7 +85,7 @@ router.post('/user/apdate_auth', auth.loginRequired, async (ctx, next) => {
    let userId = ctx.request.body.userId;
    let user = await User.findOne({ _id : userId });
     console.log(userId+"====="+user);
-   let nested=  _.pick(ctx.request.body, ['realname', 'jiguan', 'despartment', 'bron', 'gender', 'school']);
+   let nested=  _.pick(ctx.request.body, ['realname', 'jiguan', 'department', 'bron', 'gender', 'school']);
     user.nested=nested;
     let user2 = await user.save();
     ctx.body = {

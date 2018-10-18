@@ -46,6 +46,7 @@ let TodayBonus = exports.TodayBonusSchema = require('./today_bonus');
 
 let Version = exports.Version = require('./version');
 
+let Adminuser = exports.Adminuser=require('./admin_user')
 
 let Tag = exports.Tag = require('./tag');
 
