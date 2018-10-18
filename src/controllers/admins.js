@@ -91,21 +91,23 @@ router.post('/admin/update', auth.adminRequired, async (ctx, next) => {
     console.log("here is update");
 
     let loginUser = ctx.state.adminuser;
+
+    if(!loginUser.nickName){
+        auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + loginUser.session_key), '签名错误1');
+
+        let pc = new WXBizDataCrypt(config.ADMIN_APP_ID, loginUser.session_key);
+        let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
+
+        auth.assert(data.openId === ctx.state.adminuser.openid, '签名错误2');
+        auth.assert(data.watermark.appid === config.ADMIN_APP_ID, '水印错误');
+        console.log(data);
+        _.assign(loginUser, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl',]));
+        loginUser.unionid = data.unionId;
+
+        ctx.state.adminuser = await loginUser.save();
+    }
     // console.log(ctx.request.body.signature+"============="+utils.sha1(ctx.request.body.rawData + loginUser.session_key))
     //
-    // auth.assert(ctx.request.body.signature === utils.sha1(ctx.request.body.rawData + loginUser.session_key), '签名错误1');
-
-    let pc = new WXBizDataCrypt(config.ADMIN_APP_ID, loginUser.session_key);
-    let data = pc.decryptData(ctx.request.body.encryptedData, ctx.request.body.iv);
-
-    auth.assert(data.openId === ctx.state.adminuser.openid, '签名错误2');
-    auth.assert(data.watermark.appid === config.ADMIN_APP_ID, '水印错误');
-    console.log(data);
-    _.assign(loginUser, _.pick(ctx.request.body.userInfo, ['nickName', 'avatarUrl',]));
-    loginUser.unionid = data.unionId;
-
-    ctx.state.adminuser = await loginUser.save();
-
     ctx.body = {
         success: 1,
         data: loginUser
