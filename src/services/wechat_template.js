@@ -437,11 +437,11 @@ exports.comeBack = async (touser) => {
 };
 
 
-exports.sendAuthResult = async (touserId, succeed) => {
+exports.sendAuthResult = async (touserId, succeed,content) => {
 
     let touser = await User.findById(touserId);
 
-    console.log("发送认证结果******************************"+touser._id);
+    console.log(content+"发送认证结果******************************"+touser._id);
     let formid = await getFormid2(touser._id);
     if (!formid) {
         return false;
@@ -463,7 +463,7 @@ exports.sendAuthResult = async (touserId, succeed) => {
         },
         //备注
         keyword4: {
-            value: succeed ? "恭喜通过学生认证，快去二货兔校园买买买吧" : "请检查上传的资料是否清晰，学生证和身份证最好都可展示姓名头像，提高认证通过率",
+            value: succeed ? "恭喜通过学生认证，快去二货兔校园买买买吧" : (content||"请检查上传照片是否清晰，确保照片上包含主要信息，以提高审核通过率"),
         },
     };
     formid.used = 1;

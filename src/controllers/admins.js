@@ -72,10 +72,10 @@ router.post('/admin/register', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.post('/admin/login', async (ctx, next) => {
-    let user = await adminService.login(ctx, ctx.request.body.code);
+    let msg = await adminService.login(ctx, ctx.request.body.code,ctx.request.body.account);
     ctx.body = {
         success: 1,
-        data: {user_id: user._id}
+        data: msg
     };
 });
 
@@ -125,6 +125,7 @@ router.post('/admin/apdate_status', auth.loginRequired, async (ctx, next) => {
 
     let authId = ctx.request.body.authId;
     let userId = ctx.request.body.userId;
+    let content = ctx.request.body.content;
     auth.assert(authId && userId,"缺少参数");
     let adminUser = ctx.state.adminuser;
     console.log(authId+"更改标识");
@@ -135,14 +136,14 @@ router.post('/admin/apdate_status', auth.loginRequired, async (ctx, next) => {
         identity.status = 1;
         await identity.save();
         console.log("更改成功"+identity.userID);
-        res = await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 1);
+        res = await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 1,null);
     }
     if(authId==="0"){
         identity =  await Identity.findOne({userID : userId});
         identity.status = 0;
         await identity.save();
         console.log("更改不通过成功"+identity.userID);
-         res = await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 0);
+         res = await srv_wxtemplate.sendAuthResult(identity.userID, identity.status === 0,content);
     }
     console.log(res,"+++++++++++++++++++++++++++++")
     ctx.body = {

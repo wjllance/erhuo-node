@@ -1,0 +1,54 @@
+SERVER:
+  ADDRESS: 127.0.0.1
+  PORT: 8087
+  URL_PREFIX: http://localhost:8087 # 地址前缀，不以/结尾
+  SECRET_KEYS: 'hereisakey' # 加密session用的key
+  MAXAGE: 0 # 静态资源缓存时间,单位ms,推荐在正式服务器上启用
+
+MONGODB: # mongodb配置
+  HOSTNAME: 39.106.112.28:27017
+  DATABASE: c2c
+  USERNAME: erhuo
+  PASSWORD: fighting
+
+ENV: local
+
+#   OL
+#APP_ID:     wxeb3470bf6817d8b1
+#APP_SECRET: fb90ff46df72a1c84f432fd2bcc941d3
+
+SA_APP_ID : wxbe500a2cde70261c
+SA_SECRET : 0b9b5299cb18bee3ad62ab5fa5ecc4d9
+SA_TOKEN  : mengmengdaerhuotu
+
+#   qunershou
+#APP_ID: wxa46d3ba142961d8e
+#APP_SECRET: b4080c67268c6d4bc3ee08a77edbd4ce
+
+# erhuotu
+APP_ID: wxeedf8d0cba505192
+APP_SECRET: 599fb18cb0bb8c712353031a37d8e58c
+
+#admin
+ADMIN_APP_ID: wxcd96b9c7257e17b1
+ADMIN_APP_SECRET : 4440ac1daea1d14b63562fedbad76f71
+
+PUBLIC: public # 目录，储存各种用户上传的文件
+
+MCH_ID: 1503665251
+API_KEY: a14YslRRoqUWKlb49gMg441dIZuwjiZU
+
+#MCH_ID: 1491171192
+#API_KEY: OinKiHAr51RyvfCdjSECVCQ91OIC1SJM
+
+CERT_PATH: src/cert/
+
+
+LEAN_APPID: eg38EuFh9M4qUtoTOnyI837y-gzGzoHsz
+LEAN_APPKEY: ogtKFgmDozLVnlECxTwiIElq
+LEAN_MASTERKEY: LxCfATcE559Qjv3IuWjijjIA
+
+
+#IMSDK_APPID: 1400090061
+#IMKEY_DIR: src/imkeys/
+#IMACCOUNT_TYPE: 26231
