@@ -13,17 +13,19 @@ let log = exports.log = new Log('info');
 let SERVER = exports.SERVER = _.pick(config['SERVER'], ['ADDRESS', 'PORT', 'URL_PREFIX', 'SECRET_KEYS', 'MAXAGE']);
 
 // 数据库相关
-if ('MONGO_HOST' in process.env) { // for docker
-	exports.MONGODB_URL = `mongodb://${process.env['MONGO_HOST']}/${config['MONGODB']['DATABASE']}`;
-} else {
-    exports.MONGODB_URL = `mongodb://${config['MONGODB']['USERNAME']}:${config['MONGODB']['PASSWORD']}@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
-    //exports.MONGODB_URL = `mongodb://@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
-}
+
 let ROOTPATH = exports.ROOT_PATH = path.join(__dirname, '../');
 
 exports.APP_ID = config['APP_ID'];
 exports.APP_SECRET = config['APP_SECRET'];
 exports.ENV = config['ENV'];
+
+if ('MONGO_HOST' in process.env || process.env === 'prod' ) { // for docker
+    exports.MONGODB_URL = `mongodb://${process.env['MONGO_HOST']}/${config['MONGODB']['DATABASE']}`;
+} else {
+    exports.MONGODB_URL = `mongodb://${config['MONGODB']['USERNAME']}:${config['MONGODB']['PASSWORD']}@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
+    //exports.MONGODB_URL = `mongodb://@${config['MONGODB']['HOSTNAME']}/${config['MONGODB']['DATABASE']}`;
+}
 
 exports.MCH_ID = ""+config['MCH_ID'];
 exports.API_KEY = config['API_KEY'];
