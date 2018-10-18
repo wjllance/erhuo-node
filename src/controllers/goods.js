@@ -89,7 +89,7 @@ router.get('/v3/goods/index', async (ctx, next) => {
         };
         console.log(condi, sorti);
     }
-    else if (srv_goods.CATES.indexOf(cate) !== -1) {
+    else if (config.CONSTANT.GOODS_CATE.indexOf(cate) !== -1) {
         condi.category = cate;
         sorti = {
             // gpriority:-1,

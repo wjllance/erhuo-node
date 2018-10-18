@@ -1,4 +1,3 @@
-
 let mongoose = require('mongoose');
 let config = require('../config');
 
@@ -28,7 +27,7 @@ let UserFormid = exports.UserFormid = require('./user_formid');
 
 let Identity = exports.Identity = require('./identity');
 
-let University= exports.University = require('./university');
+let University = exports.University = require('./university');
 
 let Zhaopin = exports.Zhaopin = require('./zhaopin');
 
@@ -46,7 +45,7 @@ let TodayBonus = exports.TodayBonusSchema = require('./today_bonus');
 
 let Version = exports.Version = require('./version');
 
-let Adminuser = exports.Adminuser=require('./admin_user')
+let Adminuser = exports.Adminuser = require('./admin_user');
 
 let Tag = exports.Tag = require('./tag');
 
@@ -54,10 +53,9 @@ let TagLike = exports.TagLike = require('./tag_like');
 
 let UserTag = exports.UserTag = require('./user_tag');
 
-mongoose.connect(config.MONGODB_URL, {
-}, function (err) {
-	if (err) {
-		config.log.error('connect to %s error: ', config.MONGODB_URL, err.message);
-		process.exit(1);
-	}
+mongoose.connect(config.MONGODB_URL, {}, function (err) {
+    if (err) {
+        config.log.error('connect to %s error: ', config.MONGODB_URL, err.message);
+        process.exit(1);
+    }
 });
