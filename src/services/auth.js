@@ -38,9 +38,7 @@ let userM = exports.userM = async function (ctx, next) {
         ctx.state.user = await User.findById(user_id);
 	}
 
-	// console.log(ctx.session)
     let adminUserId = ctx.session.adminUserId;
-    // console.log(adminUserId+"=====================================")
     ctx.state.adminuser = null;
 
     if (adminUserId) {
@@ -127,11 +125,7 @@ let adminRequired = exports.adminRequired = async function (ctx, next) {
     console.log(config.ENV)
     if(config.ENV == "local" && !ctx.state.adminuser)
     {
-        // let user_id = ctx.session.user_id ||"5ac5ebc9a2e0c833c2326511";  //admin
-        // let user_id = ctx.session.user_id ||"5ac61945a2e0c833c2328117";  //zj
         let user_id = ctx.session.adminUserId || "5bc888b9bb51781020b2ad52";  //wjl
-        // let user_id = ctx.session.user_id ||"5ad8b906a2e0c833c24819cd";  //mirror
-        // let user_id = ctx.session.user_id ||"5ac4367c758e552f03111fc8";  //hw
         ctx.state.adminuser = await Adminuser.findById(user_id);
         if(!ctx.state.adminuser){
             console.log(user_id+"not exist")

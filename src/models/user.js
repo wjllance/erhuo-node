@@ -58,11 +58,11 @@ let userSchema = new mongoose.Schema({
         nested: {
             gender: String,
             birthday: String,
-            realname:String,
+            realname: String,
             school: String,
-            department:String,
-            number:String,
-            origin:String
+            department: String,
+            number: String,
+            origin: String,
         },
 
         active_date: { type: Date, default: moment().subtract(1, 'days') },
@@ -75,7 +75,7 @@ let userSchema = new mongoose.Schema({
 userSchema.methods.baseInfo = function () {
     let output = _.pick(this, ["_id", "nickName", "avatarUrl", "gender", 'phoneNumber']);
 
-    output.location = this.locationName ||school_map[this.location];
+    output.location = this.locationName || school_map[this.location];
 
     output.stu_verified = this.stu_verified ? "已认证" : "未认证";
     if (this.stu_verified) {

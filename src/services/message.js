@@ -16,7 +16,6 @@ let TEMPLATE_MESSAGE_ID = "bMvVQ3VWf_3-qC9lTmwaWVcGdYK2Qi7eWLoq4ssapkI";
 
 
 exports.sendTemplate = async (touser_id, content, fromuser) => {
-    console.log(touser_id);
     let touser = await User.findById(touser_id);
     let formid = await UserFormid.findOne({
         user_id: touser_id,
