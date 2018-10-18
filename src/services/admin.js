@@ -33,10 +33,10 @@ exports.login = async (ctx, code, account) => {
     if (!admin.openid) {
         _.assign(admin, data);
         await admin.save();
-    } else if (admin.openid !== data.openid) {
+    } else if (admin.openid != data.openid) {
         auth.assert(false, "登陆失败")
     }
     ctx.session.adminUserId = admin._id;
-    return msg;
+    return "登陆成功";
 
 }
