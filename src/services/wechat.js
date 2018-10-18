@@ -215,7 +215,7 @@ let sendMinaTempMsg = exports.sendMinaTempMsg = async (touser, template_id, form
         form_id: form_id,
     });
     let res = JSON.parse(text);
-    console.log(res,"..............................................");
+    console.log(res);
     return res;
 };
 
