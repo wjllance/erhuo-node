@@ -70,6 +70,16 @@ router.get("/identity/userInfoDetail", auth.loginRequired, async (ctx, next) => 
         data: ret,
     };
 });
+
+router.get("/identity/info", auth.loginRequired, async (ctx, next) => {
+    let identity = await Identity.findOne({ userID: ctx.state.user._id }).sort({ created_date: -1 });
+    let ret = identity || null;
+    ctx.body = {
+        success: 1,
+        data: ret,
+    };
+});
+
 /**
  * @api {get}    /identity/userlist  上获取认证列表
  * @apiName     userList
