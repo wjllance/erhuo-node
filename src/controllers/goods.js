@@ -89,7 +89,7 @@ router.get('/v3/goods/index', async (ctx, next) => {
         };
         console.log(condi, sorti);
     }
-    else if (srv_goods.CATES.indexOf(cate) !== -1) {
+    else if (config.CONSTANT.GOODS_CATE.indexOf(cate) !== -1) {
         condi.category = cate;
         sorti = {
             // gpriority:-1,
@@ -275,6 +275,12 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
         if (ctx.state.user.locationName) {
             goods.locationName = ctx.state.user.locationName;
         }
+    }
+    if(goods.category === '服装'){
+        goods.category = '女装';
+    }
+    if(goods.category.indexOf('鞋') != -1){
+        goods.category = '女鞋';
     }
 
     // if(goods.category === "书籍"){

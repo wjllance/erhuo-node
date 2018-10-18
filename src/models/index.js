@@ -28,7 +28,7 @@ let UserFormid = exports.UserFormid = require('./user_formid');
 
 let Identity = exports.Identity = require('./identity');
 
-let University= exports.University = require('./university');
+let University = exports.University = require('./university');
 
 let Zhaopin = exports.Zhaopin = require('./zhaopin');
 
@@ -53,10 +53,9 @@ let TagLike = exports.TagLike = require('./tag_like');
 
 let UserTag = exports.UserTag = require('./user_tag');
 
-mongoose.connect(config.MONGODB_URL, {
-}, function (err) {
-	if (err) {
-		config.log.error('connect to %s error: ', config.MONGODB_URL, err.message);
-		process.exit(1);
-	}
+mongoose.connect(config.MONGODB_URL, {}, function (err) {
+    if (err) {
+        config.log.error('connect to %s error: ', config.MONGODB_URL, err.message);
+        process.exit(1);
+    }
 });
