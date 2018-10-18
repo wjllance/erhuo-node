@@ -276,6 +276,12 @@ router.post('/v2/goods/publish', auth.stuAuthRequired, async (ctx, next) => {
             goods.locationName = ctx.state.user.locationName;
         }
     }
+    if(goods.category === '服装'){
+        goods.category = '女装';
+    }
+    if(goods.category.indexOf('鞋') != -1){
+        goods.category = '女鞋';
+    }
 
     // if(goods.category === "书籍"){
     //     goods.status = config.CONSTANT.GOODS_STATUS.RELEASED;
