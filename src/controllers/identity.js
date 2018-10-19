@@ -109,7 +109,7 @@ router.get("/identity/list", auth.adminRequired, async (ctx, next) => {
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
 
     let identitys = await identityService.userList(pageNo, pageSize);
-    console.log(identitys);
+    // console.log(identitys);
     ctx.body = {
         success: 1,
         data: identitys,

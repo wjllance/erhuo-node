@@ -167,12 +167,11 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
         user.stu_verified = Date.now();
     } else {
         if(user.stu_verified){
-            await srv_wxtemplate.sendAuthResult(userId, status, content);
+            res = await srv_wxtemplate.sendAuthResult(userId, status, content);
         }
         user.stu_verified = null;
     }
     await user.save();
-
 
     console.log("notify result+++++++++++++++++++++++++++++", res);
     ctx.body = {
