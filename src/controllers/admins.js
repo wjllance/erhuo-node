@@ -158,16 +158,21 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
     await identity.save();
 
     if (status === 1) { //通过
+        if(!user.stu_verified){
+            await srv_wxtemplate.sendAuthResult(userId, status, content);
+        }
         user.nested = nested;
         user.realname = nested.realname;
         user.school = nested.school;
         user.stu_verified = Date.now();
     } else {
+        if(user.stu_verified){
+            await srv_wxtemplate.sendAuthResult(userId, status, content);
+        }
         user.stu_verified = null;
     }
     await user.save();
 
-    let res = await srv_wxtemplate.sendAuthResult(userId, status, content);
 
     console.log(res, "+++++++++++++++++++++++++++++");
     ctx.body = {
