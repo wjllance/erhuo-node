@@ -42,7 +42,8 @@ router.get('/admin/reject_goods', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data    所创建的管理员的基本信息
  *
  */
-router.post('/admin/register', auth.loginRequired, async (ctx, next) => {
+router.post('/admin/register', async (ctx, next) => {
+    // router.post('/admin/register', auth.loginRequired, async (ctx, next) => {
 
     let code = ctx.request.body.code;
     auth.assert(code, "code值不能为空");
