@@ -6,7 +6,7 @@ let moment = require('moment');
 exports.userList = async (pageNo, pageSize) => {
 
     let sorti = {
-        created_date: -1,
+        updated_date: -1,
     };
     let total = await Identity.find().count();//表总记录数
 

@@ -41,6 +41,7 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
     }
 
     _.assign(identity, _.pick(ctx.request.body, ["name", "studentID", "school", "ncard", "nwithcard"]));
+    identity.updated_date = Date.now();
     await identity.save();
 
     //加入 提醒通知
