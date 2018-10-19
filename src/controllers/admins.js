@@ -156,10 +156,10 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
 
     identity.status = status;
     await identity.save();
-
+    let res;
     if (status === 1) { //通过
         if(!user.stu_verified){
-            await srv_wxtemplate.sendAuthResult(userId, status, content);
+            res = await srv_wxtemplate.sendAuthResult(userId, status, content);
         }
         user.nested = nested;
         user.realname = nested.realname;
@@ -174,7 +174,7 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
     await user.save();
 
 
-    console.log(res, "+++++++++++++++++++++++++++++");
+    console.log("notify result+++++++++++++++++++++++++++++", res);
     ctx.body = {
         success: 1,
         data: user,
