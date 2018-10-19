@@ -141,9 +141,9 @@ router.post('/admin/update', auth.adminRequired, async (ctx, next) => {
 
 router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
 
-    console.log("here is update userAuth");
+    console.log("here is update userAuth", ctx.request.body);
 
-    let status = ctx.request.body.status;
+    let status = parseInt(ctx.request.body.status);
     let userId = ctx.request.body.userId;
     let content = ctx.request.body.content;
 
