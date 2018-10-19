@@ -18,8 +18,8 @@ exports.userList = async (pageNo, pageSize) => {
     let hasMore = total - pageNo * pageSize > 0;
 
     let items = _.map(identitys, item => {
-        // let ret = _.pick(item, ["name", "studentID", "school", "ncard", "nwithcard", "status"]);
-        let ret = _.pick(item, ["_id","name", "studentID", "school", "status"]);
+        let ret = _.pick(item, ["name", "studentID", "school", "ncard", "nwithcard", "status"]);
+        // let ret = _.pick(item, ["_id","name", "studentID", "school", "status"]);
         ret.created_date = moment(item.created_date).format('lll');
         ret.user = item.userID.cardInfo();
         return ret;
