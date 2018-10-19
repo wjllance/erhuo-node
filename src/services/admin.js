@@ -29,7 +29,7 @@ exports.login = async (ctx, code, account) => {
     console.log(data);
     console.log(account + "================");
     let admin = await Adminuser.findOne({ admin_id: account });
-    // auth.assert(admin, "请输入正确的管理员账号");
+    auth.assert(admin, "请输入正确的管理员账号");
     if (!admin.openid || admin.openid === data.openid) {
         _.assign(admin, data);
         await admin.save();
