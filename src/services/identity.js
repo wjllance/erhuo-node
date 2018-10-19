@@ -25,12 +25,10 @@ exports.userList = async (pageNo, pageSize) => {
         if (item.status === 1) {
             ret.state = '已通过';
         } else if (item.status === 2) {
-
             ret.state = '已拒绝';
         } else {
             ret.state = '待审核';
         }
-        ret.state = item.status;
         return ret;
     });
 
