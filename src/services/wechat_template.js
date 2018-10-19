@@ -444,7 +444,7 @@ exports.sendAuthResult = async (touserId, succeed,content) => {
         },
         //认证结果
         keyword2: {
-            value: succeed === 1 ? "认证成功" : "认证失败",
+            value: parseInt(succeed) === 1 ? "认证成功" : "认证失败",
         },
         //认证时间
         keyword3: {
@@ -452,7 +452,7 @@ exports.sendAuthResult = async (touserId, succeed,content) => {
         },
         //备注
         keyword4: {
-            value: succeed === 1 ? "恭喜通过学生认证，快去二货兔校园买买买吧" : (content||"请检查上传照片是否清晰，确保照片上包含主要信息，以提高审核通过率"),
+            value: parseInt(succeed) === 1 ? "恭喜通过学生认证，快去二货兔校园买买买吧" : (content||"请检查上传照片是否清晰，确保照片上包含主要信息，以提高审核通过率"),
         },
     };
     formid.used = 1;
