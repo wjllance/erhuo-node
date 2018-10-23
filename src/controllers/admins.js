@@ -42,6 +42,8 @@ router.get('/admin/reject_goods', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data    所创建的管理员的基本信息
  *
  */
+
+//暂时去掉登陆权限的认证
 router.post('/admin/register', auth.loginRequired, async (ctx, next) => {
 
     let code = ctx.request.body.code;

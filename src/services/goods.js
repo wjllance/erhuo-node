@@ -223,10 +223,12 @@ exports.admingoodsList = async ( pageNo, pageSize) => {
         .sort(sorti)
         .limit(pageSize)
         .skip((pageNo - 1) * pageSize)
+        .populate("gpics")
         .populate("userID");
+    console.log(goods);
     for(var i =0;i<goods.length;i++){
 
-        outGoodsInfo[i] =_.pick(goods[i], ['_id','gname', 'category', 'status','gpriority','userID','gprice']);
+        outGoodsInfo[i] =_.pick(goods[i], ['_id','gname', 'category', 'status','gpriority','userID','gprice','gpics','npics']);
         outGoodsInfo[i].schoolName = outGoodsInfo[i].userID.locationName;
         outGoodsInfo[i].userID=null;
     }
