@@ -72,20 +72,11 @@ router.get('/v3/goods/index', async (ctx, next) => {
         };
         condi.category = { $ne: "求购" };
     }
-    else if (cate === "今日") {
-        let ddl = moment({ hour: 20 }).subtract(1, 'd');
-        if (moment().isBefore(moment({ hour: 20 }))) {
-            ddl = ddl.subtract(1, 'd');
-        }
-        condi.created_date = {
-            // $gt: moment().subtract(1, 'd')
-            $gt: ddl,
-        };
+    else if (cate === "今日" || cate === "最新") {
+
         sorti = {
-            gpriority: -1,
-            // removed_date:1,
             glocation: -1,
-            updated_date: -1,
+            created_date:-1,
         };
         console.log(condi, sorti);
     }

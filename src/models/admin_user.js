@@ -22,4 +22,4 @@ let adminSchema = new Schema({
 });
 
 
-let Adminuser = module.exports = mongoose.model("Adminuser", adminSchema);
+let Adminuser = module.exports = mongoose.model("mpAdminUser", adminSchema);

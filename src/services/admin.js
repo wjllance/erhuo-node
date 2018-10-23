@@ -13,30 +13,30 @@ exports.registAdmin = async function (realname, managelLocation, adminId) {
         realname: realname,
         manage_location: managelLocation,
         admin_id: adminId,
-        level: level
+        level: level,
     });
     return adminUser;
 };
 //管理员登陆
 exports.login = async (ctx, code, account) => {
-    let {text} = await superagent.get('https://api.weixin.qq.com/sns/jscode2session').query({
+    let { text } = await superagent.get('https://api.weixin.qq.com/sns/jscode2session').query({
         appid: config.ADMIN_APP_ID,
         secret: config.ADMIN_APP_SECRET,
         js_code: code,
-        grant_type: 'authorization_code'
+        grant_type: 'authorization_code',
     });
     let data = JSON.parse(text);
     console.log(data);
-    console.log(account + "================")
-    let admin = await Adminuser.findOne({admin_id: account});
-    // auth.assert(admin, "请输入正确的管理员账号");
-    if (!admin.openid) {
+    console.log(account + "================");
+    let admin = await Adminuser.findOne({ admin_id: account });
+    auth.assert(admin, "请输入正确的管理员账号");
+    if (!admin.openid || admin.openid === data.openid) {
         _.assign(admin, data);
         await admin.save();
-    } else if (admin.openid != data.openid) {
-        auth.assert(false, "登陆失败")
+    } else {
+        auth.assert(false, "登陆失败");
     }
     ctx.session.adminUserId = admin._id;
     return "登陆成功";
 
-}
+};

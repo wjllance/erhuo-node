@@ -42,9 +42,8 @@ router.get('/admin/reject_goods', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data    所创建的管理员的基本信息
  *
  */
-
-//暂时去掉登陆权限的认证
-router.post('/admin/register', auth.loginRequired, async (ctx, next) => {
+router.post('/admin/register', async (ctx, next) => {
+    // router.post('/admin/register', auth.loginRequired, async (ctx, next) => {
 
     let code = ctx.request.body.code;
     auth.assert(code, "code值不能为空");
@@ -142,9 +141,9 @@ router.post('/admin/update', auth.adminRequired, async (ctx, next) => {
 
 router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
 
-    console.log("here is update userAuth");
+    console.log("here is update userAuth", ctx.request.body);
 
-    let status = ctx.request.body.status;
+    let status = parseInt(ctx.request.body.status);
     let userId = ctx.request.body.userId;
     let content = ctx.request.body.content;
 
@@ -157,20 +156,24 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
 
     identity.status = status;
     await identity.save();
-
+    let res;
     if (status === 1) { //通过
+        if(!user.stu_verified){
+            res = await srv_wxtemplate.sendAuthResult(userId, status, content);
+        }
         user.nested = nested;
         user.realname = nested.realname;
         user.school = nested.school;
         user.stu_verified = Date.now();
     } else {
+        if(user.stu_verified){
+            res = await srv_wxtemplate.sendAuthResult(userId, status, content);
+        }
         user.stu_verified = null;
     }
     await user.save();
 
-    let res = await srv_wxtemplate.sendAuthResult(userId, status, content);
-
-    console.log(res, "+++++++++++++++++++++++++++++");
+    console.log("notify result+++++++++++++++++++++++++++++", res);
     ctx.body = {
         success: 1,
         data: user,

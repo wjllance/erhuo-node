@@ -6,7 +6,7 @@ let moment = require('moment');
 exports.userList = async (pageNo, pageSize) => {
 
     let sorti = {
-        created_date: -1,
+        updated_date: -1,
     };
     let total = await Identity.find().count();//表总记录数
 
@@ -18,10 +18,17 @@ exports.userList = async (pageNo, pageSize) => {
     let hasMore = total - pageNo * pageSize > 0;
 
     let items = _.map(identitys, item => {
-        // let ret = _.pick(item, ["name", "studentID", "school", "ncard", "nwithcard", "status"]);
-        let ret = _.pick(item, ["_id","name", "studentID", "school", "status"]);
+        let ret = _.pick(item, ["name", "studentID", "school", "ncard", "nwithcard", "status"]);
+        // let ret = _.pick(item, ["_id","name", "studentID", "school", "status"]);
         ret.created_date = moment(item.created_date).format('lll');
         ret.user = item.userID.cardInfo();
+        if (item.status === 1) {
+            ret.state = '已通过';
+        } else if (item.status === 2) {
+            ret.state = '已拒绝';
+        } else {
+            ret.state = '待审核';
+        }
         return ret;
     });
 

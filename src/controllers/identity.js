@@ -41,6 +41,7 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
     }
 
     _.assign(identity, _.pick(ctx.request.body, ["name", "studentID", "school", "ncard", "nwithcard"]));
+    identity.updated_date = Date.now();
     await identity.save();
 
     //加入 提醒通知
@@ -64,7 +65,7 @@ router.post("/v2/identity/save", auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        用户的详情信息
  *
  */
-router.get("/identity/detail", auth.loginRequired, async (ctx, next) => {
+router.get("/identity/detail", auth.adminRequired, async (ctx, next) => {
 
     let identity = await Identity.findOne({ userID: ctx.query.user_id }).sort({ created_date: -1 });
     auth.assert(identity, "未申请审核");
@@ -102,13 +103,13 @@ router.get("/identity/info", auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data        分页认证列表
  *
  */
-router.get("/identity/list", auth.loginRequired, async (ctx, next) => {
+router.get("/identity/list", auth.adminRequired, async (ctx, next) => {
 
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 6, 20); // 最大20，默认6
 
     let identitys = await identityService.userList(pageNo, pageSize);
-    console.log(identitys);
+    // console.log(identitys);
     ctx.body = {
         success: 1,
         data: identitys,
