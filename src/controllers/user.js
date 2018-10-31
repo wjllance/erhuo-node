@@ -361,7 +361,7 @@ router.get('/user/forTaoUserInfo', async(ctx, next)=>{
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
     // let condi = { created_date: { $gte: moment};
     let now = moment().toISOString();
-
+   console.log(now,"当前的时间戳" )
     let condi = {
             created_date: {$lte: new Date("2018-10-31T03:15:57.672Z") }
     };
