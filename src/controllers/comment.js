@@ -30,7 +30,7 @@ const router = module.exports = new Router();
  * @apiSuccess  {Object}    data        商品详情
  *
  */
-router.post('/comment/:goods_id', auth.stuAuthRequired, async (ctx, next) => {
+router.post('/comment/:goods_id', async (ctx, next) => {
     let goods = await Goods.findById(ctx.params.goods_id);
     auth.assert(goods, '商品不存在');
     let cmt_str = ctx.request.body.comment;
