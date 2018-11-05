@@ -1,6 +1,6 @@
 let _ = require("lodash");
 
-let { User, Comment, Goods, Like } = require("../models");
+let { User, Comment, Goods, Like ,Order} = require("../models");
 
 let auth = require("../services/auth");
 let myUtil = require("../tool/mUtils");
@@ -79,11 +79,13 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
         .populate("gpics")
         .populate("userID");
     auth.assert(goods, "商品不存在");
-
-    goods = await updateStatus(goods);
-
     let g = goods.baseInfoV2(1); //fullpic
-
+    g.buyerId =null;
+    if(goods.removed_date){
+        let order = await Order.findOne( {goods_id : goods._id});
+        g.buyerId = order.buyer;
+    }
+    goods = await updateStatus(goods);
     let jianrong = {
         name: goods.userID.nickName,
         avatar: goods.userID.avatarUrl,
