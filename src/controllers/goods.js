@@ -430,6 +430,7 @@ router.put('/v2/goods/:goods_id', auth.loginRequired, async (ctx, next) => {
  *
  */
 router.get('/v2/goods/detail/:goods_id', async (ctx, next) => {
+    console.log(ctx.params.goods_id)
     let goods = await srv_goods.getDetailByIdV2(ctx.params.goods_id, ctx.state.user);
     // auth.assert(goods, '商品不存在');
 

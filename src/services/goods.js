@@ -74,20 +74,20 @@ let updateStatus = async (goods) => {
 // 获取商品详情
 let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userInfo) {
 
-    let goods = await Goods.find({_id :goods_id})
-        .sort(sorti)
-        .limit(pageSize)
-        .skip((pageNo - 1) * pageSize)
-        .populate("gpics")
-        .populate("userID");
-    // let goods = await Goods.findById(goods_id)
-    //     .populate("gpics")
-    //     .populate("userID")
+
+    let goods = await Goods
+            .findById(goods_id)
+            .populate("gpics")
+            .populate("userID");
+    auth.assert(goods, "商品不存在");
+
+    console.log(goods)
     auth.assert(goods, "商品不存在");
     let g = goods.baseInfoV2(1); //fullpic
     g.buyerId =null;
     if(goods.removed_date){
         let order = await Order.findOne( {goods_id : goods._id});
+        console.log(order)
         g.buyerId = order.buyer;
     }
     goods = await updateStatus(goods);

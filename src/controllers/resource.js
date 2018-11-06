@@ -9,7 +9,7 @@ let body = require('koa-convert')(require('koa-better-body')());
 let config = require('../config');
 let auth = require('../services/auth');
 let { User, Image, Goods } = require('../models');
-const sharp = require('sharp');
+// const sharp = require('sharp');
 const mUtils = require('../tool/mUtils');
 
 const router = module.exports = new Router();
