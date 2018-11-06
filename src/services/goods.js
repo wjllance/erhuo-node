@@ -79,10 +79,10 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
             .findById(goods_id)
             .populate("gpics")
             .populate("userID");
-    auth.assert(goods, "商品不存�?);
+    auth.assert(goods, "商品不存�?");
 
     console.log(goods)
-    auth.assert(goods, "商品不存�?);
+    auth.assert(goods, "商品不存�?");
     let g = goods.baseInfoV2(1); //fullpic
     g.buyerId=null;
     if(goods.removed_date){
@@ -130,7 +130,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
 let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 
     let goods = await Goods.findById(goods_id);
-    auth.assert(goods, "商品不存�?);
+    auth.assert(goods, "商品不存�?");
 
     let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "gcost", 'category']);
     g.gpics = goods.npics.map(y => myUtil.thumbnail(y));
