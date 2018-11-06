@@ -359,6 +359,8 @@ router.get('/user/forTaoUserInfo', async(ctx, next)=>{
     console.log("前端访问有问题");
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+
+    let total = await User.find().count();
     // let condi = { created_date: { $gte: moment};
     let now = moment().toISOString();
    console.log(now,"当前的时间戳" )
@@ -374,6 +376,7 @@ router.get('/user/forTaoUserInfo', async(ctx, next)=>{
 
     ctx.body = {
         success:1,
+        total : total,
         data: userList,
         pageNo:pageNo
     }

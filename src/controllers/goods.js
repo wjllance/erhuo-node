@@ -486,6 +486,7 @@ router.get('/goods/get_book_by_isbn/:isbn', async (ctx, next) => {
 //获取当前数据库的用户信息
 router.get('/goods/forTaoGoodsInfo', async(ctx, next)=>{
 
+    let total = await Goods.find().count();
     console.log("前端访问有问题");
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
@@ -504,6 +505,7 @@ router.get('/goods/forTaoGoodsInfo', async(ctx, next)=>{
 
     ctx.body = {
         success:1,
+        total:total,
         data: userList,
         pageNo:pageNo
     }
