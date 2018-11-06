@@ -7,7 +7,8 @@ let myUtil = require("../tool/mUtils");
 const school_map = require("../config").CONSTANT.SCHOOL_MAP;
 
 // const goodsCates = exports.CATES = ["美妆", "女装", "女鞋", "配饰", "包包", "日用", "其他", "求购", "书籍"];
-// 对商品注入额外信�?let hasCollected = async function (goods, user) {
+// 对商品注入额外信�?
+let hasCollected = async function (goods, user) {
     if (!user) return {};
 
     let res = await Like.findOne({
@@ -25,7 +26,8 @@ const school_map = require("../config").CONSTANT.SCHOOL_MAP;
     };
 };
 
-// 获取可以输出的数�?let outputify = exports.outputify = async function (goods, user) {
+// 获取可以输出的数�?
+let outputify = exports.outputify = async function (goods, user) {
 
     if (!_.isArray(goods)) {
         return _.assign(goods.cardInfo(), await hasCollected(goods, user));
@@ -138,7 +140,8 @@ let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 };
 
 //商品未下架过滤层
-//返回值为true值表示已下架，为null或者false时为未下�?let isGoodRemoved = exports.isGoodRemoved = function (good) {
+//返回值为true值表示已下架，为null或者false时为未下�?
+let isGoodRemoved = exports.isGoodRemoved = function (good) {
     return good.removed_date && good.removed_date < Date.now();
 };
 
