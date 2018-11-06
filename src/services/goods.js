@@ -88,7 +88,9 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     if(goods.removed_date){
         let order = await Order.findOne( {goods_id : goods._id});
         if(order){
-            g.buyerId = order.buyer;
+            if(order){
+                g.buyerId = order.buyer;
+            }
         }
     }
     goods = await updateStatus(goods);
