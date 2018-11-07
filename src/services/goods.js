@@ -86,11 +86,9 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     let g = goods.baseInfoV2(1); //fullpic
     g.buyerId=null;
     if(goods.removed_date){
-        let order = await Order.findOne( {goods_id : goods._id});
+        let order = await Order.findOne( {goodsId : goods_id});
         if(order){
-            if(order){
                 g.buyerId = order.buyer;
-            }
         }
     }
     goods = await updateStatus(goods);
@@ -105,6 +103,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     let condi = { goodsId: goods_id };
     console.log(userid);
     console.log(goods.userID);
+
     if (userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)) {
         condi.$or = [
             { fromId: userid },
