@@ -84,13 +84,13 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     console.log(goods)
     auth.assert(goods, "商品不存�?");
     let g = goods.baseInfoV2(1); //fullpic
-    g.buyerId=null;
-    if(goods.removed_date){
+    let buyerId=null;
+
         let order = await Order.findOne( {goodsId : goods_id});
-        if(order){
-                g.buyerId = order.buyer;
+        if(order&&order.pay_status === 1 ){
+            console.log(order.buyer,"------------------")
+            buyerId = order.buyer;
         }
-    }
     goods = await updateStatus(goods);
     let jianrong = {
         name: goods.userID.nickName,
@@ -123,7 +123,11 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     }
     g.remark = goods.remark;
 
-    return g;
+    return {
+        g,
+        buyerId
+
+    };
 };
 
 
