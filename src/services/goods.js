@@ -7,7 +7,7 @@ let myUtil = require("../tool/mUtils");
 const school_map = require("../config").CONSTANT.SCHOOL_MAP;
 
 // const goodsCates = exports.CATES = ["美妆", "女装", "女鞋", "配饰", "包包", "日用", "其他", "求购", "书籍"];
-// 对商品注入额外信息
+// 对商品注入额外信�?
 let hasCollected = async function (goods, user) {
     if (!user) return {};
 
@@ -26,7 +26,7 @@ let hasCollected = async function (goods, user) {
     };
 };
 
-// 获取可以输出的数据
+// 获取可以输出的数�?
 let outputify = exports.outputify = async function (goods, user) {
 
     if (!_.isArray(goods)) {
@@ -79,10 +79,10 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
             .findById(goods_id)
             .populate("gpics")
             .populate("userID");
-    auth.assert(goods, "商品不存在");
+    auth.assert(goods, "商品不存�?");
 
     console.log(goods)
-    auth.assert(goods, "商品不存在");
+    auth.assert(goods, "商品不存�?");
     let g = goods.baseInfoV2(1); //fullpic
     g.buyerId=null;
     if(goods.removed_date){
@@ -131,7 +131,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
 let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 
     let goods = await Goods.findById(goods_id);
-    auth.assert(goods, "商品不存在");
+    auth.assert(goods, "商品不存�?");
 
     let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "gcost", 'category']);
     g.gpics = goods.npics.map(y => myUtil.thumbnail(y));
@@ -141,7 +141,7 @@ let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 };
 
 //商品未下架过滤层
-//返回值为true值表示已下架，为null或者false时为未下架
+//返回值为true值表示已下架，为null或者false时为未下�?
 let isGoodRemoved = exports.isGoodRemoved = function (good) {
     return good.removed_date && good.removed_date < Date.now();
 };
