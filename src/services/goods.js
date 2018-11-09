@@ -1,13 +1,13 @@
 let _ = require("lodash");
 
-let { User, Comment, Goods, Like ,Order} = require("../models");
+let { User, Comment, Goods, Like } = require("../models");
 
 let auth = require("../services/auth");
 let myUtil = require("../tool/mUtils");
 const school_map = require("../config").CONSTANT.SCHOOL_MAP;
 
 // const goodsCates = exports.CATES = ["美妆", "女装", "女鞋", "配饰", "包包", "日用", "其他", "求购", "书籍"];
-// 对商品注入额外信�?
+// 对商品注入额外信息
 let hasCollected = async function (goods, user) {
     if (!user) return {};
 
@@ -26,7 +26,7 @@ let hasCollected = async function (goods, user) {
     };
 };
 
-// 获取可以输出的数�?
+// 获取可以输出的数据
 let outputify = exports.outputify = async function (goods, user) {
 
     if (!_.isArray(goods)) {
@@ -74,24 +74,21 @@ let updateStatus = async (goods) => {
 // 获取商品详情
 let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userInfo) {
 
-
     let goods = await Goods
-            .findById(goods_id)
-            .populate("gpics")
-            .populate("userID");
-    auth.assert(goods, "商品不存�?");
+        .findById(goods_id)
+        .populate("gpics")
+        .populate("userID");
+    auth.assert(goods, "商品不存在");
 
-    console.log(goods)
-    auth.assert(goods, "商品不存�?");
-    let g = goods.baseInfoV2(1); //fullpic
-    g.buyerId=null;
-
-        let order = await Order.findOne( {goodsId : goods_id});
-        if(order&&order.pay_status === 1 ){
-            console.log(order.buyer,"------------------")
-            g.buyerId = order.buyer;
-        }
     goods = await updateStatus(goods);
+    let g = goods.baseInfoV2(1); //fullpic
+    g.buyerId = null;
+
+    let order = await Order.findOne({ goodsId: goods_id });
+    if (order && order.pay_status === 1) {
+        console.log(order.buyer, "------------------");
+        g.buyerId = order.buyer;
+    }
     let jianrong = {
         name: goods.userID.nickName,
         avatar: goods.userID.avatarUrl,
@@ -103,7 +100,6 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     let condi = { goodsId: goods_id };
     console.log(userid);
     console.log(goods.userID);
-
     if (userid != null && !userInfo.isAdmin && !goods.userID._id.equals(userid)) {
         condi.$or = [
             { fromId: userid },
@@ -127,11 +123,10 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
 };
 
 
-
 let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 
     let goods = await Goods.findById(goods_id);
-    auth.assert(goods, "商品不存�?");
+    auth.assert(goods, "商品不存在");
 
     let g = _.pick(goods, ["_id", "gname", "gsummary", "gprice", "gcost", 'category']);
     g.gpics = goods.npics.map(y => myUtil.thumbnail(y));
@@ -141,7 +136,7 @@ let getBaseInfoById = exports.getBaseInfoById = async function (goods_id) {
 };
 
 //商品未下架过滤层
-//返回值为true值表示已下架，为null或者false时为未下�?
+//返回值为true值表示已下架，为null或者false时为未下架
 let isGoodRemoved = exports.isGoodRemoved = function (good) {
     return good.removed_date && good.removed_date < Date.now();
 };
@@ -221,10 +216,9 @@ exports.goodsListV2 = async (user, pageNo, pageSize, condi, sorti) => {
 };
 
 
+exports.admingoodsList = async (pageNo, pageSize) => {
 
-exports.admingoodsList = async ( pageNo, pageSize) => {
-
-    let     sorti = { created_date: -1 };
+    let sorti = { created_date: -1 };
 
     let total = await Goods.find().count();//表总记录数
     let outGoodsInfo = [];
@@ -232,14 +226,12 @@ exports.admingoodsList = async ( pageNo, pageSize) => {
         .sort(sorti)
         .limit(pageSize)
         .skip((pageNo - 1) * pageSize)
-        .populate("gpics")
         .populate("userID");
-    console.log(goods);
-    for(var i =0;i<goods.length;i++){
+    for (var i = 0; i < goods.length; i++) {
 
-        outGoodsInfo[i] =_.pick(goods[i], ['_id','gname', 'category', 'status','gpriority','userID','gprice','gpics','npics']);
+        outGoodsInfo[i] = _.pick(goods[i], ['_id', 'gname', 'category', 'status', 'gpriority', 'userID', 'gprice', 'npics']);
         outGoodsInfo[i].schoolName = outGoodsInfo[i].userID.locationName;
-        outGoodsInfo[i].userID=null;
+        outGoodsInfo[i].userID = null;
     }
     let hasMore = total - pageNo * pageSize > 0;
     return {
@@ -248,7 +240,6 @@ exports.admingoodsList = async ( pageNo, pageSize) => {
         total: total,
     };
 };
-
 
 
 exports.goodsFeedList = async (user, pageNo, pageSize, condi, sorti) => {
@@ -276,17 +267,17 @@ exports.goodsFeedList = async (user, pageNo, pageSize, condi, sorti) => {
     };
 };
 
-getFeedsInfo  = async (goods, user) => {
+getFeedsInfo = async (goods, user) => {
     let ret = [];
     for (let i = 0; i < goods.length; i++) {
         let comments = await Comment.find({
-                goodsId: goods[i].id,
+            goodsId: goods[i].id,
+        })
+            .sort({
+                updated_date: -1,
             })
-                .sort({
-                    updated_date: -1,
-                })
-                .limit(3)
-                .populate("fromId");
+            .limit(3)
+            .populate("fromId");
         let res = goods[i].cardInfo();
         res.comments = comments.map(x => x.getSimpleInfo());
         _.assign(res, await hasCollected(goods[i], user));

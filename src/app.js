@@ -15,8 +15,7 @@ let schedule = require('./schedule');
 
 
 const xmlParser = require('koa-xml-body');
-app.use(xmlParser())
-    .use((ctx,next) => {
+app.use(xmlParser()).use((ctx,next) => {
     ctx.data = ctx.request.body;
     return next();
 });
