@@ -1,6 +1,6 @@
 let _ = require("lodash");
 
-let { User, Comment, Goods, Like } = require("../models");
+let { User, Comment, Goods, Like, Order } = require("../models");
 
 let auth = require("../services/auth");
 let myUtil = require("../tool/mUtils");
