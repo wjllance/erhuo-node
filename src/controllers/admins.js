@@ -9,7 +9,7 @@ let logger = log4js.getLogger('errorLogger');
 let config = require('../config');
 let adminService = require('../services/admin');
 let WXBizDataCrypt = require('../services/WXBizDataCrypt');
-let { User, Goods, Identity } = require("../models");
+let {User, Goods, Identity} = require("../models");
 let srv_message = require('../services/message');
 const router = module.exports = new Router();
 let srv_goods = require('../services/goods');
@@ -147,7 +147,7 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
     let userId = ctx.request.body.userId;
     let content = ctx.request.body.content;
 
-    let identity = await Identity.findOne({ userID: userId }).sort({ created_date: -1 });
+    let identity = await Identity.findOne({userID: userId}).sort({created_date: -1});
     let user = await User.findById(userId);
     auth.assert(user && identity, '未提交审核');
     auth.assert(status && userId, "缺少参数");
@@ -158,7 +158,7 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
     await identity.save();
     let res;
     if (status === 1) { //通过
-        if(!user.stu_verified){
+        if (!user.stu_verified) {
             res = await srv_wxtemplate.sendAuthResult(userId, status, content);
         }
         user.nested = nested;
@@ -166,7 +166,7 @@ router.post('/admin/identity/judge', auth.adminRequired, async (ctx, next) => {
         user.school = nested.school;
         user.stu_verified = Date.now();
     } else {
-        if(user.stu_verified){
+        if (user.stu_verified) {
             res = await srv_wxtemplate.sendAuthResult(userId, status, content);
         }
         user.stu_verified = null;
@@ -235,7 +235,10 @@ router.get('/admin/goods/Detail', async (ctx, next) => {
     let goodsId = ctx.query.goodsId;
     console.log(goodsId);
 
-    let goods = await  Goods.findOne({ _id: goodsId });
+    let goods = await Goods.findOne({_id: goodsId})
+        .populate('userID');
+
+
     console.log(goods + "==============================");
     ctx.body = {
         success: 1,
@@ -267,7 +270,7 @@ router.post('/admin/goods/examine', async (ctx, next) => {
     let goodsId = ctx.request.body.goodsId;
     let status = ctx.request.body.status;
     let category = ctx.request.body.category;
-    let goods = await Goods.findOne({ _id: goodsId });
+    let goods = await Goods.findOne({_id: goodsId});
     ;
     if (priority) {
         goods.gpriority = priority;
