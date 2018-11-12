@@ -231,6 +231,8 @@ exports.admingoodsList = async (pageNo, pageSize) => {
 
         outGoodsInfo[i] = _.pick(goods[i], ['_id', 'gname', 'category', 'status', 'gpriority', 'userID', 'gprice', 'npics']);
         outGoodsInfo[i].schoolName = outGoodsInfo[i].userID.locationName;
+        outGoodsInfo[i].realname = outGoodsInfo[i].userID.realname;
+        outGoodsInfo[i].nickName = outGoodsInfo[i].userID.nickName;
         outGoodsInfo[i].userID = null;
     }
     let hasMore = total - pageNo * pageSize > 0;
