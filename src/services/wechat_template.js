@@ -191,7 +191,7 @@ exports.moneyArrive = async (order) => {
 };
 
 
-exports.refundApply = async (order) => {
+exports.refundApply = async (order,message) => {
     let seller_id = order.seller._id || order.seller;
     let buyer_id = order.buyer._id || order.buyer;
 
@@ -206,7 +206,7 @@ exports.refundApply = async (order) => {
     let data = {
         //温馨提示
         keyword1: {
-            value: "买家申请退货，请及时处理退货申请或联系客服拒绝退货",
+            value: message||"买家申请退货，请及时处理退货申请或联系客服拒绝退货",
         },
         //订单编号
         keyword2: {

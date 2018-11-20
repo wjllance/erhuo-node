@@ -92,6 +92,7 @@ let getDetailByIdV2 = exports.getDetailByIdV2 = async function (goods_id, userIn
     let jianrong = {
         name: goods.userID.nickName,
         avatar: goods.userID.avatarUrl,
+        school: goods.userID.school,
     };
     _.assign(g.user, jianrong);
 

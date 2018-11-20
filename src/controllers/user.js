@@ -359,14 +359,26 @@ router.get('/user/forTaoUserInfo', async(ctx, next)=>{
     console.log("前端访问有问题");
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+    let date =ctx.query.date;
 
-    let total = await User.find().count();
     // let condi = { created_date: { $gte: moment};
     let now = moment().toISOString();
    console.log(now,"当前的时间戳" )
-    let condi = {
+    let condi=null;
+   let total=null;
+    if(!date){
+        total = await User.find().count();
+        condi = {
             created_date: {$lte: new Date("2018-10-31T03:15:57.672Z") }
-    };
+        };
+    }else{
+
+        condi = {
+            created_date: {$gte: new Date(date) }
+        };
+        total = await User.find(condi).count();
+    }
+
 
     console.log(now,"时间的值");
     let  userList = await User.find(condi)

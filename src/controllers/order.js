@@ -394,6 +394,38 @@ router.post('/order/refund/apply', auth.loginRequired, async(ctx, next)=>{
     }
 });
 
+
+
+
+/**
+ * @api     {post}  /order/refund/cancelApply  取消申请退款
+ * @apiName     RefundCancel
+ * @apiGroup    Order
+ *
+ * @apiParam    {String}    orderId
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ */
+router.post('/order/refund/cancelApply', auth.loginRequired, async(ctx, next)=>{
+    let order = await Order.findById(ctx.request.body.orderId);
+    auth.assert(order, "订单不存在");
+    auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
+    let res = await srv_order.refund_cancel(order);
+    let transaction = await srv_transaction.cancelTran(order);
+    let message ="买家取消退货申请，请及时处理"
+        await srv_wxtemplate.refundApply(order,message);
+
+
+    console.log("create refund transaction ", transaction);
+    ctx.body = {
+        success:1,
+        data: res
+    }
+});
+
+
+
 /**
  * @api     {post}  /order/refund/confirm  确认退款
  * @apiName     RefundConfirm
