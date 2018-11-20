@@ -152,6 +152,8 @@ router.get('/goods/search', async (ctx, next) => {
             $or: [
                 { glocation: user.location },
                 { glocation: 0 },
+                { locationName: user.locationName},
+                { locationName: user.school}
             ],
         });
     }
