@@ -335,6 +335,16 @@ exports.refund_apply = async(order) =>{
     //TODO SEND NOTIFY
 };
 
+
+exports.refund_cancel = async(order) =>{
+    auth.assert(order.refund_status === REFUND_STATUS.APPLYING && order.pay_status === PAY_STATUS.SUCCEED, "不可申请取消退款");
+    auth.assert(!order.finished_date, "订单已结束，申请退款请私下联系或联系客服");
+    order.refund_status = REFUND_STATUS.FAILED;
+    await order.save();
+    //TODO SEND NOTIFY
+};
+
+
 exports.refund_confirm = async(order) =>{
     auth.assert(order.refund_status === REFUND_STATUS.APPLYING, "不可确认退款");
     order.refund_status = REFUND_STATUS.SUCCEED;

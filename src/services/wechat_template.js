@@ -13,6 +13,7 @@ let auth = require("./auth");
 const xml2js = require("xml2js");
 let fs = require("fs");
 let path = require("path");
+var qs = require('qs');
 let { User, AccessToken, Comment, Order, UserFormid } = require("../models");
 let srv_wechat = require("./wechat");
 
@@ -101,6 +102,58 @@ exports.sendPaidTemplate = async (order) => {
     return true;
 };
 
+//支付成功回调的时候 发送短信
+exports.sendCode = async (order) => {
+    let seller_id = order.seller._id || order.seller;
+    let buyer_id = order.buyer._id || order.buyer;
+
+    let touser = await User.findById(seller_id);
+    let buyer = await  User.findById(buyer_id);
+
+    let YUNPIAN_APIKEY = config.YUNPIAN_KEY;
+    let phoneNum = touser.phoneNumber;
+    //发送请求
+    console.log("发送短信", phoneNum);
+    let getAccessUrl = `https://sms.yunpian.com/v2/sms/tpl_single_send.json`;
+    let tpl_value = {
+        '#code#': order.goodsInfo.gname,
+        '#username#': buyer.nickName,
+        '#tel#': phoneNum,
+        '#order#': order.sn,
+    };
+    let { text } = await superagent.post(getAccessUrl)
+        .type('application/x-www-form-urlencoded; charset=UTF-8')
+        .send(
+            {
+                'apikey': YUNPIAN_APIKEY,
+                'mobile': phoneNum,
+                'tpl_id': 2600192,
+                'tpl_value': qs.stringify(tpl_value),
+            },
+        );
+    let parse = JSON.parse(text);
+    console.log("状态码" + parse.code + "=======" + parse.msg);
+};
+
+//买家对商品发起第一条消息
+exports.sendBuy = async (touser) => {
+    let YUNPIAN_APIKEY = config.YUNPIAN_KEY;
+    let phoneNum = touser.phoneNumber;
+    //发送请求
+    console.log("发送短信", phoneNum);
+    let getAccessUrl = 'https://sms.yunpian.com/v2/sms/tpl_single_send.json';
+    let { text } = await superagent.post(getAccessUrl)
+        .type('application/x-www-form-urlencoded; charset=UTF-8')
+        .send(
+            {
+                'apikey': YUNPIAN_APIKEY,
+                'mobile': phoneNum,
+                'tpl_id': 2602120,
+            },
+        );
+    let parse = JSON.parse(text);
+    console.log("状态码" + parse.code + "=======" + parse.msg);
+};
 
 exports.confirmReceipt = async (order) => {
     let seller_id = order.seller._id || order.seller;
@@ -191,7 +244,7 @@ exports.moneyArrive = async (order) => {
 };
 
 
-exports.refundApply = async (order) => {
+exports.refundApply = async (order, message) => {
     let seller_id = order.seller._id || order.seller;
     let buyer_id = order.buyer._id || order.buyer;
 
@@ -206,7 +259,7 @@ exports.refundApply = async (order) => {
     let data = {
         //温馨提示
         keyword1: {
-            value: "买家申请退货，请及时处理退货申请或联系客服拒绝退货",
+            value: message || "买家申请退货，请及时处理退货申请或联系客服拒绝退货",
         },
         //订单编号
         keyword2: {
@@ -426,11 +479,11 @@ exports.comeBack = async (touser) => {
 };
 
 
-exports.sendAuthResult = async (touserId, succeed,content) => {
+exports.sendAuthResult = async (touserId, succeed, content) => {
 
     let touser = await User.findById(touserId);
 
-    console.log(content+"发送认证结果******************************"+touser._id);
+    console.log(content + "发送认证结果******************************" + touser._id);
     let formid = await getFormid(touser._id);
     if (!formid) {
         return false;
@@ -452,7 +505,7 @@ exports.sendAuthResult = async (touserId, succeed,content) => {
         },
         //备注
         keyword4: {
-            value: parseInt(succeed) === 1 ? "恭喜通过学生认证，快去二货兔校园买买买吧" : (content||"请检查上传照片是否清晰，确保照片上包含主要信息，以提高审核通过率"),
+            value: parseInt(succeed) === 1 ? "恭喜通过学生认证，快去二货兔校园买买买吧" : (content || "请检查上传照片是否清晰，确保照片上包含主要信息，以提高审核通过率"),
         },
     };
     formid.used = 1;

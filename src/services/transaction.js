@@ -118,8 +118,19 @@ exports.createRefund = async(order)=>{
     // transaction.markModified('info');
 
     return await transaction.save();
-}
+};
 
+
+exports.cancelTran = async (order) => {
+    let transaction = await Transaction.findOne({
+        orderId: order._id,
+        type: TRANSACTION_TYPE.REFUND,
+    });
+    auth.assert(transaction.type === TRANSACTION_TYPE.REFUND && transaction.status === TRANSACTION_STATUS.INIT, "该交易不能取消退款或已经进行了退款操作");
+    transaction.status = TRANSACTION_STATUS.FAILED;
+
+    return await transaction.save();
+};
 
 exports.refundConfirm = async(order)=>{
     let r_transaction = await Transaction.findOne({
