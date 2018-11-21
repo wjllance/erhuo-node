@@ -118,7 +118,7 @@ exports.sendCode = async (order) => {
     let tpl_value = {
         '#code#': order.goodsInfo.gname,
         '#username#': buyer.nickName,
-        '#tel#': phoneNum,
+        '#tel#': buyer.phoneNumber,
         '#order#': order.sn,
     };
     let { text } = await superagent.post(getAccessUrl)
