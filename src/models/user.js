@@ -48,6 +48,7 @@ let userSchema = new mongoose.Schema({
         },
         created_date: { type: Date, default: Date.now },
         updated_date: { type: Date, default: Date.now },
+        message_date: Date,
 
         phoneNumber: String,
 

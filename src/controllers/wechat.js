@@ -170,7 +170,8 @@ router.post('/wechat/notify', async(ctx, next) => {
         let order = await srv_order.checkPay(xmlData.out_trade_no[0], xmlData.result_code[0], xmlData.total_fee[0]);
         if(order){
             await srv_transaction.createIncome(order);
-            await srv_wxtemplate.sendPaidTemplate(order)
+            await srv_wxtemplate.sendPaidTemplate(order);
+            await srv_wxtemplate.sendCode(order)
         }
         ret_body = '<xml>\n' +
             '  <return_code><![CDATA[SUCCESS]]></return_code>\n' +
