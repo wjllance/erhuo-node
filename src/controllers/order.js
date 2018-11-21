@@ -339,10 +339,13 @@ router.post('/order/cancel', auth.loginRequired, async(ctx, next) => {
     let uid = ctx.state.user._id.toString();
     auth.assert(order.buyer.equals(uid) || order.seller.equals(uid), "无权限");
     if(order.buyer.equals(uid)){
-        auth.assert(order.order_status == srv_order.ORDER_STATUS.TOPAY, "现在不能取消")
+        auth.assert(order.order_status == srv_order.ORDER_STATUS.PAID, "现在不能取消")
     }
-    await srv_order.cancel(order);
-
+    let order1 = await srv_order.cancel(order);
+    if(order1){
+        let message ="买家已经取消订单，请及时处理"
+        await srv_wxtemplate.refundApply(order,message);
+    }
     //TODO: REFUND
     if(order.order_status != srv_order.ORDER_STATUS.TOPAY
         && order.refund_status != srv_order.REFUND_STATUS.SUCCEED){
@@ -350,6 +353,7 @@ router.post('/order/cancel', auth.loginRequired, async(ctx, next) => {
     }
     ctx.body = {
         success:1,
+        data: order1
     }
 });
 
@@ -415,7 +419,6 @@ router.post('/order/refund/cancelApply', auth.loginRequired, async(ctx, next)=>{
     let transaction = await srv_transaction.cancelTran(order);
     let message ="买家取消退货申请，请及时处理"
         await srv_wxtemplate.refundApply(order,message);
-
 
     console.log("create refund transaction ", transaction);
     ctx.body = {

@@ -287,6 +287,22 @@ exports.tradingStatus = async (goods) => {
 exports.cancel = async (order)=>{
     // auth.assert(order.order_status != order.COMPLETE, "不能取消");
     auth.assert(!order.finished_date, "不能取消");
+
+    let account = await Account.findOneOrCreate({userID:order.buyer});
+
+    let transaction = await Transaction.findOne({
+        orderId: order._id,
+        type: TRANSACTION_TYPE.INCOME
+    });
+    auth.assert(transaction.status === TRANSACTION_STATUS.INIT, "该交易不能取消");
+    transaction.status =TRANSACTION_STATUS.FAILED;
+    // transaction.markModified('info');
+    let ret = await transaction.save();
+    account.balance = account.balance + order.price;
+    await account.save();
+    return ret;
+
+
     order.order_status = ORDER_STATUS.CANCEL;
     await order.save();
 
