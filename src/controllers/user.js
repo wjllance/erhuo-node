@@ -354,7 +354,7 @@ router.get('/user/mylikes', auth.loginRequired, getUserLikes);
 
 
 //获取当前数据库的用户信息
-router.get('/user/forTaoUserInfo', async(ctx, next)=>{
+router.get('/user/forTaoUserInfo', async (ctx, next) => {
 
     console.log("前端访问有问题");
     let pageNo = ctx.query.pageNo || 1;
@@ -372,7 +372,6 @@ router.get('/user/forTaoUserInfo', async(ctx, next)=>{
             created_date: {$lte: new Date("2018-10-31T03:15:57.672Z") }
         };
     }else{
-
         condi = {
             created_date: {$gte: new Date(date) }
         };
@@ -380,16 +379,16 @@ router.get('/user/forTaoUserInfo', async(ctx, next)=>{
     }
 
 
-    console.log(now,"时间的值");
-    let  userList = await User.find(condi)
+    console.log(now, "时间的值");
+    let userList = await User.find(condi)
         .limit(pageSize)
-         .skip((pageNo - 1) * pageSize);
+        .skip((pageNo - 1) * pageSize);
     console.log(userList);
 
     ctx.body = {
-        success:1,
-        total : total,
+        success: 1,
+        total: total,
         data: userList,
-        pageNo:pageNo
-    }
+        pageNo: pageNo,
+    };
 });

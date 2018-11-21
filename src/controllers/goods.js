@@ -65,9 +65,9 @@ router.get('/v3/goods/index', async (ctx, next) => {
     console.log(cate);
     if (cate === "推荐") {
         sorti = {
+            glocation: -1,
             gpriority: -1,
             // removed_date:1,
-            glocation: -1,
             updated_date: -1,
         };
         condi.category = { $ne: "求购" };
@@ -152,6 +152,8 @@ router.get('/goods/search', async (ctx, next) => {
             $or: [
                 { glocation: user.location },
                 { glocation: 0 },
+                { locationName: user.locationName},
+                { locationName: user.school}
             ],
         });
     }

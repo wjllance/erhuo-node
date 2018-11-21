@@ -47,6 +47,9 @@ exports.LEAN_APPKEY = config['LEAN_APPKEY'];
 exports.LEAN_MASTERKEY = config['LEAN_MASTERKEY'];
 
 
+exports.YUNPIAN_KEY = config['YUNPIAN_KEY'];
+
+
 exports.CONSTANT = {
     SCHOOL:{
         ALL:0,
