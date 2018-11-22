@@ -354,7 +354,7 @@ exports.refund_apply = async(order) =>{
 exports.refund_cancel = async(order) =>{
     auth.assert(order.refund_status === REFUND_STATUS.APPLYING && order.pay_status === PAY_STATUS.SUCCEED, "不可申请取消退款");
     auth.assert(!order.finished_date, "订单已结束，申请退款请私下联系或联系客服");
-    order.refund_status = REFUND_STATUS.FAILED;
+    order.refund_status = REFUND_STATUS.INIT;
     await order.save();
     //TODO SEND NOTIFY
 };
