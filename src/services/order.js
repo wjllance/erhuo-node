@@ -302,13 +302,11 @@ exports.cancel = async (order)=>{
     let ret = await transaction.save();
     account.balance = account.balance + order.price;
     await account.save();
-    return ret;
+	order.order_status = ORDER_STATUS.CANCEL;
+	await order.save();
 
 
-    order.order_status = ORDER_STATUS.CANCEL;
-    await order.save();
-
-    // TODO NOTIFY
+	return ret;
 }
 
 
