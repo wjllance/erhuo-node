@@ -17,7 +17,8 @@ let srv_wxtemplate = require('./wechat_template');
 let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
 let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
 let REFUND_STATUS = exports.REFUND_STATUS = require('../config').CONSTANT.REFUND_STATUS;
-
+let TRANSACTION_TYPE = exports.REFUND_STATUS = require('../config').CONSTANT.TRANSACTION_TYPE;
+let TRANSACTION_STATUS = exports.REFUND_STATUS = require('../config').CONSTANT.TRANSACTION_STATUS;
 let SNnumber = 0;
 
 let generateSerialNumber = () => {
@@ -289,8 +290,6 @@ exports.tradingStatus = async (goods) => {
 exports.cancel = async (order)=>{
     // auth.assert(order.order_status != order.COMPLETE, "不能取消");
     auth.assert(!order.finished_date, "不能取消");
-    order.status = ORDER_STATUS.CANCEL;
-    await order.save();
     let account = await Account.findOneOrCreate({userID:order.buyer});
 
     let transaction = await Transaction.findOne({
