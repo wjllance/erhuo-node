@@ -12,7 +12,7 @@ let moment = require('moment');
 moment.locale('zh-cn');
 /*-----------------------------------------------*/
 
-let { User, Order, Goods, Transaction } = require('../models');
+let { User, Order, Goods, Transaction,Account } = require('../models');
 let srv_wxtemplate = require('./wechat_template');
 let ORDER_STATUS = exports.ORDER_STATUS = require('../config').CONSTANT.ORDER_STATUS;
 let PAY_STATUS = exports.PAY_STATUS = require('../config').CONSTANT.PAY_STATUS;
@@ -289,7 +289,8 @@ exports.tradingStatus = async (goods) => {
 exports.cancel = async (order)=>{
     // auth.assert(order.order_status != order.COMPLETE, "不能取消");
     auth.assert(!order.finished_date, "不能取消");
-
+    order.status = ORDER_STATUS.CANCEL;
+    await order.save();
     let account = await Account.findOneOrCreate({userID:order.buyer});
 
     let transaction = await Transaction.findOne({
