@@ -328,7 +328,7 @@ let scheduleOrderTimeout = ()=>{
         });
         console.log(orders);
         for (let i = 0; i < orders.length; i++) {
-            await srv_order.cancel(orders[i]);
+            await srv_order.cancel2(orders[i]);
         }
     })
 };
