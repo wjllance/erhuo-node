@@ -269,47 +269,7 @@ exports.getDetailById = async (id) => {
 
 
 exports.tradingStatus = async (goods) => {
-<<<<<<< HEAD
-    let gid = goods._id;
-    if(!goods.remark){
-        let orders = await Order.find({
-            goodsId: gid,
-            refund_status: REFUND_STATUS.INIT,
-            order_status: {
-                $in: [ORDER_STATUS.PAID, ORDER_STATUS.COMPLETE, ORDER_STATUS.CONFIRM]
-            }
-        });
-        console.log("orders", orders);
-        if(orders.length > 0){
-            return "已被抢";
-        }
-    }
-    return "我想要";
-}
 
-exports.cancel = async (order)=>{
-    // auth.assert(order.order_status != order.COMPLETE, "不能取消");
-    auth.assert(!order.finished_date, "不能取消");
-    let account = await Account.findOneOrCreate({userID:order.buyer});
-
-    let transaction = await Transaction.findOne({
-        orderId: order._id,
-        type: TRANSACTION_TYPE.INCOME
-    });
-    let ret;
-     auth.assert(transaction,'请确认改交易是否存在')
-			auth.assert(transaction.status === TRANSACTION_STATUS.INIT, "该交易不能取消");
-			transaction.status =TRANSACTION_STATUS.FAILED;
-			// transaction.markModified('info');
-			ret = await transaction.save();
-			account.balance = account.balance + order.price;
-			await account.save();
-			order.order_status = ORDER_STATUS.CANCEL;
-			await order.save();
-			return ret;
-
-}
-=======
 	let gid = goods._id;
 	if (!goods.remark) {
 		let orders = await Order.find({
@@ -336,6 +296,7 @@ exports.cancel = async (order) => {
 		orderId: order._id,
 		type: TRANSACTION_TYPE.INCOME,
 	});
+	auth.assert(transaction,'请确认改交易是否存在')
 	auth.assert(transaction.status === TRANSACTION_STATUS.INIT, "该交易不能取消");
 	transaction.status = TRANSACTION_STATUS.FAILED;
 	// transaction.markModified('info');
@@ -348,7 +309,6 @@ exports.cancel = async (order) => {
 
 	return ret;
 };
->>>>>>> c39e2cf96db09d9fb7a72a8e79f4020e8d7132be
 
 
 exports.confirm = async (order) => {
@@ -406,22 +366,12 @@ exports.refund_confirm = async (order) => {
 	//TODO SEND NOTIFY
 };
 
-<<<<<<< HEAD
 exports.finish = async(orderId) => {
     let order = await Order.findById(orderId);
     auth.assert(order, "订单不存在");
     auth.assert(order.refund_status === REFUND_STATUS.INIT && order.order_status === ORDER_STATUS.PAID, "不能结束，请检查订单状态");
     order.finished_date = moment();
     await order.save();
-=======
-exports.finish = async (orderId) => {
-	let order = await Order.findById(orderId);
-	auth.assert(order, "订单不存在");
-	auth.assert(order.refund_status === REFUND_STATUS.INIT && order.order_status === ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
-	order.finished_date = moment();
-	await order.save();
->>>>>>> c39e2cf96db09d9fb7a72a8e79f4020e8d7132be
-
 	//NOTIFY
 	await srv_wxtemplate.moneyArrive(order);
 };
