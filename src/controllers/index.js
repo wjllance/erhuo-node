@@ -55,7 +55,9 @@ router.get('/v2/schools/population/:name', async (ctx, next) => {
 
 	if (!university.populationBase) {
 		university.populationBase = population;
+		await university.save();
 	}
+
 
 	ctx.body = {
 		success: 1,
