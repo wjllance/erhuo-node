@@ -114,11 +114,13 @@ exports.sendCode = async (order) => {
     let phoneNum = touser.phoneNumber;
     //发送请求
     console.log("发送短信", phoneNum);
+    let buyPhone = buyer.phoneNumber;
+    buyPhone = buyPhone.substr(0, 3) + '****' + buyPhone.substr(7);
     let getAccessUrl = `https://sms.yunpian.com/v2/sms/tpl_single_send.json`;
     let tpl_value = {
         '#code#': order.goodsInfo.gname,
         '#username#': buyer.nickName,
-        '#tel#': phoneNum,
+        '#tel#': buyPhone,
         '#order#': order.sn,
     };
     let { text } = await superagent.post(getAccessUrl)
@@ -244,9 +246,7 @@ exports.moneyArrive = async (order) => {
 };
 
 
-
-exports.refundApply = async (order,message) => {
-
+exports.refundApply = async (order, message) => {
     let seller_id = order.seller._id || order.seller;
     let buyer_id = order.buyer._id || order.buyer;
 
