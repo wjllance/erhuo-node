@@ -29,7 +29,7 @@ router.get('/schools', async (ctx, next) => {
 	};
 });
 
-router.get('/schools/population/:name', async (ctx, next) => {
+router.get('/v2/schools/population/:name', async (ctx, next) => {
 	let name = ctx.params.name;
 
 	let university = await University.findOne({name});
@@ -44,7 +44,7 @@ router.get('/schools/population/:name', async (ctx, next) => {
 	};
 });
 
-router.get('/v2/schools/population/:name', async (ctx, next) => {
+router.get('/schools/population/:name', async (ctx, next) => {
 	let name = ctx.params.name;
 
 	let university = await University.findOne({name});
@@ -54,14 +54,14 @@ router.get('/v2/schools/population/:name', async (ctx, next) => {
 	let population = await User.find({location: university.locationNum}).count();
 
 	if (!university.populationBase) {
-		university.populationBase = population;
+		university.populationBase = population*2 + 300;
 		await university.save();
 	}
 
 
 	ctx.body = {
 		success: 1,
-		data: university.populationBase * 2 + population,
+		data: university.populationBase + population,
 	};
 });
 
