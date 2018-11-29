@@ -269,7 +269,6 @@ exports.getDetailById = async (id) => {
 
 
 exports.tradingStatus = async (goods) => {
-
 	let gid = goods._id;
 	if (!goods.remark) {
 		let orders = await Order.find({

@@ -80,8 +80,7 @@ exports.countdown = async(order) => {
     let transaction = await Transaction.findOne({orderId: order._id});
     transaction.countdown_date = moment();
     await transaction.save();
-    console.log("countdown begin...", moment());
-};
+ };
  exports.finish = async(transaction) => {
     auth.assert(!transaction.finished_date, "交易已结束");
 
