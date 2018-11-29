@@ -489,7 +489,7 @@ router.get('/goods/get_book_by_isbn/:isbn', async (ctx, next) => {
 router.get('/goods/forTaoGoodsInfo', async(ctx, next)=>{
 
     let total = await Goods.find().count();
-    console.log("前端访问有问题");
+    // console.log("前端访问有问题");
     let pageNo = ctx.query.pageNo || 1;
     let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
     let date =ctx.query.date;
@@ -511,7 +511,7 @@ router.get('/goods/forTaoGoodsInfo', async(ctx, next)=>{
     let  userList = await Goods.find(condi)
         .limit(pageSize)
         .skip((pageNo - 1) * pageSize);
-    console.log(userList);
+    // console.log(userList);
 
     ctx.body = {
         success:1,

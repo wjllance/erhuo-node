@@ -349,14 +349,14 @@ router.get('/user/mylikes', auth.loginRequired, getUserLikes);
 //获取当前数据库的用户信息
 router.get('/user/forTaoUserInfo', async (ctx, next) => {
 
-	console.log("前端访问有问题");
+	// console.log("前端访问有问题");
 	let pageNo = ctx.query.pageNo || 1;
 	let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
 	let date = ctx.query.date;
 
 	// let condi = { created_date: { $gte: moment};
 	let now = moment().toISOString();
-	console.log(now, "当前的时间戳");
+	// console.log(now, "当前的时间戳");
 	let condi = null;
 	let total = null;
 	if (!date) {
@@ -376,7 +376,7 @@ router.get('/user/forTaoUserInfo', async (ctx, next) => {
 	let userList = await User.find(condi)
 		.limit(pageSize)
 		.skip((pageNo - 1) * pageSize);
-	console.log(userList);
+	// console.log(userList);
 
 	ctx.body = {
 		success: 1,
