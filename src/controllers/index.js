@@ -29,7 +29,7 @@ router.get('/schools', async (ctx, next) => {
 	};
 });
 
-router.get('/v2/schools/population/:name', async (ctx, next) => {
+router.get('/schools/population/:name', async (ctx, next) => {
 	let name = ctx.params.name;
 
 	let university = await University.findOne({name});
@@ -44,8 +44,8 @@ router.get('/v2/schools/population/:name', async (ctx, next) => {
 	};
 });
 
-router.get('/schools/population/:name', async (ctx, next) => {
-	let name = ctx.params.name;
+router.post('/schools/population', async (ctx, next) => {
+	let name = ctx.request.body.name;
 
 	let university = await University.findOne({name});
 	console.log(university);
@@ -62,19 +62,6 @@ router.get('/schools/population/:name', async (ctx, next) => {
 	ctx.body = {
 		success: 1,
 		data: university.populationBase + population,
-	};
-});
-
-router.post('/schools/population', async (ctx, next) => {
-	let name = ctx.request.body.name;
-
-	let university = await University.findOne({name});
-	// let schoolIdx = config.CONSTANT.SCHOOL_MAP.indexOf(name);
-	console.log(university);
-	let population = await User.find({location: university.locationNum}).count();
-	ctx.body = {
-		success: 1,
-		data: population,
 	};
 });
 
