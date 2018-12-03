@@ -150,7 +150,7 @@ router.get('/user/index', auth.loginRequired, async (ctx, next) => {
 router.get('/user/:id/profile', auth.loginRequired, async (ctx, next) => {
 	let user = await User.findById(ctx.params.id);
 	let baseInfo = user.baseInfo();
-	profile = _.pick(baseInfo, ["_id", "nickName", "avatarUrl", "gender", 'location', 'stu_verified']);
+	profile = _.pick(baseInfo, ["_id", "nickName", "avatarUrl", "gender", 'location','school', 'stu_verified']);
 	profile.tags = await tagService.listWithLike(user._id, ctx.state.user);
 	let followed = await Follow.findOne({
 		fromId: ctx.state.user._id,
