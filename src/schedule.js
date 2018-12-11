@@ -324,7 +324,7 @@ let scheduleOrderTimeout = () => {
 			},
 			order_status: config.CONSTANT.ORDER_STATUS.TOPAY,
 		});
-		console.log(orders);
+		console.log("超时取消的订单", orders);
 		for (let i = 0; i < orders.length; i++) {
 			await srv_order.cancel2(orders[i]);
 		}

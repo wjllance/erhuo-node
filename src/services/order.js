@@ -313,7 +313,7 @@ exports.cancel = async (order) => {
 exports.cancel2 = async (order) => {
 	// auth.assert(order.order_status != order.COMPLETE, "不能取消");
 	auth.assert(!order.finished_date, "不能取消");
-	order.status = ORDER_STATUS.CANCEL;
+	order.order_status = ORDER_STATUS.CANCEL;
 	await order.save();
 };
 
