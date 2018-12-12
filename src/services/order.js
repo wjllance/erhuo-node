@@ -273,6 +273,7 @@ exports.getDetailById = async (id) => {
 
 
 exports.tradingStatus = async (goods) => {
+
 	let gid = goods._id;
 	if (!goods.remark) {
 		let orders = await Order.find({
@@ -290,6 +291,7 @@ exports.tradingStatus = async (goods) => {
 	return "我想要";
 };
 
+//取消订单
 exports.cancel = async (order) => {
 	// auth.assert(order.order_status != order.COMPLETE, "不能取消");
 	auth.assert(!order.finished_date, "不能取消");
@@ -299,6 +301,7 @@ exports.cancel = async (order) => {
 		orderId: order._id,
 		type: TRANSACTION_TYPE.INCOME,
 	});
+	auth.assert(transaction,'请确认改交易是否存在')
 	auth.assert(transaction.status === TRANSACTION_STATUS.INIT, "该交易不能取消");
 	transaction.status = TRANSACTION_STATUS.FAILED;
 	// transaction.markModified('info');
@@ -310,6 +313,13 @@ exports.cancel = async (order) => {
 
 
 	return ret;
+};
+//超时取消
+exports.cancel2 = async (order) => {
+	// auth.assert(order.order_status != order.COMPLETE, "不能取消");
+	auth.assert(!order.finished_date, "不能取消");
+  order.status =ORDER_STATUS.CANCEL;
+  await order.save()
 };
 
 
@@ -368,13 +378,13 @@ exports.refund_confirm = async (order) => {
 	//TODO SEND NOTIFY
 };
 
-exports.finish = async (orderId) => {
-	let order = await Order.findById(orderId);
-	auth.assert(order, "订单不存在");
-	auth.assert(order.refund_status === REFUND_STATUS.INIT && order.order_status === ORDER_STATUS.COMPLETE, "不能结束，请检查订单状态");
-	order.finished_date = moment();
-	await order.save();
-
+exports.finish = async(orderId) => {
+    let order = await Order.findById(orderId);
+    auth.assert(order, "订单不存在");
+    auth.assert(order.refund_status === REFUND_STATUS.INIT , "订单申请退款，无法完到账"+order.refund_status);
+    auth.assert(order.order_status === ORDER_STATUS.COMPLETE,'订单未确认收货'+order.order_status)
+    order.finished_date = moment();
+    await order.save();
 	//NOTIFY
 	await srv_wxtemplate.moneyArrive(order);
 };

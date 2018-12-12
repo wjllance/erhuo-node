@@ -82,8 +82,7 @@ exports.countdown = async(order) => {
     await transaction.save();
     console.log("countdown begin...", moment());
 };
-
-let transacFinish = exports.finish = async(transaction) => {
+ exports.finish = async(transaction) => {
     auth.assert(!transaction.finished_date, "交易已结束");
 
     transaction.finished_date = moment();
