@@ -389,7 +389,7 @@ exports.finish = async (orderId) => {
 	await srv_wxtemplate.moneyArrive(order);
 };
 
-exports.handlePayFinally = async(order)=>{
+exports.handleCompletePay = async(order)=>{
 	if (order.pay_status === config.CONSTANT.PAY_STATUS.PAYING) {
 		order.pay_status = config.CONSTANT.PAY_STATUS.INIT;
 		await order.save();
