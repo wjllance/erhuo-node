@@ -31,8 +31,11 @@ let generateSerialNumber = () => {
 };
 
 exports.updateSN = async (order) => {
-	order.sn = generateSerialNumber();
-	return await order.save();
+	if(order.sn) {
+		order.sn = generateSerialNumber();
+		await order.save();
+	}
+	return order;
 };
 
 //goods:CardInfo
@@ -176,12 +179,13 @@ exports.preparePayV2 = async function (order) {
 		if (!order.sn) {
 			order.sn = generateSerialNumber();
 		}
-		await order.save();
 	}
 	auth.assert(order.order_status === ORDER_STATUS.TOPAY, "不可支付");
 
 	// order.sn = generateSerialNumber();
 	//TO BE REMOVE in a few time later
+	order.pay_status = config.CONSTANT.PAY_STATUS.PAYING;
+	await order.save();
 
 	let buyer = await User.findById(order.buyer);
 	// let price = (config.ENV == 'local') ? 1 : order.price*100;
@@ -374,3 +378,11 @@ exports.finish = async (orderId) => {
 	//NOTIFY
 	await srv_wxtemplate.moneyArrive(order);
 };
+
+exports.handlePayFinally = async(order)=>{
+	if (order.pay_status === config.CONSTANT.PAY_STATUS.PAYING) {
+		order.pay_status = config.CONSTANT.PAY_STATUS.INIT;
+		await order.save();
+	}
+	return order;
+}
