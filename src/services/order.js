@@ -33,6 +33,7 @@ let generateSerialNumber = () => {
 exports.updateSN = async (order) => {
 	if(order.sn) {
 		order.sn = generateSerialNumber();
+		order.updated_date = new Date();
 		await order.save();
 	}
 	return order;

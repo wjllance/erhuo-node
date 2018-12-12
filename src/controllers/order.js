@@ -161,10 +161,12 @@ let modifyOrder = async (ctx, next) => {
 	auth.assert(order.pay_status === config.CONSTANT.PAY_STATUS.PAYING, "买家可能支付中，请稍后再试");
 	// console.log(order.seller, ctx.state.user._id);
 	// auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
+
+	console.log("修改前", ctx.state.user, order);
 	_.assign(order, _.pick(ctx.request.body, ['price']));
 	let res = await srv_order.updateSN(order);
 	// await order.save();
-	console.log(res);
+	console.log("修改后",res);
 	ctx.body = {
 		success: 1,
 		data: res.baseInfo(),
