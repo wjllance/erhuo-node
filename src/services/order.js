@@ -186,6 +186,7 @@ exports.preparePayV2 = async function (order) {
 	// order.sn = generateSerialNumber();
 	//TO BE REMOVE in a few time later
 	order.pay_status = config.CONSTANT.PAY_STATUS.PAYING;
+	order.updated_date = new Date();
 	await order.save();
 
 	let buyer = await User.findById(order.buyer);
