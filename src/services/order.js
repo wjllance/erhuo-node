@@ -240,7 +240,7 @@ exports.checkPay = async (out_trade_no, result_code, fee) => {
 
 	console.log("order info", order);
 	auth.assert(order, "订单不存在");
-	auth.assert(order.pay_status === config.CONSTANT.PAY_STATUS.INIT, "已确认");
+	auth.assert(order.pay_status === config.CONSTANT.PAY_STATUS.INIT || order.pay_status === config.CONSTANT.PAY_STATUS.PAYING, "已确认");
 	if (result_code == "FAIL") {
 		order.pay_status = PAY_STATUS.FAILED;
 		await order.save();

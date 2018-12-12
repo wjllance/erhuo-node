@@ -158,7 +158,7 @@ router.post('/v2/order/', auth.loginRequired, async (ctx, next) => {
 let modifyOrder = async (ctx, next) => {
 	let order = await Order.findById(ctx.params.orderId);
 	auth.assert(order, "订单不存在");
-	auth.assert(order.pay_status === config.CONSTANT.PAY_STATUS.PAYING, "买家可能支付中，请稍后再试");
+	auth.assert(order.pay_status !== config.CONSTANT.PAY_STATUS.PAYING, "买家可能支付中，请稍后再试");
 	// console.log(order.seller, ctx.state.user._id);
 	// auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
 
