@@ -50,17 +50,16 @@ exports.register = function () {
 
 let scheduleCompletePay = () => {
 	schedule.scheduleJob('0 */1 * * * *', async function () {
-
 		let condi = {
 			updated_date: {
-				$lt: moment().subtract(90, 's').toDate(),
+				$lt: moment().subtract(60, 's').toDate(),
 			},
 			pay_status: config.CONSTANT.PAY_STATUS.PAYING
 		};
 
 
 		let orders = await Order.find(condi);
-		console.log(moment(), "结束支付状态", orders);
+		console.log(moment(), "结束支付状态");
 
 		let res = await Promise.all(_.map(orders, o => srv_order.handleCompletePay(o)))
 		console.log("result", res);
