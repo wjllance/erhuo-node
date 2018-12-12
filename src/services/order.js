@@ -30,13 +30,13 @@ let generateSerialNumber = () => {
 	return datetime + rand + No + ts;
 };
 
-exports.updateSN = async (order) => {
+exports.updatePrice = async (order, price) => {
+	order.price = price;
 	if(order.sn) {
 		order.sn = generateSerialNumber();
 		order.updated_date = new Date();
-		await order.save();
 	}
-	return order;
+	return await order.save();
 };
 
 //goods:CardInfo

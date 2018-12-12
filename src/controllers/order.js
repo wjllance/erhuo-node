@@ -157,14 +157,14 @@ router.post('/v2/order/', auth.loginRequired, async (ctx, next) => {
  */
 let modifyOrder = async (ctx, next) => {
 	let order = await Order.findById(ctx.params.orderId);
+	const {price} = ctx.request.body;
 	auth.assert(order, "订单不存在");
 	auth.assert(order.pay_status !== config.CONSTANT.PAY_STATUS.PAYING, "买家可能支付中，请稍后再试");
 	// console.log(order.seller, ctx.state.user._id);
 	// auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
 
 	console.log("修改前", ctx.state.user, order);
-	_.assign(order, _.pick(ctx.request.body, ['price']));
-	let res = await srv_order.updateSN(order);
+	let res = await srv_order.updatePrice(order, price);
 	// await order.save();
 	console.log("修改后", res);
 	ctx.body = {
