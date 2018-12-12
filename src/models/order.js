@@ -50,7 +50,6 @@ let orderSchema = new Schema({
     completed_date: Date,   //确认收货
     finished_date: Date,   //到账时间
 
-
     //new
     no_modify: {type:Boolean, default:false}
 
