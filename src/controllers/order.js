@@ -145,7 +145,7 @@ router.post('/v2/order/', auth.loginRequired, async (ctx, next) => {
 
 
 /**
- * @api {patch}   /order/:orderId  修改订单
+ * @api {put}   /order/:orderId  修改订单
  * @apiName     OrderPatch
  * @apiGroup    Order
  *
@@ -155,35 +155,27 @@ router.post('/v2/order/', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.patch('/order/:orderId', auth.loginRequired, async (ctx, next) => {
+let modifyOrder = async (ctx, next) => {
 	let order = await Order.findById(ctx.params.orderId);
+	const {price} = ctx.request.body;
 	auth.assert(order, "订单不存在");
+	auth.assert(order.pay_status !== config.CONSTANT.PAY_STATUS.PAYING, "买家可能支付中，请稍后再试");
 	// console.log(order.seller, ctx.state.user._id);
 	// auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
-	_.assign(order, _.pick(ctx.request.body, ['price']));
 
-	let res = await srv_order.updateSN(order);
+	console.log("修改前", ctx.state.user, order);
+	let res = await srv_order.updatePrice(order, price);
 	// await order.save();
-	console.log(res);
+	console.log("修改后", res);
 	ctx.body = {
 		success: 1,
 		data: res.baseInfo(),
 	};
-});
+};
 
-router.put('/order/:orderId', auth.loginRequired, async (ctx, next) => {
-	let order = await Order.findById(ctx.params.orderId);
-	auth.assert(order, "订单不存在");
-	// console.log(order.seller, ctx.state.user._id);
-	// auth.assert(order.seller.equals(ctx.state.user._id), "没有权限");
-	_.assign(order, _.pick(ctx.request.body, ['price']));
-	let res = await srv_order.updateSN(order);
-	console.log(res);
-	ctx.body = {
-		success: 1,
-		data: res.baseInfo(),
-	};
-});
+
+router.patch('/order/:orderId', auth.loginRequired, modifyOrder);
+router.put('/order/:orderId', auth.loginRequired, modifyOrder);
 
 
 /**
@@ -474,7 +466,30 @@ router.post('/order/refund/confirm', auth.loginRequired, async (ctx, next) => {
 	};
 });
 
+/**
+ * @api     {post}  /order/:orderId/complete_pay  支付结束（不一定成功）
+ * @apiName     PayFinal
+ * @apiGroup    Order
+ *
+ * @apiSuccess  {Number}    success
+ * @apiSuccess  {Object}    data
+ */
+router.post('/order/:orderId/complete_pay', auth.loginRequired, async (ctx, next) => {
+	let order = await Order.findById(ctx.params.orderId);
 
+	auth.assert(order, "订单不存在");
+	auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
+
+
+	let res = await srv_order.handleCompletePay(order);
+	// handleCompletePay();
+	console.log("handle result", res);
+
+	ctx.body = {
+		success: 1,
+		data: res
+	};
+});
 
 
 

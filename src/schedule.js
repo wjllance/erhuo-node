@@ -43,6 +43,27 @@ exports.register = function () {
 	// uploadFakeGoods();
 
 	scheduleComeBack();
+
+
+	scheduleCompletePay();
+};
+
+let scheduleCompletePay = () => {
+	schedule.scheduleJob('0 */1 * * * *', async function () {
+		let condi = {
+			updated_date: {
+				$lt: moment().subtract(60, 's').toDate(),
+			},
+			pay_status: config.CONSTANT.PAY_STATUS.PAYING,
+		};
+
+
+		let orders = await Order.find(condi);
+		console.log(moment(), "结束支付状态");
+
+		let res = await Promise.all(_.map(orders, o => srv_order.handleCompletePay(o)));
+		console.log("result", res);
+	});
 };
 
 
@@ -317,7 +338,7 @@ let scheduleOrderImgUpdate = () => {
 let scheduleOrderTimeout = () => {
 	schedule.scheduleJob('0 */1 * * * *', async function () {
 		// schedule.scheduleJob('*/5 * * * * *', async function(){
-		console.log('checking order timeout...');
+		console.log(moment(), 'checking order timeout...');
 		let orders = await Order.find({
 			updated_date: {
 				$lt: moment().subtract(15, 'm').toDate(),
@@ -335,7 +356,7 @@ let scheduleOrderCountDown = () => {
 
 	if (config.ENV === "local") {
 		schedule.scheduleJob('*/30 * * * * *', async function () {
-			console.log('checking normal order countdown...');
+			console.log(moment(), '检查完成订单...');
 			let transactions = await Transaction.find({
 				countdown_date: {
 					$lt: moment().subtract(30, 's').toDate(),
@@ -343,7 +364,7 @@ let scheduleOrderCountDown = () => {
 				status: config.CONSTANT.TRANSACTION_STATUS.INIT,
 				finished_date: { $exists: false },
 			});
-			console.log(transactions);
+			console.log("正在倒计时的交易", transactions);
 			for (let i = 0; i < transactions.length; i++) {
 				try {
 					await srv_order.finish(transactions[i].orderId);

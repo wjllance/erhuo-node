@@ -30,8 +30,12 @@ let generateSerialNumber = () => {
 	return datetime + rand + No + ts;
 };
 
-exports.updateSN = async (order) => {
-	order.sn = generateSerialNumber();
+exports.updatePrice = async (order, price) => {
+	order.price = price;
+	if(order.sn) {
+		order.sn = generateSerialNumber();
+		order.updated_date = new Date();
+	}
 	return await order.save();
 };
 
@@ -176,12 +180,14 @@ exports.preparePayV2 = async function (order) {
 		if (!order.sn) {
 			order.sn = generateSerialNumber();
 		}
-		await order.save();
 	}
 	auth.assert(order.order_status === ORDER_STATUS.TOPAY, "不可支付");
 
 	// order.sn = generateSerialNumber();
 	//TO BE REMOVE in a few time later
+	order.pay_status = config.CONSTANT.PAY_STATUS.PAYING;
+	order.updated_date = new Date();
+	await order.save();
 
 	let buyer = await User.findById(order.buyer);
 	// let price = (config.ENV == 'local') ? 1 : order.price*100;
@@ -235,7 +241,7 @@ exports.checkPay = async (out_trade_no, result_code, fee) => {
 
 	console.log("order info", order);
 	auth.assert(order, "订单不存在");
-	auth.assert(order.pay_status === config.CONSTANT.PAY_STATUS.INIT, "已确认");
+	auth.assert(order.pay_status === config.CONSTANT.PAY_STATUS.INIT || order.pay_status === config.CONSTANT.PAY_STATUS.PAYING, "已确认");
 	if (result_code == "FAIL") {
 		order.pay_status = PAY_STATUS.FAILED;
 		await order.save();
@@ -383,3 +389,11 @@ exports.finish = async (orderId) => {
 	//NOTIFY
 	await srv_wxtemplate.moneyArrive(order);
 };
+
+exports.handleCompletePay = async(order)=>{
+	if (order.pay_status === config.CONSTANT.PAY_STATUS.PAYING) {
+		order.pay_status = config.CONSTANT.PAY_STATUS.INIT;
+		await order.save();
+	}
+	return order;
+}
