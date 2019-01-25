@@ -351,7 +351,7 @@ router.get('/user/forTaoUserInfo', async (ctx, next) => {
 
 	// console.log("前端访问有问题");
 	let pageNo = ctx.query.pageNo || 1;
-	let pageSize = Math.min(ctx.query.pageSize || 20, 20); // 最大20，默认6
+	let pageSize = Math.min(ctx.query.pageSize || 100, 100); // 最大20，默认6
 	let date = ctx.query.date;
 
 	// let condi = { created_date: { $gte: moment};

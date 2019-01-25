@@ -253,20 +253,20 @@ router.post('/order/create_pay', auth.loginRequired, async (ctx, next) => {
  * @apiSuccess  {Object}    data
  *
  */
-router.post('/order/complete', auth.loginRequired, async (ctx, next) => {
-
-	//TODO: 原子性！！！！
-	let order = await Order.findById(ctx.request.body.orderId);
-	auth.assert(order, "订单不存在");
-	auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
-	await srv_order.complete(order);
-	let transac = await srv_transaction.incomeByOrder(order);
-	transac.status = 1;
-	await transac.save();
-	ctx.body = {
-		success: 1,
-	};
-});
+// router.post('/order/complete', auth.loginRequired, async (ctx, next) => {
+//
+// 	//TODO: 原子性！！！！
+// 	let order = await Order.findById(ctx.request.body.orderId);
+// 	auth.assert(order, "订单不存在");
+// 	auth.assert(order.buyer.equals(ctx.state.user._id), "无权限");
+// 	await srv_order.complete(order);
+// 	let transac = await srv_transaction.incomeByOrder(order);
+// 	transac.status = 1;
+// 	await transac.save();
+// 	ctx.body = {
+// 		success: 1,
+// 	};
+// });
 
 router.post('/v2/order/complete', auth.loginRequired, async (ctx, next) => {
 
