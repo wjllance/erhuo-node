@@ -502,7 +502,7 @@ router.get('/goods/forTaoGoodsInfo', async(ctx, next)=>{
         };
     }else{
         condi = {
-            created_date: {$gte: new Date(date) }
+            created_date: {$gt: new Date(date) }
         };
     }
 

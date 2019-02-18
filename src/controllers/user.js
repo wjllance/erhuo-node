@@ -366,7 +366,7 @@ router.get('/user/forTaoUserInfo', async (ctx, next) => {
 		};
 	} else {
 		condi = {
-			created_date: { $gte: new Date(date) },
+			created_date: { $gt: new Date(date) },
 		};
 		total = await User.find(condi).count();
 	}
